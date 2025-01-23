@@ -5,6 +5,10 @@ import { PlugsConnected as PlugsConnectedIcon } from '@phosphor-icons/react/dist
 import { User as UserIcon } from '@phosphor-icons/react/dist/ssr/User';
 import { Users as UsersIcon } from '@phosphor-icons/react/dist/ssr/Users';
 import { XSquare } from '@phosphor-icons/react/dist/ssr/XSquare';
+import { BagSimple as OrdersIcon } from '@phosphor-icons/react/dist/ssr/BagSimple';
+import { Package as ProductsIcon } from '@phosphor-icons/react/dist/ssr/Package';
+import { DeviceMobile as UIIcon } from '@phosphor-icons/react/dist/ssr/DeviceMobile';
+import { TagSimple as OffersIcon } from '@phosphor-icons/react/dist/ssr/TagSimple';
 
 export const navIcons = {
   'chart-pie': ChartPieIcon,
@@ -13,4 +17,8 @@ export const navIcons = {
   'x-square': XSquare,
   user: UserIcon,
   users: UsersIcon,
+  orders: OrdersIcon,
+  products: ProductsIcon,
+  ui: UIIcon,
+  offers: OffersIcon,
 } as Record<string, Icon>;

@@ -5,22 +5,27 @@ import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
+import Popover from '@mui/material/Popover';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import { Bell as BellIcon } from '@phosphor-icons/react/dist/ssr/Bell';
+import { Globe as GlobeIcon } from '@phosphor-icons/react/dist/ssr/Globe';
 import { List as ListIcon } from '@phosphor-icons/react/dist/ssr/List';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
-import { Users as UsersIcon } from '@phosphor-icons/react/dist/ssr/Users';
+import Flag from 'react-world-flags'; // Ensure you install this package or replace with your flag solution
 
 import { usePopover } from '@/hooks/use-popover';
 
 import { MobileNav } from './mobile-nav';
 import { UserPopover } from './user-popover';
+import LanguagePopover from './language-popover';
 
 export function MainNav(): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);
 
   const userPopover = usePopover<HTMLDivElement>();
+  const languagePopover = usePopover<HTMLButtonElement>(); // Updated ref type
 
   return (
     <React.Fragment>
@@ -48,24 +53,22 @@ export function MainNav(): React.JSX.Element {
             >
               <ListIcon />
             </IconButton>
-            <Tooltip title="Search">
-              <IconButton>
-                <MagnifyingGlassIcon />
-              </IconButton>
-            </Tooltip>
           </Stack>
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
-            <Tooltip title="Contacts">
-              <IconButton>
-                <UsersIcon />
-              </IconButton>
-            </Tooltip>
             <Tooltip title="Notifications">
               <Badge badgeContent={4} color="success" variant="dot">
                 <IconButton>
                   <BellIcon />
                 </IconButton>
               </Badge>
+            </Tooltip>
+            <Tooltip title="Switch Language">
+              <IconButton
+                onClick={languagePopover.handleOpen}
+                ref={languagePopover.anchorRef} // Correctly typed ref
+              >
+                <GlobeIcon />
+              </IconButton>
             </Tooltip>
             <Avatar
               onClick={userPopover.handleOpen}
@@ -77,6 +80,7 @@ export function MainNav(): React.JSX.Element {
         </Stack>
       </Box>
       <UserPopover anchorEl={userPopover.anchorRef.current} onClose={userPopover.handleClose} open={userPopover.open} />
+      <LanguagePopover anchorEl={languagePopover.anchorRef.current} onClose={languagePopover.handleClose} open={languagePopover.open} />
       <MobileNav
         onClose={() => {
           setOpenNav(false);
