@@ -22,6 +22,7 @@ module.exports = {
     },
   },
   rules: {
+    "camelcase": 0,
     '@typescript-eslint/no-unused-vars': [
       'error',
       {
@@ -43,6 +44,7 @@ module.exports = {
         ignoreOnInitialization: true,
       },
     ],
+    
     "@typescript-eslint/naming-convention": "off",
     "@typescript-eslint/camelcase": "off",
     'import/newline-after-import': 'error',
