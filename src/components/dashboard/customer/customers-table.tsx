@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+/*eslint camelcase: ["error", {ignoreImports: true}]*/
 import { MaterialReactTable, MRT_ColumnDef } from 'material-react-table';
 import Avatar from '@mui/material/Avatar';
 import { Paper } from '@mui/material';
