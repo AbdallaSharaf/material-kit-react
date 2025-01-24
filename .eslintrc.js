@@ -48,16 +48,8 @@ module.exports = {
     'import/newline-after-import': 'error',
     'react/jsx-uses-react': 'error',
     'react/react-in-jsx-scope': 'error',
-    'unicorn/filename-case': [
-      'error',
-      {
-        cases: {
-          kebabCase: true, // personal style
-          pascalCase: true,
-        },
-      },
-    ],
-
+    "@typescript-eslint/consistent-type-imports": "off",
+    'unicorn/filename-case': "off",
     // Deactivated
     '@typescript-eslint/dot-notation': 'off', // paths are used with a dot notation
     '@typescript-eslint/no-misused-promises': 'off', // onClick with async fails
