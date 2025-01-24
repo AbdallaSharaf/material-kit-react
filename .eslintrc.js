@@ -43,6 +43,8 @@ module.exports = {
         ignoreOnInitialization: true,
       },
     ],
+    "@typescript-eslint/naming-convention": "off",
+    "@typescript-eslint/camelcase": "off",
     'import/newline-after-import': 'error',
     'react/jsx-uses-react': 'error',
     'react/react-in-jsx-scope': 'error',
