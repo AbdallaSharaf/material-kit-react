@@ -1,8 +1,7 @@
 'use client';
 
 import * as React from 'react';
-/*eslint camelcase: ["error", {ignoreImports: true}]*/
-import { MaterialReactTable, MRT_ColumnDef } from 'material-react-table';
+import { MaterialReactTable, MRT_ColumnDef as mrtColumnDef } from 'material-react-table';
 import Avatar from '@mui/material/Avatar';
 import { Paper } from '@mui/material';
 
@@ -21,7 +20,7 @@ interface CustomersTableProps {
 }
 
 // Define columns outside the component to avoid defining them during render
-const columns: MRT_ColumnDef<Customer>[] = [
+const columns: mrtColumnDef<Customer>[] = [
   {
     accessorKey: 'name',
     header: 'Name',
