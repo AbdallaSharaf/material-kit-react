@@ -17,6 +17,7 @@ import { MobileNav } from './mobile-nav';
 import { UserPopover } from './user-popover';
 import LanguagePopover from './language-popover';
 
+
 export function MainNav(): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);
 
@@ -75,8 +76,8 @@ export function MainNav(): React.JSX.Element {
           </Stack>
         </Stack>
       </Box>
-      <UserPopover anchorEl={userPopover.anchorRef.current} onClose={userPopover.handleClose} open={userPopover.open} />
-      <LanguagePopover anchorEl={languagePopover.anchorRef.current} onClose={languagePopover.handleClose} open={languagePopover.open} />
+      <UserPopover anchorEl={userPopover.anchorRef.current || undefined} onClose={userPopover.handleClose} open={userPopover.open} />
+      <LanguagePopover anchorEl={languagePopover.anchorRef.current || undefined} onClose={languagePopover.handleClose} open={languagePopover.open} />
       <MobileNav
         onClose={() => {
           setOpenNav(false);

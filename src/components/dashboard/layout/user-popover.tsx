@@ -18,7 +18,7 @@ import { logger } from '@/lib/default-logger';
 import { useUser } from '@/hooks/use-user';
 
 export interface UserPopoverProps {
-  anchorEl: Element | null;
+  anchorEl: Element | undefined;
   onClose: () => void;
   open: boolean;
 }

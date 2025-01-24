@@ -4,7 +4,7 @@ import * as React from 'react';
 import Flag from 'react-world-flags';
 
 export interface UserPopoverProps {
-    anchorEl: Element | null;
+    anchorEl: Element | undefined;
     onClose: () => void;
     open: boolean;
   }
@@ -34,7 +34,6 @@ export function LanguagePopover({ anchorEl, onClose, open }: UserPopoverProps): 
             onClick={() => {
                 // Handle switching to English
                 onClose();
-                console.log('Switched to English');
             }}
             >
             <Flag code="US" style={{ width: 24, height: 16, borderRadius: 2 }} />
@@ -54,7 +53,6 @@ export function LanguagePopover({ anchorEl, onClose, open }: UserPopoverProps): 
             onClick={() => {
                 // Handle switching to Arabic
                 onClose();
-                console.log('Switched to Arabic');
             }}
             >
             <Flag code="EG" style={{ width: 24, height: 16, borderRadius: 2 }} />
