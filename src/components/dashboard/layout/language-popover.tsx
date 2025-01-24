@@ -9,7 +9,7 @@ export interface UserPopoverProps {
     open: boolean;
   }
 
-const LanguagePopover = ({ anchorEl, onClose, open }: UserPopoverProps) => {
+export function LanguagePopover({ anchorEl, onClose, open }: UserPopoverProps): React.JSX.Element {
   return (
     <Popover
         anchorEl={anchorEl}

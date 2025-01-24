@@ -3,7 +3,6 @@
 import * as React from 'react';
 import {MaterialReactTable, MRT_ColumnDef } from 'material-react-table';
 import Avatar from '@mui/material/Avatar';
-import dayjs from 'dayjs';
 import { Paper } from '@mui/material';
 
 export interface Customer {
