@@ -76,7 +76,7 @@ module.exports = {
     'no-redeclare': 'off', // conflict with TypeScript function overloads
     'react/jsx-fragments': 'off', // personal style
     'react/prop-types': 'off', // TypeScript is used for type checking
-
+    'react/no-unstable-nested-components': 'off',
     '@next/next/no-img-element': 'off', // Temporary disabled
   },
 };
