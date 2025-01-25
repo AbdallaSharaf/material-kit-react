@@ -4,6 +4,7 @@ import * as React from 'react';
 import { MaterialReactTable, MRT_ColumnDef } from 'material-react-table';
 import Avatar from '@mui/material/Avatar';
 import { Paper } from '@mui/material';
+import CustomToolbar from './custom-toolbar';
 
 export interface Customer {
   id: string;
@@ -16,7 +17,7 @@ export interface Customer {
 }
 
 interface CustomersTableProps {
-  rows?: Customer[];
+  data?: Customer[];
 }
 
 // Define columns outside the component to avoid defining them during render
@@ -45,11 +46,20 @@ const columns: MRT_ColumnDef<Customer>[] = [
 ];
 
 export function CustomersTable({
-  rows = [],
+  data = [],
 }: CustomersTableProps): React.JSX.Element {
+
+
   return (
     <Paper>
-      <MaterialReactTable columns={columns} data={rows} enableRowSelection />
+      <MaterialReactTable 
+        columns={columns} 
+        data={data} 
+        enableRowSelection
+        columnFilterDisplayMode = 'popover'
+        positionToolbarAlertBanner= 'bottom'
+        renderTopToolbarCustomActions = {({ table }) => (<CustomToolbar table={table} data={data}/>)}
+      />
     </Paper>
   );
 }
