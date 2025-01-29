@@ -5,6 +5,7 @@ import React from 'react'
 import { mkConfig, generateCsv, download } from 'export-to-csv'; //or use your library of choice here
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { MRT_Row } from 'material-react-table';
+import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { Customer } from './customers-table';
 
 const csvConfig = mkConfig({
@@ -50,6 +51,9 @@ export default function CustomToolbar({table, data}: any) {
         flexWrap: 'wrap',
         }}
     >
+        <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={()=>table.setCreatingRow(true)}>
+          Add
+        </Button>
         <Button
         //export all data that is currently in the table (ignore pagination, sorting, filtering, etc.)
         onClick={handleExportData}
