@@ -14,20 +14,16 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { ArrowRight as ArrowRightIcon } from '@phosphor-icons/react/dist/ssr/ArrowRight';
 import dayjs from 'dayjs';
+import { Order } from '../orders/orders-table';
 
 const statusMap = {
   pending: { label: 'Pending', color: 'warning' },
+  shipped: { label: 'Shipped', color: 'info' },
   delivered: { label: 'Delivered', color: 'success' },
-  refunded: { label: 'Refunded', color: 'error' },
+  returned: { label: 'Returned', color: 'error' },
+  canceled: { label: 'Canceled', color: 'primary' },
 } as const;
 
-export interface Order {
-  id: string;
-  customer: { name: string };
-  amount: number;
-  status: 'pending' | 'delivered' | 'refunded';
-  createdAt: Date;
-}
 
 export interface LatestOrdersProps {
   orders?: Order[];
@@ -51,7 +47,7 @@ export function LatestOrders({ orders = [], sx }: LatestOrdersProps): React.JSX.
           </TableHead>
           <TableBody>
             {orders.map((order) => {
-              const { label, color } = statusMap[order.status] ?? { label: 'Unknown', color: 'default' };
+              const { label, color } = statusMap[order.shippingStatus] ?? { label: 'Unknown', color: 'default' };
 
               return (
                 <TableRow hover key={order.id}>

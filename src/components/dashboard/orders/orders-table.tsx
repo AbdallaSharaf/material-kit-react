@@ -2,56 +2,71 @@
 
 import * as React from 'react';
 import { MaterialReactTable, MRT_ColumnDef, MRT_EditActionButtons, MRT_TableOptions } from 'material-react-table';
-import Avatar from '@mui/material/Avatar';
-import { DialogActions, DialogContent, DialogTitle, IconButton, Paper, Tooltip } from '@mui/material';
+import { DialogActions, DialogContent, DialogTitle, IconButton, Paper, Tooltip, Typography } from '@mui/material';
 import CustomToolbar from './custom-toolbar';
 import { Box } from '@mui/system';
 import Swal from 'sweetalert2';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { products } from '@/app/dashboard/products/page';
+import dayjs from 'dayjs';
 
 
-export interface Customer {
-  id: string;
-  avatar: string;
-  name: string;
-  email: string;
-  ordersCount: number;
-  totalSpent: number;
-  phone: string;
+export interface Order {
+    id: string;
+    customer: {
+      id: string;
+      name: string;
+      phone: string;
+    };
+    amount: number;
+    shippingStatus: 'pending' | 'shipped' | 'delivered' | 'returned' | 'canceled';
+    paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+    createdAt: Date;
+    notes?: string; // Optional field for extra info
+    items: {
+      id: string;
+      quantity: number;
+    }[];
+  }
+  
+
+interface OrdersTableProps {
+  data?: Order[];
 }
 
-interface CustomersTableProps {
-  data?: Customer[];
-}
-
-const handleSaveRow: MRT_TableOptions<Customer>['onEditingRowSave'] = ({
+const handleSaveRow: MRT_TableOptions<Order>['onEditingRowSave'] = ({
   exitEditingMode,
 }) => {
   exitEditingMode();
 };
 
 // Define columns outside the component to avoid defining them during render
-const columns: MRT_ColumnDef<Customer>[] = [
+const columns: MRT_ColumnDef<Order>[] = [
   {
-    accessorKey: 'name',
-    header: 'Name',
-    Cell: ({ row }) => (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <Avatar src={row.original.avatar} />
-        {row.original.name}
-      </div>
-    ),
-  },
-  { accessorKey: 'phone', header: 'Phone' },
-  { accessorKey: 'email', header: 'Email' },
-  {
-    accessorKey: 'ordersCount',
-    header: 'NO. of orders',
+    accessorKey: 'id',
+    header: 'Number',
     enableEditing: false,
+    size: 70,
+    enableColumnActions: false,
+    enableSorting: false,
+    enableColumnFilter: false
   },
   {
-    accessorKey: 'totalSpent',
-    header: 'Total Spent',
+    accessorKey: 'createdAt',
+    header: 'Date',
+    Cell: ({ cell }) => <div>{dayjs(cell.getValue<Date>()).format('MMMM D, YYYY, h:mm A')}</div>, // Format the date
+  },
+  { 
+    accessorKey: 'customer.name', // Accessing phone inside customer object
+    header: 'Name' 
+  },
+  { 
+    accessorKey: 'customer.phone', // Accessing phone inside customer object
+    header: 'Phone' 
+  },
+  {
+    accessorKey: 'amount',
+    header: 'Total Amount',
     enableEditing: false,
     filterVariant: 'range-slider',
     muiFilterSliderProps: {
@@ -88,9 +103,9 @@ const handleDelete = async (id: string) => {
   }
 };
 
-export function CustomersTable({
+export function OrdersTable({
   data = [],
-}: CustomersTableProps): React.JSX.Element {
+}: OrdersTableProps): React.JSX.Element {
 
 
   return (
@@ -139,6 +154,47 @@ export function CustomersTable({
             </DialogActions>
           </>
         )}
+        enableExpandAll= {false} //disable expand all button
+        muiDetailPanelProps= {() => ({
+          sx: (theme) => ({
+            backgroundColor:
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,210,244,0.1)'
+                : 'rgba(0,0,0,0.1)',
+          }),
+        })}
+        //custom expand button rotation
+        muiExpandButtonProps= {({ row, table }) => ({
+          onClick: () => table.setExpanded({ [row.id]: !row.getIsExpanded() }), //only 1 detail panel open at a time
+          sx: {
+            transform: row.getIsExpanded() ? 'rotate(180deg)' : 'rotate(-90deg)',
+            transition: 'transform 0.2s',
+          },
+        })}
+        //conditionally render detail panel
+        renderDetailPanel= {({ row }) =>
+            row.original.items ? (
+                <Box className="flex flex-col gap-3">
+                    {row.original.items.map((item) => {
+                    const product = products.find((prod) => prod.id === item.id); // Find the product by item.id
+                    return product ? (
+                        <Box key={item.id} className='flex items-center'>
+                        <img
+                            src={product.image}
+                            alt={product.name}
+                            className='w-20 h-20 mr-3'
+                        />
+                        <Box className="flex flex-col gap-1">
+                            <Typography><strong>ID:</strong> {item.id}</Typography>
+                            <Typography><strong>Name:</strong> {product.name}</Typography>
+                            <Typography><strong>Quantity:</strong> {item.quantity}</Typography>
+                        </Box>
+                        </Box>
+                    ) : null;
+                    })}
+                </Box>
+            ) : null
+        }
         renderTopToolbarCustomActions = {({ table }) => (<CustomToolbar table={table} data={data}/>)}
         renderRowActions= {({ row, table }) => (
           <Box sx={{ display: 'flex', gap: '1rem' }}>
