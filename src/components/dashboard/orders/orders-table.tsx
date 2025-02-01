@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { MaterialReactTable, MRT_ColumnDef, MRT_EditActionButtons, MRT_TableOptions } from 'material-react-table';
-import { DialogActions, DialogContent, DialogTitle, IconButton, Paper, Tooltip, Typography } from '@mui/material';
+import { Autocomplete, DialogActions, DialogContent, DialogTitle, IconButton, Paper, TextField, Tooltip, Typography } from '@mui/material';
 import CustomToolbar from './custom-toolbar';
 import { Box } from '@mui/system';
 import Swal from 'sweetalert2';
@@ -129,7 +129,7 @@ export function OrdersTable({
         }}
         renderCreateRowDialogContent={ ({ table, row, internalEditComponents }) => (
           <>
-            <DialogTitle variant="h3">Create New User</DialogTitle>
+            <DialogTitle variant="h3">Create New Order</DialogTitle>
             <DialogContent
               sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
             >
@@ -141,19 +141,46 @@ export function OrdersTable({
           </>
         )}
         //optionally customize modal content
-        renderEditRowDialogContent = {({ table, row, internalEditComponents }) => (
-          <>
-            <DialogTitle variant="h3">Edit User</DialogTitle>
-            <DialogContent
-              sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
-            >
-              {internalEditComponents} {/* or render custom edit components here */}
-            </DialogContent>
-            <DialogActions>
-              <MRT_EditActionButtons variant="text" table={table} row={row} />
-            </DialogActions>
-          </>
-        )}
+        renderEditRowDialogContent = {({ table, row, internalEditComponents }) => {
+            const [selectedItems, setSelectedItems] = React.useState<Order['items']>(row.original.items || []);
+            const [discount, setDiscount] = React.useState<number>(0);
+          
+            return (
+              <>
+                <DialogTitle variant="h3">Edit Order</DialogTitle>
+                <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                  {internalEditComponents}
+          
+                  {/* Multi-Select for Items */}
+                  <Autocomplete
+                    multiple
+                    options={products}
+                    getOptionLabel={(option) => option.name}
+                    value={selectedItems.map((item) =>
+                      products.find((p) => p.id === item.id) || { id: '', name: '' }
+                    )}
+                    onChange={(_, newValue) =>
+                      setSelectedItems(newValue.map((product) => ({ id: product.id, quantity: 1 })))
+                    }
+                    renderInput={(params) => <TextField {...params} label="Items" />}
+                  />
+          
+                  {/* Discount Field */}
+                  <TextField
+                    label="Discount"
+                    type="number"
+                    fullWidth
+                    value={discount}
+                    onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <MRT_EditActionButtons variant="text" table={table} row={row} />
+                </DialogActions>
+              </>
+            );
+          }}
+          
         enableExpandAll= {false} //disable expand all button
         muiDetailPanelProps= {() => ({
           sx: (theme) => ({
