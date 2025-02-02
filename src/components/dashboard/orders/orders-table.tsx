@@ -1,15 +1,32 @@
 'use client';
 
 import * as React from 'react';
-import { MaterialReactTable, MRT_ColumnDef, MRT_EditActionButtons, MRT_TableOptions } from 'material-react-table';
-import { Autocomplete, DialogActions, DialogContent, DialogTitle, IconButton, Paper, TextField, Tooltip, Typography } from '@mui/material';
+import { MaterialReactTable, MRT_ColumnDef, MRT_TableOptions } from 'material-react-table';
+import { Chip, ChipProps, IconButton, Paper, Tooltip, Typography } from '@mui/material';
 import CustomToolbar from './custom-toolbar';
 import { Box } from '@mui/system';
 import Swal from 'sweetalert2';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { products } from '@/app/dashboard/products/page';
 import dayjs from 'dayjs';
+import EditOrderDialog from './edit-order-dialog';
 
+type ChipColor = ChipProps['color']; 
+
+const statusColors: Record<Order['shippingStatus'], ChipColor> = {
+    pending: 'warning',
+    shipped: 'primary',
+    delivered: 'success',
+    returned: 'error',
+    canceled: 'default',
+  };
+  
+  const paymentColors: Record<Order['paymentStatus'], ChipColor> = {
+    pending: 'warning',
+    paid: 'success',
+    failed: 'error',
+    refunded: 'info',
+  };
 
 export interface Order {
     id: string;
@@ -46,28 +63,63 @@ const columns: MRT_ColumnDef<Order>[] = [
     accessorKey: 'id',
     header: 'Number',
     enableEditing: false,
+    grow: true,
+
     size: 70,
     enableColumnActions: false,
     enableSorting: false,
     enableColumnFilter: false
-  },
-  {
+},
+{ 
+    accessorKey: 'customer.name', // Accessing phone inside customer object
+    header: 'Name',
+    grow: true,
+    size: 140
+},
+{
     accessorKey: 'createdAt',
+    enableEditing: false,
+    filterVariant: 'datetime-range',
+    size: 120,
     header: 'Date',
     Cell: ({ cell }) => <div>{dayjs(cell.getValue<Date>()).format('MMMM D, YYYY, h:mm A')}</div>, // Format the date
-  },
-  { 
-    accessorKey: 'customer.name', // Accessing phone inside customer object
-    header: 'Name' 
-  },
+},
   { 
     accessorKey: 'customer.phone', // Accessing phone inside customer object
-    header: 'Phone' 
+    header: 'Phone',
+    size: 110,
+},
+{
+    accessorKey: 'paymentStatus',
+    header: 'Payment',
+    editVariant: 'select',
+    filterVariant: "select",
+    filterSelectOptions: ['pending' , 'paid' , 'failed' , 'refunded'],
+    editSelectOptions: ['pending' , 'paid' , 'failed' , 'refunded'],
+    size: 100,
+    Cell: ({ cell }) => {
+        const status = cell.getValue<Order['paymentStatus']>();
+        return <Chip label={status.toUpperCase()} color={paymentColors[status]}/>;
+    },
+},
+{
+    accessorKey: 'shippingStatus',
+    header: 'Shipping',
+    editVariant: 'select',
+    filterVariant: "select",
+    filterSelectOptions: ['pending' , 'shipped' , 'delivered' , 'returned' , 'canceled'],
+    editSelectOptions: ['pending' , 'shipped' , 'delivered' , 'returned' , 'canceled'],
+    size: 100,
+    Cell: ({ cell }) => {
+      const status = cell.getValue<Order['shippingStatus']>();
+      return <Chip label={status.toUpperCase()} color={statusColors[status]} />;
+    },
   },
   {
     accessorKey: 'amount',
-    header: 'Total Amount',
+    header: 'Total',
     enableEditing: false,
+    size: 100,
     filterVariant: 'range-slider',
     muiFilterSliderProps: {
       marks: true,
@@ -118,68 +170,20 @@ export function OrdersTable({
         editDisplayMode= 'modal' //default ('row', 'cell', 'table', and 'custom' are also available)
         enableEditing = {true}
         enableRowActions
+        enableColumnResizing
+        
         onEditingRowSave={handleSaveRow} 
         columnFilterDisplayMode = 'popover'
         positionToolbarAlertBanner= 'bottom'
         getRowId = {(row) => row.id}
-        initialState= {{
-          columnPinning: {
-            right: ['mrt-row-actions'],
-          },
-        }}
+        positionActionsColumn="last" 
         renderCreateRowDialogContent={ ({ table, row, internalEditComponents }) => (
-          <>
-            <DialogTitle variant="h3">Create New Order</DialogTitle>
-            <DialogContent
-              sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
-            >
-              {internalEditComponents} {/* or render custom edit components here */}
-            </DialogContent>
-            <DialogActions>
-              <MRT_EditActionButtons variant="text" table={table} row={row} />
-            </DialogActions>
-          </>
+            <EditOrderDialog table={table} row={row} internalEditComponents={internalEditComponents} products={products} />
         )}
-        //optionally customize modal content
-        renderEditRowDialogContent = {({ table, row, internalEditComponents }) => {
-            const [selectedItems, setSelectedItems] = React.useState<Order['items']>(row.original.items || []);
-            const [discount, setDiscount] = React.useState<number>(0);
-          
-            return (
-              <>
-                <DialogTitle variant="h3">Edit Order</DialogTitle>
-                <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                  {internalEditComponents}
-          
-                  {/* Multi-Select for Items */}
-                  <Autocomplete
-                    multiple
-                    options={products}
-                    getOptionLabel={(option) => option.name}
-                    value={selectedItems.map((item) =>
-                      products.find((p) => p.id === item.id) || { id: '', name: '' }
-                    )}
-                    onChange={(_, newValue) =>
-                      setSelectedItems(newValue.map((product) => ({ id: product.id, quantity: 1 })))
-                    }
-                    renderInput={(params) => <TextField {...params} label="Items" />}
-                  />
-          
-                  {/* Discount Field */}
-                  <TextField
-                    label="Discount"
-                    type="number"
-                    fullWidth
-                    value={discount}
-                    onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
-                  />
-                </DialogContent>
-                <DialogActions>
-                  <MRT_EditActionButtons variant="text" table={table} row={row} />
-                </DialogActions>
-              </>
-            );
-          }}
+
+        renderEditRowDialogContent={({ table, row, internalEditComponents }) => (
+            <EditOrderDialog table={table} row={row} internalEditComponents={internalEditComponents} products={products} isEditing/>
+          )}
           
         enableExpandAll= {false} //disable expand all button
         muiDetailPanelProps= {() => ({
@@ -190,14 +194,7 @@ export function OrdersTable({
                 : 'rgba(0,0,0,0.1)',
           }),
         })}
-        //custom expand button rotation
-        muiExpandButtonProps= {({ row, table }) => ({
-          onClick: () => table.setExpanded({ [row.id]: !row.getIsExpanded() }), //only 1 detail panel open at a time
-          sx: {
-            transform: row.getIsExpanded() ? 'rotate(180deg)' : 'rotate(-90deg)',
-            transition: 'transform 0.2s',
-          },
-        })}
+ 
         //conditionally render detail panel
         renderDetailPanel= {({ row }) =>
             row.original.items ? (
@@ -222,9 +219,10 @@ export function OrdersTable({
                 </Box>
             ) : null
         }
+        layoutMode='grid'
         renderTopToolbarCustomActions = {({ table }) => (<CustomToolbar table={table} data={data}/>)}
         renderRowActions= {({ row, table }) => (
-          <Box sx={{ display: 'flex', gap: '1rem' }}>
+          <Box sx={{ display: 'flex', gap: '4px'}}>
             <Tooltip title="Edit">
               <IconButton onClick={() => table.setEditingRow(row)}>
                 <i
@@ -241,6 +239,7 @@ export function OrdersTable({
             </Tooltip>
           </Box>
         )}
+
       />
     </Paper>
   );
