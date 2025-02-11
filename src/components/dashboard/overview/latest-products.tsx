@@ -14,14 +14,9 @@ import type { SxProps } from '@mui/material/styles';
 import { ArrowRight as ArrowRightIcon } from '@phosphor-icons/react/dist/ssr/ArrowRight';
 import { DotsThreeVertical as DotsThreeVerticalIcon } from '@phosphor-icons/react/dist/ssr/DotsThreeVertical';
 import dayjs from 'dayjs';
+import { Product } from '../products/products-table';
 
-export interface Product {
-  id: string;
-  image: string;
-  name: string;
-  price: number;
-  updatedAt: Date;
-}
+
 
 export interface LatestProductsProps {
   products?: Product[];

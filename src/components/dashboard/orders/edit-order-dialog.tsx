@@ -2,7 +2,7 @@ import React from 'react';
 import { DialogTitle, DialogContent, DialogActions, TextField, Typography, Box, Autocomplete } from '@mui/material';
 import { MRT_EditActionButtons, MRT_Row } from 'material-react-table';
 import { Order } from './orders-table';
-import { Product } from '../overview/latest-products';
+import { Product } from '../products/products-table';
 
 // Define the order item type
 interface OrderItem {

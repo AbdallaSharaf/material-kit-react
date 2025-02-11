@@ -1,19 +1,42 @@
+
 import * as React from 'react';
 import type { Metadata } from 'next';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-
 import { config } from '@/config';
 import dayjs from 'dayjs';
+import { Product, ProductsTable } from '@/components/dashboard/products/products-table';
 
-// export const metadata = { title: `Customers | Dashboard | ${config.site.name}` } satisfies Metadata;
-export const products = [
+export const metadata2 = {
+  title: `Products | Dashboard | ${config.site.name}`,
+} satisfies Metadata;
+
+export const availableTags: string[] = [
+    'aromatic',
+    'organic',
+    'skincare',
+    'hydrating',
+    'luxury',
+    'floral',
+    'makeup',
+    'bold',
+    'natural',
+    'soothing',
+    'refreshing',
+    'antioxidant',
+    'vegan',
+    'cruelty-free',
+  ];
+
+export const products: Product[] = [
     {
       id: 'PRD-005',
       name: 'Soja & Co. Eucalyptus',
       image: '/assets/product-5.png',
       price: 150, // Price in SAR
       updatedAt: dayjs().subtract(18, 'minutes').subtract(5, 'hour').toDate(),
+      tags: ['aromatic', 'organic'],
+      isPricePerKilo: true,
     },
     {
       id: 'PRD-004',
@@ -21,6 +44,8 @@ export const products = [
       image: '/assets/product-4.png',
       price: 120,
       updatedAt: dayjs().subtract(41, 'minutes').subtract(3, 'hour').toDate(),
+      tags: ['skincare', 'hydrating'],
+      isPricePerKilo: false,
     },
     {
       id: 'PRD-003',
@@ -28,6 +53,8 @@ export const products = [
       image: '/assets/product-3.png',
       price: 200,
       updatedAt: dayjs().subtract(5, 'minutes').subtract(3, 'hour').toDate(),
+      tags: ['luxury', 'floral'],
+      isPricePerKilo: true,
     },
     {
       id: 'PRD-002',
@@ -35,6 +62,8 @@ export const products = [
       image: '/assets/product-2.png',
       price: 180,
       updatedAt: dayjs().subtract(23, 'minutes').subtract(2, 'hour').toDate(),
+      tags: ['makeup', 'bold'],
+      isPricePerKilo: false,
     },
     {
       id: 'PRD-001',
@@ -42,22 +71,24 @@ export const products = [
       image: '/assets/product-1.png',
       price: 250,
       updatedAt: dayjs().subtract(10, 'minutes').toDate(),
+      tags: ['natural', 'soothing'],
+      isPricePerKilo: true,
     },
   ];
-  
+
 
 export default function Page(): React.JSX.Element {
 
   return (
     <Stack spacing={3}>
       <Stack direction="row" spacing={3}>
-        <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-          <Typography variant="h4">Customers</Typography>
-        </Stack>
+        <div className="flex w-full justify-between items-center">
+                <Typography variant="h4">Products</Typography>
+        </div>
       </Stack>
-      {/* <OrdersTable
-        data={orders}
-      /> */}
+
+      <ProductsTable data={products} />
+
     </Stack>
   );
 }
