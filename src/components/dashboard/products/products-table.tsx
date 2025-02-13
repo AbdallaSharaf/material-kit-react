@@ -8,8 +8,23 @@ import { Box } from '@mui/system';
 import Swal from 'sweetalert2';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { useRouter } from 'next/navigation';
-import { availableTags } from '@/app/dashboard/products/page';
 
+export const availableTags: string[] = [
+  'aromatic',
+  'organic',
+  'skincare',
+  'hydrating',
+  'luxury',
+  'floral',
+  'makeup',
+  'bold',
+  'natural',
+  'soothing',
+  'refreshing',
+  'antioxidant',
+  'vegan',
+  'cruelty-free',
+];
 
 export interface Product {
     id: string;
