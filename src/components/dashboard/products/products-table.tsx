@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import * as React from 'react';
 import { MaterialReactTable, MRT_ColumnDef, MRT_TableOptions } from 'material-react-table';
@@ -7,7 +7,6 @@ import CustomToolbar from './custom-toolbar';
 import { Box } from '@mui/system';
 import Swal from 'sweetalert2';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { availableTags } from '@/app/dashboard/products/page';
 
