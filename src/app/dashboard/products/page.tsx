@@ -1,15 +1,14 @@
-
+import dayjs from 'dayjs';
+import { Product, ProductsTable } from '@/components/dashboard/products/products-table';
 import * as React from 'react';
 import type { Metadata } from 'next';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { config } from '@/config';
-import dayjs from 'dayjs';
-import { Product, ProductsTable } from '@/components/dashboard/products/products-table';
 
-export const metadata2 = {
-  title: `Products | Dashboard | ${config.site.name}`,
-} satisfies Metadata;
+
+import { config } from '@/config';
+
+export const metadata = { title: `Products | Dashboard | ${config.site.name}` } satisfies Metadata;
 
 export const availableTags: string[] = [
     'aromatic',
