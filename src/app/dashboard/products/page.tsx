@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { Product, ProductsTable } from '@/components/dashboard/products/products-table';
+import { Product } from '@/components/dashboard/products/products-table';
 import * as React from 'react';
 import type { Metadata } from 'next';
 import Stack from '@mui/material/Stack';
