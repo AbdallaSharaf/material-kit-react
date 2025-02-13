@@ -2,7 +2,7 @@ import { Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import React from 'react';
 import ProductForm from '@/components/dashboard/products/product-form';
-import { products } from '../../page'; // Ensure this path is correct
+import { products } from '@/components/dashboard/products/products-table';
 
 interface PageProps {
   params: { id: string };
