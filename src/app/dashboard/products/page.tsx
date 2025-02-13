@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { Product } from '@/components/dashboard/products/products-table';
+import { Product, ProductsTable } from '@/components/dashboard/products/products-table';
 import * as React from 'react';
 import type { Metadata } from 'next';
 import Stack from '@mui/material/Stack';
@@ -88,6 +88,7 @@ export default function Page(): React.JSX.Element {
         </div>
       </Stack>
 
+      <ProductsTable data={products} />
 
     </Stack>
   );
