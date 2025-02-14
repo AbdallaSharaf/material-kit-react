@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from 'react';
 import dayjs from 'dayjs';
 import { Product, ProductsTable } from '@/components/dashboard/products/products-table';
