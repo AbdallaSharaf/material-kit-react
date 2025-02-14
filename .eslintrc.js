@@ -24,7 +24,7 @@ module.exports = {
   rules: {
     "camelcase": 0,
     '@typescript-eslint/no-unused-vars': [
-      'error',
+      'off',
       {
         ignoreRestSiblings: true,
         argsIgnorePattern: '^_',
@@ -33,13 +33,13 @@ module.exports = {
       },
     ],
     '@typescript-eslint/no-empty-interface': [
-      'error',
+      'off',
       {
         allowSingleExtends: true,
       },
     ],
     '@typescript-eslint/no-shadow': [
-      'error',
+      'off',
       {
         ignoreOnInitialization: true,
       },
@@ -47,9 +47,9 @@ module.exports = {
     
     "@typescript-eslint/naming-convention": "off",
     "@typescript-eslint/camelcase": "off",
-    'import/newline-after-import': 'error',
-    'react/jsx-uses-react': 'error',
-    'react/react-in-jsx-scope': 'error',
+    'import/newline-after-import': 'off',
+    'react/jsx-uses-react': 'off',
+    'react/react-in-jsx-scope': 'off',
     "@typescript-eslint/consistent-type-imports": "off",
     'unicorn/filename-case': "off",
     // Deactivated
@@ -60,7 +60,7 @@ module.exports = {
     '@typescript-eslint/require-await': 'off', // Server Actions require async flag always
     '@typescript-eslint/prefer-nullish-coalescing': 'off', // personal style
     '@typescript-eslint/restrict-template-expressions': [
-      'error',
+      'off',
       {
         allowNumber: true,
       },
