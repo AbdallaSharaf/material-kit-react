@@ -1,8 +1,8 @@
 import { Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import React from 'react';
-import ProductForm from '@/components/dashboard/products/product-form';
-import { products } from '../../page'; // Ensure this path is correct
+import ProductForm from '@/components/dashboard/items/items-form';
+import { items } from '@/components/dashboard/items/items-table';
 
 interface PageProps {
   params: { id: string };
@@ -10,7 +10,7 @@ interface PageProps {
 
 export default function ProductPage({ params }: PageProps) {
   const { id } = params;
-  const product = products.find((p) => p.id === id);
+  const product = items.find((p) => p.id === id);
 
   if (!product) {
     return (

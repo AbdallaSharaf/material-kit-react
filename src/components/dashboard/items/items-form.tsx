@@ -3,10 +3,9 @@ import React from 'react';
 import { Box, Button, Chip, MenuItem, TextField, Typography } from '@mui/material';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
-import { Product } from './products-table';
 
 // Define the shape of your form's values, now including an image field
-interface ProductFormValues {
+interface ItemFormValues {
   name: string;
   price: number | '';
   tags: string[]; // Updated from category to tags
@@ -18,7 +17,7 @@ interface ProductFormValues {
 
 
 const validationSchema = Yup.object({
-  name: Yup.string().required('Product name is required'),
+  name: Yup.string().required('Item name is required'),
   price: Yup.number()
     .typeError('Price must be a number')
     .positive('Price must be positive')
@@ -38,20 +37,20 @@ const validationSchema = Yup.object({
   // description and  can be optional
 });
 
-const ProductForm = ({product}:any) => {
+const ItemForm = ({item}:any) => {
 
-    const initialValues: ProductFormValues = {
-        name: product.name || '',
-        price: product.price || 0,
-        tags: product.tags || [], // Use tags from the product if available
+    const initialValues: ItemFormValues = {
+        name: item.name || '',
+        price: item.price || 0,
+        tags: item.tags || [], // Use tags from the item if available
         description: '',
         stock: '',
-        unit: product.isPricePerKilo ? 'kg' : 'piece',
-        image: product.image || null, // Initial value is null (no file)
+        unit: item.isPricePerKilo ? 'kg' : 'piece',
+        image: item.image || null, // Initial value is null (no file)
       };
   
-  const [preview, setPreview] = React.useState<string | null>(product.image || null);
-  const handleSubmit = (values: ProductFormValues, { setSubmitting }: any) => {
+  const [preview, setPreview] = React.useState<string | null>(item.image || null);
+  const handleSubmit = (values: ItemFormValues, { setSubmitting }: any) => {
     // You can send the form values to an API here
     console.log('Form values:', values);
     setSubmitting(false);
@@ -80,7 +79,7 @@ const ProductForm = ({product}:any) => {
               fullWidth
               margin="normal"
               name="name"
-              label="Product Name"
+              label="Item Name"
               variant="outlined"
               value={values.name}
               onChange={handleChange}
@@ -250,4 +249,4 @@ const ProductForm = ({product}:any) => {
   );
 };
 
-export default ProductForm;
+export default ItemForm;

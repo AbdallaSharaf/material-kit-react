@@ -2,7 +2,7 @@ import React from 'react';
 import { DialogTitle, DialogContent, DialogActions, TextField, Typography, Box, Autocomplete } from '@mui/material';
 import { MRT_EditActionButtons, MRT_Row } from 'material-react-table';
 import { Order } from './orders-table';
-import { Product } from '../products/products-table';
+import { Item } from '../items/items-table';
 
 // Define the order item type
 interface OrderItem {
@@ -16,7 +16,7 @@ interface EditOrderDialogProps {
   row: MRT_Row<Order>;
   isEditing?: boolean;
   internalEditComponents: React.ReactNode[];
-  products: Product[];
+  products: Item[];
 }
 
 const EditOrderDialog: React.FC<EditOrderDialogProps> = ({ table, row, internalEditComponents, products, isEditing }) => {
