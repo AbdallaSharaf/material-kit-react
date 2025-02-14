@@ -47,28 +47,34 @@ export function SignUpForm(): React.JSX.Element {
     setError,
     formState: { errors },
   } = useForm<Values>({ defaultValues, resolver: zodResolver(schema) });
-
+  
   const onSubmit = React.useCallback(
     async (values: Values): Promise<void> => {
       setIsPending(true);
-
-      const { error } = await authClient.signUp(values);
-
+  
+      const { email, password, firstName, lastName, terms } = values;
+  
+      if (!email || !password || !firstName || !lastName || terms === undefined) {
+        setError('root', { type: 'server', message: 'All fields are required' });
+        setIsPending(false);
+        return;
+      }
+  
+      const { error } = await authClient.signUp({ email, password, firstName, lastName });
+  
       if (error) {
         setError('root', { type: 'server', message: error });
         setIsPending(false);
         return;
       }
-
-      // Refresh the auth state
+  
       await checkSession?.();
-
-      // UserProvider, for this case, will not refresh the router
-      // After refresh, GuestGuard will handle the redirect
       router.refresh();
     },
     [checkSession, router, setError]
   );
+  
+  
 
   return (
     <Stack spacing={3}>

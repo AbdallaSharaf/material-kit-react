@@ -51,7 +51,17 @@ export function SignInForm(): React.JSX.Element {
     async (values: Values): Promise<void> => {
       setIsPending(true);
 
-      const { error } = await authClient.signInWithPassword(values);
+      const { email, password } = values;
+  
+      if (!email || !password  === undefined) {
+        setError('root', { type: 'server', message: 'All fields are required' });
+        setIsPending(false);
+        return;
+      }
+
+      
+
+      const { error } = await authClient.signInWithPassword({ email, password });
 
       if (error) {
         setError('root', { type: 'server', message: error });
