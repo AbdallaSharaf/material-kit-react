@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import { config } from '@/config';
 import dayjs from 'dayjs';
 
-// export const metadata = { title: `Customers | Dashboard | ${config.site.name}` } satisfies Metadata;
+export const metadata = { title: `Products | Dashboard | ${config.site.name}` } satisfies Metadata;
 export const products = [
     {
       id: 'PRD-005',
