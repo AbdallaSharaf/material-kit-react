@@ -12,7 +12,7 @@ import { TotalCustomers } from '@/components/dashboard/overview/total-customers'
 import { TotalProfit } from '@/components/dashboard/overview/total-profit';
 import { Traffic } from '@/components/dashboard/overview/traffic';
 import { orders } from './orders/page';
-import { items } from '@/components/dashboard/items/items-table';
+import { products } from './products/page';
 
 export const metadata = { title: `Overview | Dashboard | ${config.site.name}` } satisfies Metadata;
 
@@ -46,7 +46,7 @@ export default function Page(): React.JSX.Element {
       </Grid>
       <Grid lg={4} md={6} xs={12}>
         <LatestProducts
-          products={items}
+          products={products}
           sx={{ height: '100%' }}
         />
       </Grid>

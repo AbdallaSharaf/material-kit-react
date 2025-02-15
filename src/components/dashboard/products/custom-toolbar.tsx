@@ -6,7 +6,7 @@ import { mkConfig, generateCsv, download } from 'export-to-csv'; //or use your l
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { MRT_Row } from 'material-react-table';
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
-import { Item } from './items-table';
+import { Product } from './products-table';
 import { useRouter } from 'next/navigation';
 
 const csvConfig = mkConfig({
@@ -20,7 +20,7 @@ export default function CustomToolbar({table, data}: any) {
 
     const router = useRouter()
 
-  const handleExportRows = (rows: MRT_Row<Item>[]) => {
+  const handleExportRows = (rows: MRT_Row<Product>[]) => {
     const rowData = rows.map((row) => ({
       id: row.original.id,
     }));
@@ -34,8 +34,8 @@ export default function CustomToolbar({table, data}: any) {
   const handleExportData = () => {
     if (data.length === 0) return; // Prevent exporting empty data
   
-    const rowData = data.map((item: Item) => ({
-      id: item.id,
+    const rowData = data.map((product: Product) => ({
+      id: product.id,
     }));
   
     const csv = generateCsv(csvConfig)(rowData);
@@ -51,7 +51,7 @@ export default function CustomToolbar({table, data}: any) {
         flexWrap: 'wrap',
         }}
     >
-        <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={()=>router.push(`items/add`)}>
+        <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={()=>router.push(`products/add`)}>
           Add
         </Button>
         <Button

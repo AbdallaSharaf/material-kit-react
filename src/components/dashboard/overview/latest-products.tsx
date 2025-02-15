@@ -14,12 +14,12 @@ import type { SxProps } from '@mui/material/styles';
 import { ArrowRight as ArrowRightIcon } from '@phosphor-icons/react/dist/ssr/ArrowRight';
 import { DotsThreeVertical as DotsThreeVerticalIcon } from '@phosphor-icons/react/dist/ssr/DotsThreeVertical';
 import dayjs from 'dayjs';
-import { Item } from '../items/items-table';
+import { Product } from '../products/products-table';
 
 
 
 export interface LatestProductsProps {
-  products?: Item[];
+  products?: Product[];
   sx?: SxProps;
 }
 

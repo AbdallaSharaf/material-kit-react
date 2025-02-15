@@ -7,9 +7,9 @@ import CustomToolbar from './custom-toolbar';
 import { Box } from '@mui/system';
 import Swal from 'sweetalert2';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { products } from '@/app/dashboard/products/page';
 import dayjs from 'dayjs';
 import EditOrderDialog from './edit-order-dialog';
-import { items } from '../items/items-table';
 
 type ChipColor = ChipProps['color']; 
 
@@ -178,11 +178,11 @@ export function OrdersTable({
         getRowId = {(row) => row.id}
         positionActionsColumn="last" 
         renderCreateRowDialogContent={ ({ table, row, internalEditComponents }) => (
-            <EditOrderDialog table={table} row={row} internalEditComponents={internalEditComponents} products={items} />
+            <EditOrderDialog table={table} row={row} internalEditComponents={internalEditComponents} products={products} />
         )}
 
         renderEditRowDialogContent={({ table, row, internalEditComponents }) => (
-            <EditOrderDialog table={table} row={row} internalEditComponents={internalEditComponents} products={items} isEditing/>
+            <EditOrderDialog table={table} row={row} internalEditComponents={internalEditComponents} products={products} isEditing/>
           )}
           
         enableExpandAll= {false} //disable expand all button
@@ -200,7 +200,7 @@ export function OrdersTable({
             row.original.items ? (
                 <Box className="flex flex-col gap-3">
                     {row.original.items.map((item) => {
-                    const product = items.find((prod) => prod.id === item.id); // Find the product by item.id
+                    const product = products.find((prod) => prod.id === item.id); // Find the product by item.id
                     return product ? (
                         <Box key={item.id} className='flex items-center'>
                         <img
