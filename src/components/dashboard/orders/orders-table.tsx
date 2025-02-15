@@ -7,9 +7,9 @@ import CustomToolbar from './custom-toolbar';
 import { Box } from '@mui/system';
 import Swal from 'sweetalert2';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import { products } from '@/app/dashboard/products/page';
 import dayjs from 'dayjs';
 import EditOrderDialog from './edit-order-dialog';
+import { products } from '../products/products-table';
 
 type ChipColor = ChipProps['color']; 
 
