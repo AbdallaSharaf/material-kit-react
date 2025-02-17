@@ -41,16 +41,16 @@ const validationSchema = Yup.object({
 const ProductForm = ({product}:any) => {
 
     const initialValues: ProductFormValues = {
-        name: product.name || '',
-        price: product.price || 0,
-        tags: product.tags || [], // Use tags from the product if available
+        name: product?.name || '',
+        price: product?.price || 0,
+        tags: product?.tags || [], // Use tags from the product if available
         description: '',
         stock: '',
-        unit: product.isPricePerKilo ? 'kg' : 'piece',
-        image: product.image || null, // Initial value is null (no file)
+        unit: product?.isPricePerKilo ? 'kg' : 'piece',
+        image: product?.image || null, // Initial value is null (no file)
       };
   
-  const [preview, setPreview] = React.useState<string | null>(product.image || null);
+  const [preview, setPreview] = React.useState<string | null>(product?.image || null);
   const handleSubmit = (values: ProductFormValues, { setSubmitting }: any) => {
     // You can send the form values to an API here
     console.log('Form values:', values);
@@ -187,9 +187,8 @@ const ProductForm = ({product}:any) => {
                         alignItems: 'center',
                         justifyContent: 'center',
                         width: '100%',
-                        height: 'auto',
                       }}
-                      className='border border-[#21263658] rounded-xl hover:border-[#212636]'
+                      className='border h-40 border-[#21263658] rounded-xl hover:border-[#212636]'
                     >
                       <Typography variant="body1">Click to upload image</Typography>
                     </Box>

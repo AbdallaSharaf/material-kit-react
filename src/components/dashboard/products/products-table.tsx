@@ -265,7 +265,16 @@ export function ProductsTable(): React.JSX.Element {
             </Tooltip>
           </Box>
         )}
-
+        muiTableHeadCellProps={{
+          sx: {
+            '& .Mui-TableHeadCell-Content-Wrapper': {
+              height: 18,
+            },
+            '& .Mui-TableHeadCell-Content-Labels': {
+              height: 18,
+            },
+          },
+        }}
       />
     </Paper>
   );
