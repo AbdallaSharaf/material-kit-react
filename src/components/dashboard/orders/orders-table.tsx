@@ -221,25 +221,6 @@ export function OrdersTable({
         }
         layoutMode='grid'
         renderTopToolbarCustomActions = {({ table }) => (<CustomToolbar table={table} data={data}/>)}
-        renderRowActions= {({ row, table }) => (
-          <Box sx={{ display: 'flex', gap: '4px'}}>
-            <Tooltip title="Edit">
-              <IconButton onClick={() => table.setEditingRow(row)}>
-                <i
-                  className="fa fa-pencil !text-sm text-yellow-500 hover:text-yellow-600 cursor-pointer"
-                ></i>
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Delete">
-              <IconButton color="error" onClick={() => handleDelete(row.original.id)}>
-                <i
-                  className="fa fa-trash !text-sm text-red-500 hover:text-red-600 cursor-pointer"
-                ></i>
-              </IconButton>
-            </Tooltip>
-          </Box>
-        )}
-
       />
     </Paper>
   );
