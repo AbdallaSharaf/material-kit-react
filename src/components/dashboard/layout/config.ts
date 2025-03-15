@@ -10,5 +10,6 @@ export const navItems = [
   { key: 'offers', title: 'Offers', href: paths.dashboard.offers, icon: 'offers' },
   { key: 'ui', title: 'Ui', href: paths.dashboard.ui, icon: 'ui' },
   { key: 'integrations', title: 'Integrations', href: paths.dashboard.integrations, icon: 'plugs-connected' },
+  { key: 'reviews', title: 'Reviews', href: paths.dashboard.reviews, icon: 'star' },
   { key: 'settings', title: 'Settings', href: paths.dashboard.settings, icon: 'gear-six' },
 ] satisfies NavItemConfig[];

@@ -10,6 +10,7 @@ export const paths = {
     offers: '/dashboard/offers',
     customers: '/dashboard/customers',
     integrations: '/dashboard/integrations',
+    reviews: '/dashboard/reviews',
     settings: '/dashboard/settings',
   },
   errors: { notFound: '/errors/not-found' },

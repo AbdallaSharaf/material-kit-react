@@ -9,6 +9,7 @@ import { BagSimple as OrdersIcon } from '@phosphor-icons/react/dist/ssr/BagSimpl
 import { Package as ProductsIcon } from '@phosphor-icons/react/dist/ssr/Package';
 import { DeviceMobile as UIIcon } from '@phosphor-icons/react/dist/ssr/DeviceMobile';
 import { TagSimple as OffersIcon } from '@phosphor-icons/react/dist/ssr/TagSimple';
+import { Star as StarIcon } from '@phosphor-icons/react/dist/ssr/Star'; // Added Star icon
 
 export const navIcons = {
   'chart-pie': ChartPieIcon,
@@ -21,4 +22,5 @@ export const navIcons = {
   products: ProductsIcon,
   ui: UIIcon,
   offers: OffersIcon,
+  star: StarIcon, // Added Star icon
 } as Record<string, Icon>;

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { MaterialReactTable, MRT_ColumnDef, MRT_TableOptions } from 'material-react-table';
-import { IconButton, Paper, Tooltip } from '@mui/material';
+import { IconButton, Paper, Switch, Tooltip } from '@mui/material';
 import CustomToolbar from './custom-toolbar';
 import { Box } from '@mui/system';
 import Swal from 'sweetalert2';
@@ -36,6 +36,7 @@ export interface Product {
     updatedAt: Date;
     tags: string[];
     isPricePerKilo: boolean; // true if the price is per kilogram, false if per piece
+    isActive: boolean;
   }  
   
 
@@ -58,6 +59,7 @@ export const products: Product[] = [
     updatedAt: dayjs().subtract(18, 'minutes').subtract(5, 'hour').toDate(),
     tags: ['aromatic', 'organic'],
     isPricePerKilo: true,
+    isActive: true,
   },
   {
     id: 'PRD-004',
@@ -67,6 +69,7 @@ export const products: Product[] = [
     updatedAt: dayjs().subtract(41, 'minutes').subtract(3, 'hour').toDate(),
     tags: ['skincare', 'hydrating'],
     isPricePerKilo: false,
+    isActive: true,
   },
   {
     id: 'PRD-003',
@@ -76,6 +79,7 @@ export const products: Product[] = [
     updatedAt: dayjs().subtract(5, 'minutes').subtract(3, 'hour').toDate(),
     tags: ['luxury', 'floral'],
     isPricePerKilo: true,
+    isActive: true,
   },
   {
     id: 'PRD-002',
@@ -85,6 +89,7 @@ export const products: Product[] = [
     updatedAt: dayjs().subtract(23, 'minutes').subtract(2, 'hour').toDate(),
     tags: ['makeup', 'bold'],
     isPricePerKilo: false,
+    isActive: true,
   },
   {
     id: 'PRD-001',
@@ -94,9 +99,17 @@ export const products: Product[] = [
     updatedAt: dayjs().subtract(10, 'minutes').toDate(),
     tags: ['natural', 'soothing'],
     isPricePerKilo: true,
+    isActive: true,
   },
 ];
 
+const handleToggleActiveStatus = (id: string) => {
+  // Find the product and update its status
+  const index = products.findIndex((p) => p.id === id);
+  if (index !== -1) {
+    products[index].isActive = !products[index].isActive;
+  }
+};
 
 // Define columns outside the component to avoid defining them during render
 const columns: MRT_ColumnDef<Product>[] = [
@@ -194,6 +207,30 @@ const columns: MRT_ColumnDef<Product>[] = [
         </div>
       ),
     },
+    {
+      accessorKey: 'isActive',
+      header: 'Active Status',
+      size: 90,
+      enableSorting: false,
+      enableColumnActions: false,
+      filterVariant: 'select', // Enable dropdown filter
+      filterSelectOptions: [
+        { label: 'Active', value: 'true' },
+        { label: 'Inactive', value: 'false' },
+      ],
+      filterFn: (row, columnId, filterValue) => {
+        if (filterValue === 'true') return row.getValue(columnId) === true;
+        if (filterValue === 'false') return row.getValue(columnId) === false;
+        return true; // Show all if no filter is selected
+      },
+      Cell: ({ row }) => (
+        <Switch
+          checked={row.original.isActive}
+          onChange={() => handleToggleActiveStatus(row.original.id)}
+          color="primary"
+        />
+      ),
+    },    
   ];
   
 const handleDelete = async (id: string) => {
