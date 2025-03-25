@@ -18,6 +18,7 @@ const products: Product[] = [
     updatedAt: dayjs().subtract(18, 'minutes').subtract(5, 'hour').toDate(),
     tags: ['aromatic', 'organic'],
     isPricePerKilo: true,
+    isActive: true,
   },
   {
     id: 'PRD-004',
@@ -27,6 +28,7 @@ const products: Product[] = [
     updatedAt: dayjs().subtract(41, 'minutes').subtract(3, 'hour').toDate(),
     tags: ['skincare', 'hydrating'],
     isPricePerKilo: false,
+    isActive: false,
   },
   {
     id: 'PRD-003',
@@ -36,6 +38,7 @@ const products: Product[] = [
     updatedAt: dayjs().subtract(5, 'minutes').subtract(3, 'hour').toDate(),
     tags: ['luxury', 'floral'],
     isPricePerKilo: true,
+    isActive: true,
   },
   {
     id: 'PRD-002',
@@ -45,6 +48,7 @@ const products: Product[] = [
     updatedAt: dayjs().subtract(23, 'minutes').subtract(2, 'hour').toDate(),
     tags: ['makeup', 'bold'],
     isPricePerKilo: false,
+    isActive: true,
   },
   {
     id: 'PRD-001',
@@ -54,8 +58,10 @@ const products: Product[] = [
     updatedAt: dayjs().subtract(10, 'minutes').toDate(),
     tags: ['natural', 'soothing'],
     isPricePerKilo: true,
+    isActive: false,
   },
 ];
+
 
 export default function ProductPage({ params }: PageProps) {
   const { id } = params;
