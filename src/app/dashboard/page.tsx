@@ -13,60 +13,66 @@ import { TotalProfit } from '@/components/dashboard/overview/total-profit';
 import { Traffic } from '@/components/dashboard/overview/traffic';
 import { orders } from './orders/page';
 import dayjs from 'dayjs';
+import { Product } from '../../components/dashboard/products/products-table';
 
 export const metadata = { title: `Overview | Dashboard | ${config.site.name}` } satisfies Metadata;
 
 
 export default function Page(): React.JSX.Element {
   
-const products = [
-  {
-    id: 'PRD-005',
-    name: 'Soja & Co. Eucalyptus',
-    image: '/assets/product-5.png',
-    price: 150, // Price in SAR
-    updatedAt: dayjs().subtract(18, 'minutes').subtract(5, 'hour').toDate(),
-    tags: ['aromatic', 'organic'],
-    isPricePerKilo: true,
-  },
-  {
-    id: 'PRD-004',
-    name: 'Necessaire Body Lotion',
-    image: '/assets/product-4.png',
-    price: 120,
-    updatedAt: dayjs().subtract(41, 'minutes').subtract(3, 'hour').toDate(),
-    tags: ['skincare', 'hydrating'],
-    isPricePerKilo: false,
-  },
-  {
-    id: 'PRD-003',
-    name: 'Ritual of Sakura',
-    image: '/assets/product-3.png',
-    price: 200,
-    updatedAt: dayjs().subtract(5, 'minutes').subtract(3, 'hour').toDate(),
-    tags: ['luxury', 'floral'],
-    isPricePerKilo: true,
-  },
-  {
-    id: 'PRD-002',
-    name: 'Lancome Rouge',
-    image: '/assets/product-2.png',
-    price: 180,
-    updatedAt: dayjs().subtract(23, 'minutes').subtract(2, 'hour').toDate(),
-    tags: ['makeup', 'bold'],
-    isPricePerKilo: false,
-  },
-  {
-    id: 'PRD-001',
-    name: 'Erbology Aloe Vera',
-    image: '/assets/product-1.png',
-    price: 250,
-    updatedAt: dayjs().subtract(10, 'minutes').toDate(),
-    tags: ['natural', 'soothing'],
-    isPricePerKilo: true,
-  },
-];
-
+  const products: Product[] = [
+    {
+      id: 'PRD-005',
+      name: 'Soja & Co. Eucalyptus',
+      image: '/assets/product-5.png',
+      price: 150, // Price in SAR
+      updatedAt: dayjs().subtract(18, 'minutes').subtract(5, 'hour').toDate(),
+      tags: ['aromatic', 'organic'],
+      isPricePerKilo: true,
+      isActive: true,
+    },
+    {
+      id: 'PRD-004',
+      name: 'Necessaire Body Lotion',
+      image: '/assets/product-4.png',
+      price: 120,
+      updatedAt: dayjs().subtract(41, 'minutes').subtract(3, 'hour').toDate(),
+      tags: ['skincare', 'hydrating'],
+      isPricePerKilo: false,
+      isActive: false,
+    },
+    {
+      id: 'PRD-003',
+      name: 'Ritual of Sakura',
+      image: '/assets/product-3.png',
+      price: 200,
+      updatedAt: dayjs().subtract(5, 'minutes').subtract(3, 'hour').toDate(),
+      tags: ['luxury', 'floral'],
+      isPricePerKilo: true,
+      isActive: true,
+    },
+    {
+      id: 'PRD-002',
+      name: 'Lancome Rouge',
+      image: '/assets/product-2.png',
+      price: 180,
+      updatedAt: dayjs().subtract(23, 'minutes').subtract(2, 'hour').toDate(),
+      tags: ['makeup', 'bold'],
+      isPricePerKilo: false,
+      isActive: true,
+    },
+    {
+      id: 'PRD-001',
+      name: 'Erbology Aloe Vera',
+      image: '/assets/product-1.png',
+      price: 250,
+      updatedAt: dayjs().subtract(10, 'minutes').toDate(),
+      tags: ['natural', 'soothing'],
+      isPricePerKilo: true,
+      isActive: false,
+    },
+  ];
+  
   return (
     <Grid container spacing={3}>
       <Grid lg={3} sm={6} xs={12}>
