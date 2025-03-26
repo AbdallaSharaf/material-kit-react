@@ -22,7 +22,7 @@ export default function CustomToolbar({table, data}: any) {
 
   const handleExportRows = (rows: MRT_Row<Product>[]) => {
     const rowData = rows.map((row) => ({
-      id: row.original.id,
+      id: row.original._id,
     }));
   
     if (rowData.length > 0) {
@@ -35,7 +35,7 @@ export default function CustomToolbar({table, data}: any) {
     if (data.length === 0) return; // Prevent exporting empty data
   
     const rowData = data.map((product: Product) => ({
-      id: product.id,
+      id: product._id,
     }));
   
     const csv = generateCsv(csvConfig)(rowData);

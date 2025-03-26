@@ -30,7 +30,7 @@ export function LatestProducts({ products = [], sx }: LatestProductsProps): Reac
       <Divider />
       <List>
         {products.map((product, index) => (
-          <ListItem divider={index < products.length - 1} key={product.id}>
+          <ListItem divider={index < products.length - 1} key={product._id}>
             <ListItemAvatar>
               {product.image ? (
                 <Box component="img" src={product.image} sx={{ borderRadius: 1, height: '48px', width: '48px' }} />

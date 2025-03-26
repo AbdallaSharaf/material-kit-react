@@ -16,7 +16,7 @@ interface EditOrderDialogProps {
   row: MRT_Row<Order>;
   isEditing?: boolean;
   internalEditComponents: React.ReactNode[];
-  products: Product[];
+  products: any[];
 }
 
 const EditOrderDialog: React.FC<EditOrderDialogProps> = ({ table, row, internalEditComponents, products, isEditing }) => {

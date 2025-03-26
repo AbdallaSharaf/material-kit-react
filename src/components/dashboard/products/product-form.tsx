@@ -1,15 +1,18 @@
 'use client'
 import React from 'react';
-import { Box, Button, Chip, MenuItem, TextField, Typography } from '@mui/material';
+import { Box, Button, Checkbox, Chip, InputLabel, ListItemText, MenuItem, Select, TextField, Typography } from '@mui/material';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { Product } from './products-table';
+import { useSelector } from 'react-redux';
+import { useCategoryHandlers } from '@/controllers/categoriesController';
+import { RootState } from '@/redux/store/store';
 
 // Define the shape of your form's values, now including an image field
 interface ProductFormValues {
   name: string;
   price: number | '';
-  tags: string[]; // Updated from category to tags
+  categories: string[]; // Updated from category to categories
   description: string;
   stock: number | '';
   unit: 'kg' | 'piece';
@@ -23,10 +26,10 @@ const validationSchema = Yup.object({
     .typeError('Price must be a number')
     .positive('Price must be positive')
     .required('Price is required'),
-    tags: Yup.array()
+    categories: Yup.array()
     .of(Yup.string())
     .min(1, 'At least one tag is required')
-    .required('Tags are required'),
+    .required('Categories are required'),
     stock: Yup.number()
     .typeError('Stock must be a number')
     .min(0, 'Stock cannot be negative')
@@ -40,10 +43,20 @@ const validationSchema = Yup.object({
 
 const ProductForm = ({product}:any) => {
 
+    const { fetchData } = useCategoryHandlers();
+
+    const { 
+      categories,
+      refreshData 
+    } = useSelector((state: RootState) => state.categories);
+    React.useEffect(() => {
+      fetchData();
+    }, [refreshData]);
+
     const initialValues: ProductFormValues = {
         name: product?.name || '',
         price: product?.price || 0,
-        tags: product?.tags || [], // Use tags from the product if available
+        categories: product?.categories || [], // Use categories from the product if available
         description: '',
         stock: '',
         unit: product?.isPricePerKilo ? 'kg' : 'piece',
@@ -89,37 +102,32 @@ const ProductForm = ({product}:any) => {
               helperText={touched.name && errors.name}
             />
 
-            <TextField
-            select
+            <Select
             fullWidth
-            margin="normal"
-            name="tags"
-            label="Tags"
+            name="categories"
+            label="Categories"
             variant="outlined"
-            value={values.tags}
+            value={values.categories}
             onChange={handleChange}
             onBlur={handleBlur}
-            SelectProps={{
-                multiple: true,
-                renderValue: (selected) => (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {(selected as string[]).map((value) => (
-                    <Chip
-                        key={value}
-                        label={value}
-                    />
-                    ))}
-                </Box>
-                ),
-            }}
-            error={Boolean(touched.tags && errors.tags)}
-            helperText={touched.tags && errors.tags}
+            multiple
+            renderValue= {(selected) => (
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+              {(selected as string[]).map((selectedId) => {
+                const category = categories?.find((cat) => cat._id === selectedId);
+                return category ? <Chip key={category._id} label={category.name.en} /> : null;
+              })}
+            </Box>
+            )}
+            error={Boolean(touched.categories && errors.categories)}
             >
-            <MenuItem value="citrus">Citrus</MenuItem>
-            <MenuItem value="berry">Berry</MenuItem>
-            <MenuItem value="tropical">Tropical</MenuItem>
-            <MenuItem value="stone">Stone</MenuItem>
-            </TextField>
+              {categories?.map((cat) => (
+                  <MenuItem key={cat._id} value={cat._id}>
+                    <Checkbox checked={values.categories.includes(cat._id)} />
+                    <ListItemText primary={cat.name["en"]} />
+                  </MenuItem>
+                ))}
+            </Select>
 
 
             <TextField
@@ -231,7 +239,7 @@ const ProductForm = ({product}:any) => {
 
             </div>
             
-            <Box sx={{ mt: 4 }} className='col-start-2'>
+            <Box sx={{ mt: 4 }} className='col-start-2 w-1/4 ms-auto'>
               <Button
                 type="submit"
                 variant="contained"

@@ -200,7 +200,7 @@ export function OrdersTable({
             row.original.items ? (
                 <Box className="flex flex-col gap-3">
                     {row.original.items.map((item) => {
-                    const product = products.find((prod) => prod.id === item.id); // Find the product by item.id
+                    const product = products.find((prod) => prod._id === item.id); // Find the product by item.id
                     return product ? (
                         <Box key={item.id} className='flex items-center'>
                         <img

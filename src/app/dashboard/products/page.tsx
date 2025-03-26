@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default function Page(): React.JSX.Element {
+
   return (
     <Stack spacing={3}>
       <Stack direction="row" spacing={3}>

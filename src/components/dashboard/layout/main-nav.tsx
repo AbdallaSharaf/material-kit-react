@@ -16,14 +16,21 @@ import { usePopover } from '@/hooks/use-popover';
 import { MobileNav } from './mobile-nav';
 import { UserPopover } from './user-popover';
 import LanguagePopover from './language-popover';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/redux/store/store';
+import { restoreSession } from '@/redux/slices/authSlice';
 
 
 export function MainNav(): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);
+  const dispatch = useDispatch<AppDispatch>()
 
   const userPopover = usePopover<HTMLDivElement>();
   const languagePopover = usePopover<HTMLButtonElement>(); // Updated ref type
-
+  React.useEffect(() => {
+    dispatch(restoreSession());
+  }, []);
+  
   return (
     <React.Fragment>
       <Box

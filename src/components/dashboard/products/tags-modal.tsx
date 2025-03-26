@@ -7,58 +7,42 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  TextField,
   Chip,
   Stack,
   IconButton,
 } from "@mui/material";
-import { Tag as TagIcon } from "@phosphor-icons/react/dist/ssr/Tag";
+import { Tag as TagIcon } from "@phosphor-icons/react/dist/ssr/tag";
 import { Plus as PlusIcon } from "@phosphor-icons/react/dist/ssr/Plus";
 import { X as CloseIcon } from "@phosphor-icons/react/dist/ssr/X";
-import { Check as CheckIcon } from "@phosphor-icons/react/dist/ssr/Check";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store/store";
+import { CategoryIn } from "@/interfaces/categoryInterface";
+import { deleteCategory } from "@/redux/slices/categorySlice";
+import { useCategoryHandlers } from "@/controllers/categoriesController";
 
-export default function TagsModal(): React.JSX.Element {
-  const [tagsOpen, setTagsOpen] = React.useState(false);
-  const [tags, setTags] = React.useState<string[]>(["Organic", "New", "Sale"]); // Example tags
-  const [newTag, setNewTag] = React.useState("");
-  const [isAdding, setIsAdding] = React.useState(false);
-  const [editingTag, setEditingTag] = React.useState<string | null>(null);
-  const [editedTagValue, setEditedTagValue] = React.useState("");
+export default function CategoriesModal(): React.JSX.Element {
+  const [categoriesOpen, setCategoriesOpen] = React.useState(false);
+  const { handleDelete } = useCategoryHandlers();
+  const { 
+    categories, 
+  } = useSelector((state: RootState) => state.categories);
+  const router = useRouter();
 
-  const handleTagsOpen = () => setTagsOpen(true);
-  const handleTagsClose = () => setTagsOpen(false);
+  const handleCategoriesOpen = () => setCategoriesOpen(true);
+  const handleCategoriesClose = () => setCategoriesOpen(false);
 
-  const handleDeleteTag = (tagToDelete: string) => {
-    setTags((prevTags) => prevTags.filter((tag) => tag !== tagToDelete));
+  const handleDeleteCategory = (categoryToDelete: CategoryIn) => {
+    handleDelete(categoryToDelete)
+    // TODO: Add delete API call or logic here
   };
 
-  const handleAddTag = () => {
-    if (newTag.trim() && !tags.includes(newTag.trim())) {
-      setTags([...tags, newTag.trim()]);
-      setNewTag("");
-      setIsAdding(false);
-    }
+  const handleEditCategory = (category: string) => {
+    router.push(`/dashboard/categories/edit/${category}`);
   };
 
-  const handleEditTag = (tag: string) => {
-    setEditingTag(tag);
-    setEditedTagValue(tag);
-  };
-
-  const handleDiscardEdit = () => {
-    setEditingTag(null);
-    setEditedTagValue('');
-  };
-
-  const handleSaveEditedTag = () => {
-    if (editedTagValue.trim() === "") {
-      handleDeleteTag(editingTag!);
-    } else if (!tags.includes(editedTagValue.trim())) {
-      setTags((prevTags) =>
-        prevTags.map((t) => (t === editingTag ? editedTagValue.trim() : t))
-      );
-    }
-    setEditingTag(null);
+  const handleAddCategory = () => {
+    router.push("/dashboard/categories/add");
   };
 
   return (
@@ -66,86 +50,44 @@ export default function TagsModal(): React.JSX.Element {
       <Button
         startIcon={<TagIcon fontSize="var(--icon-fontSize-md)" />}
         variant="contained"
-        onClick={handleTagsOpen}
+        onClick={handleCategoriesOpen}
       >
-        Tags
+        Categories
       </Button>
 
-      <Dialog open={tagsOpen} onClose={handleTagsClose} fullWidth maxWidth="sm">
-        <DialogTitle>Manage Tags</DialogTitle>
+      <Dialog open={categoriesOpen} onClose={handleCategoriesClose} fullWidth maxWidth="sm">
+        <DialogTitle>Manage Categories</DialogTitle>
         <DialogContent>
           <Stack spacing={2} mt={1}>
-            {/* Render Tags as Chips */}
+            {/* Render Categories as Chips */}
             <Stack direction="row" flexWrap="wrap" gap={1}>
-              {tags.map((tag) =>
-                editingTag === tag ? (
-                  <Stack key={tag} direction="row" alignItems="center" spacing={1}>
-                    <TextField
-                      size="small"
-                      variant="outlined"
-                      value={editedTagValue}
-                      autoFocus
-                      onChange={(e) => setEditedTagValue(e.target.value)}
-                      onBlur={handleSaveEditedTag}
-                      onKeyDown={(e) => e.key === "Enter" && handleSaveEditedTag()}
-                    />
-                    <IconButton size="small" onClick={handleSaveEditedTag} color="primary">
-                      <CheckIcon />
-                    </IconButton>
-                    <IconButton size="small" onClick={handleDiscardEdit} color="primary">
-                      <CloseIcon />
-                    </IconButton>
-                  </Stack>
-                ) : (
-                  <Chip
-                    key={tag}
-                    label={tag}
-                    onDelete={() => handleDeleteTag(tag)}
-                    onClick={() => handleEditTag(tag)}
-                    color="primary"
-                    sx={{ cursor: "pointer" }}
-                  />
-                )
-              )}
-              {/* Add New Tag Button */}
-              {
-                !isAdding  ? (
-                    <IconButton
-                    size="small"
-                    color="primary"
-                    onClick={() => setIsAdding(true)}
-                    sx={{ borderRadius: "50%", border: "1px solid", height: 32, width: 32 }}
-                    className={`${editingTag && '!hidden'}`}
-                    >
-                    <PlusIcon />
-                    </IconButton>
-                ) : (
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                    <TextField
-                        size="small"
-                        variant="outlined"
-                        placeholder="New tag..."
-                        value={newTag}
-                        onChange={(e) => setNewTag(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleAddTag()}
-                        autoFocus
-                    />
-                    <IconButton color="primary" size="small" onClick={handleAddTag}>
-                        <CheckIcon />
-                    </IconButton>
-                    <IconButton size="small" onClick={() => setIsAdding(false)}>
-                        <CloseIcon />
-                    </IconButton>
-                    </Stack>
-                )
-                }
+              {categories?.map((category) => (
+                <Chip
+                  key={category._id}
+                  label={category.name["en"]}
+                  onDelete={() => handleDeleteCategory(category)}
+                  onClick={() => handleEditCategory(category._id)}
+                  color="primary"
+                  sx={{ cursor: "pointer" }}
+                />
+              ))}
+
+              {/* Add New Category Button */}
+              <IconButton
+                size="small"
+                color="primary"
+                onClick={handleAddCategory}
+                sx={{ borderRadius: "50%", border: "1px solid", height: 32, width: 32 }}
+              >
+                <PlusIcon />
+              </IconButton>
             </Stack>
           </Stack>
         </DialogContent>
+
         <DialogActions>
-          <Button onClick={handleTagsClose}>Cancel</Button>
-          <Button variant="contained" onClick={handleTagsClose}>
-            Save
+          <Button onClick={handleCategoriesClose} variant="outlined" color="primary">
+            Close
           </Button>
         </DialogActions>
       </Dialog>

@@ -9,9 +9,12 @@ import Swal from 'sweetalert2';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
+import { CategoryIn } from '@/interfaces/categoryInterface';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store/store';
+import { useCategoryHandlers } from '@/controllers/categoriesController';
 
-
-export const availableTags: string[] = [
+export const availableCategories: string[] = [
   'aromatic',
   'organic',
   'skincare',
@@ -29,12 +32,12 @@ export const availableTags: string[] = [
 ];
 
 export interface Product {
-    id: string;
+    _id: string;
     image: string;
     name: string;
     price: number;
     updatedAt: Date;
-    tags: string[];
+    categories: CategoryIn[];
     isPricePerKilo: boolean; // true if the price is per kilogram, false if per piece
     isActive: boolean;
   }  
@@ -49,55 +52,75 @@ const handleSaveRow: MRT_TableOptions<Product>['onEditingRowSave'] = ({
 }) => {
   exitEditingMode();
 };
+const categoryDummy = {
+  name: {
+      ar: "بوكسات",
+      en: "Boxes"
+  },
+  description: {
+      ar: "وصف بوكسات",
+      en: "Boxed products description"
+  },
+  showInTopMenu: true,
+  _id: "67dc6cc098d32ef1f31ebff1",
+  slug: "boxes",
+  photos: [],
+  order: 1,
+  available: true,
+  deleted: false,
+  createdAt: "2025-03-20T19:30:08.661Z",
+  updatedAt: "2025-03-20T19:30:08.661Z",
+  __v: 0,
+}
 
 export const products: Product[] = [
   {
-    id: 'PRD-005',
+    _id: 'PRD-005',
     name: 'Soja & Co. Eucalyptus',
     image: '/assets/product-5.png',
     price: 150, // Price in SAR
     updatedAt: dayjs().subtract(18, 'minutes').subtract(5, 'hour').toDate(),
-    tags: ['aromatic', 'organic'],
+    categories: [categoryDummy],
     isPricePerKilo: true,
     isActive: true,
   },
   {
-    id: 'PRD-004',
+    _id: 'PRD-004',
     name: 'Necessaire Body Lotion',
     image: '/assets/product-4.png',
     price: 120,
     updatedAt: dayjs().subtract(41, 'minutes').subtract(3, 'hour').toDate(),
-    tags: ['skincare', 'hydrating'],
+    categories: [categoryDummy],
     isPricePerKilo: false,
     isActive: true,
   },
   {
-    id: 'PRD-003',
+    _id: 'PRD-003',
     name: 'Ritual of Sakura',
     image: '/assets/product-3.png',
     price: 200,
     updatedAt: dayjs().subtract(5, 'minutes').subtract(3, 'hour').toDate(),
-    tags: ['luxury', 'floral'],
+    categories: [categoryDummy],
     isPricePerKilo: true,
     isActive: true,
   },
   {
-    id: 'PRD-002',
+    _id: 'PRD-002',
     name: 'Lancome Rouge',
     image: '/assets/product-2.png',
     price: 180,
     updatedAt: dayjs().subtract(23, 'minutes').subtract(2, 'hour').toDate(),
-    tags: ['makeup', 'bold'],
+    categories: [categoryDummy],
     isPricePerKilo: false,
     isActive: true,
   },
   {
-    id: 'PRD-001',
+    _id: 'PRD-001',
     name: 'Erbology Aloe Vera',
     image: '/assets/product-1.png',
     price: 250,
     updatedAt: dayjs().subtract(10, 'minutes').toDate(),
-    tags: ['natural', 'soothing'],
+    categories: [categoryDummy],
     isPricePerKilo: true,
     isActive: true,
   },
@@ -105,7 +128,7 @@ export const products: Product[] = [
 
 const handleToggleActiveStatus = (id: string) => {
   // Find the product and update its status
-  const index = products.findIndex((p) => p.id === id);
+  const index = products.findIndex((p) => p._id === id);
   if (index !== -1) {
     products[index].isActive = !products[index].isActive;
   }
@@ -114,7 +137,7 @@ const handleToggleActiveStatus = (id: string) => {
 // Define columns outside the component to avoid defining them during render
 const columns: MRT_ColumnDef<Product>[] = [
     {
-      accessorKey: 'id',
+      accessorKey: '_id',
       header: 'Number',
       grow: true,
       size: 70,
@@ -144,30 +167,30 @@ const columns: MRT_ColumnDef<Product>[] = [
       size: 140,
     },
     {
-        accessorKey: 'tags',
-        header: 'Tags',
+        accessorKey: 'categories',
+        header: 'Categories',
         size: 140,
         filterVariant: 'select',
-        filterSelectOptions: availableTags.map((tag)=> {return {
-            label: tag,
-            value: tag
+        filterSelectOptions: availableCategories.map((category)=> {return {
+            label: category,
+            value: category
         }}),
-        // Custom filter function: returns true if any of the selected tags appear in the row's tags.
+        // Custom filter function: returns true if any of the selected categories appear in the row's categories.
         filterFn: (row, columnId, filterValue: any) => {
-            const selectedTags = Array.isArray(filterValue) ? filterValue : [filterValue]; // Force array
+            const selectedCategories = Array.isArray(filterValue) ? filterValue : [filterValue]; // Force array
           
-            if (selectedTags.length === 0) return true;
+            if (selectedCategories.length === 0) return true;
           
-            const rowTags = row.getValue<string[]>(columnId);
-            if (!Array.isArray(rowTags)) return false;
+            const rowCategories = row.getValue<string[]>(columnId);
+            if (!Array.isArray(rowCategories)) return false;
           
-            return selectedTags.some((tag) => rowTags.includes(tag));
+            return selectedCategories.some((category) => rowCategories.includes(category));
           },
           
         
         Cell: ({ row }) => (
           <div>
-            {row.original.tags.map((tag: string, index: number) => (
+            {row.original.categories.map((category, index: number) => (
               <span
                 key={index}
                 style={{
@@ -179,7 +202,7 @@ const columns: MRT_ColumnDef<Product>[] = [
                   fontSize: '12px',
                 }}
               >
-                {tag}
+                {category.name['en']}
               </span>
             ))}
           </div>
@@ -226,7 +249,7 @@ const columns: MRT_ColumnDef<Product>[] = [
       Cell: ({ row }) => (
         <Switch
           checked={row.original.isActive}
-          onChange={() => handleToggleActiveStatus(row.original.id)}
+          onChange={() => handleToggleActiveStatus(row.original._id)}
           color="primary"
         />
       ),
@@ -254,8 +277,19 @@ const handleDelete = async (id: string) => {
 
 export function ProductsTable(): React.JSX.Element {
 
-    const router = useRouter()
+    const { fetchData } = useCategoryHandlers();
 
+    const { 
+      refreshData, 
+      categories
+    } = useSelector((state: RootState) => state.categories);
+    React.useEffect(() => {
+      fetchData();
+      console.log("refetched")
+    }, [refreshData]);
+    
+    const router = useRouter()
+console.log(categories[5])
   return (
     <Paper>
       <MaterialReactTable 
@@ -268,7 +302,7 @@ export function ProductsTable(): React.JSX.Element {
         onEditingRowSave={handleSaveRow} 
         columnFilterDisplayMode = 'popover'
         positionToolbarAlertBanner= 'bottom'
-        getRowId = {(row) => row.id}
+        getRowId = {(row) => row._id}
         positionActionsColumn="last" 
 
 
@@ -287,14 +321,14 @@ export function ProductsTable(): React.JSX.Element {
         renderRowActions= {({ row }) => (
           <Box sx={{ display: 'flex', gap: '4px'}}>
             <Tooltip title="Edit">
-              <IconButton onClick={() => router.push(`products/edit/${row.original.id}`)}>
+              <IconButton onClick={() => router.push(`products/edit/${row.original._id}`)}>
                 <i
                   className="fa fa-pencil !text-sm text-yellow-500 hover:text-yellow-600 cursor-pointer"
                 ></i>
               </IconButton>
             </Tooltip>
             <Tooltip title="Delete">
-              <IconButton color="error" onClick={() => handleDelete(row.original.id)}>
+              <IconButton color="error" onClick={() => handleDelete(row.original._id)}>
                 <i
                   className="fa fa-trash !text-sm text-red-500 hover:text-red-600 cursor-pointer"
                 ></i>
