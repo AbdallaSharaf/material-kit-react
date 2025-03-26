@@ -11,14 +11,12 @@ import {
   Stack,
   IconButton,
 } from "@mui/material";
-import { Tag as TagIcon } from "@phosphor-icons/react/dist/ssr/tag";
+import { Tag as TagIcon } from "@phosphor-icons/react/dist/ssr/Tag";
 import { Plus as PlusIcon } from "@phosphor-icons/react/dist/ssr/Plus";
-import { X as CloseIcon } from "@phosphor-icons/react/dist/ssr/X";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store/store";
 import { CategoryIn } from "@/interfaces/categoryInterface";
-import { deleteCategory } from "@/redux/slices/categorySlice";
 import { useCategoryHandlers } from "@/controllers/categoriesController";
 
 export default function CategoriesModal(): React.JSX.Element {
