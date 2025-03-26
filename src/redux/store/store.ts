@@ -11,8 +11,8 @@ import { User } from '../../types/user';
 // const userData = Cookies.get('userData');
 // const token = Cookies.get('token');
 
-const userData = localStorage.getItem('userData'); // ⬅️ Use localStorage instead of Cookies
-const token = localStorage.getItem('token'); // ⬅️ Use localStorage instead of Cookies
+const userData = typeof window !== 'undefined' ? localStorage.getItem('userData') : null;
+const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
 const initialUser = userData ? (JSON.parse(userData) as User) : null;
 const store = configureStore({
