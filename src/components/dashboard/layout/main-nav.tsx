@@ -30,7 +30,7 @@ export function MainNav(): React.JSX.Element {
   React.useEffect(() => {
     dispatch(restoreSession());
   }, []);
-  
+
   return (
     <React.Fragment>
       <Box
