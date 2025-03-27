@@ -36,17 +36,25 @@ const categoryPage = async ({ params }: PageProps) => {
 
   const category = await getCategoryById(id);
 
-  if (!category) return <p>Loading category data...</p>;
+  if (!category) {
+    return (
+      <Stack spacing={3}>
+        <Typography variant="h4">Product Not Found</Typography>
+      </Stack>
+    );
+  }
 
   return (
     <Stack spacing={3}>
       <Stack direction="row" spacing={3}>
         <div className="flex w-full justify-between items-center">
-          <Typography variant="h4">Update Category</Typography>
+          <Typography variant="h4">
+            {category && `Edit ${category.name["en"]}`}
+          </Typography>
         </div>
       </Stack>
 
-      <CategoryForm category={category} />
+      {category &&  <CategoryForm category={category} />}
     </Stack>
   );
 };

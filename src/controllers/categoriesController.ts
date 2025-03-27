@@ -20,20 +20,23 @@ const dispatch = useDispatch<AppDispatch>()
     values: CategoryOut) => {
     
         // This item is a Category.
-        Swal.update({
+        Swal.fire({
           title: "Adding Category...",
           text: "Please wait while we add the category.",
           allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading(); // Show loading spinner
+          },
         });
         try {
           const resultAction = await dispatch(addCategory(values));
           Swal.hideLoading();
           if (addCategory.fulfilled.match(resultAction)) {
-            await Swal.fire({
+            Swal.update({
               title: "Category added!",
-              text: `Values ${values.name} has been successfully added.`,
+              text: `Category has been successfully added.`,
               icon: "success",
-              confirmButtonText: "OK",
+              showConfirmButton: true,
             });
             setTimeout(() => {
                 Swal.close();
@@ -43,7 +46,8 @@ const dispatch = useDispatch<AppDispatch>()
             return true
 
           } else {
-            await Swal.fire({
+            Swal.hideLoading()
+            Swal.update({
               title: "Error adding category",
               text: resultAction.payload
                 ? String(resultAction.payload)
@@ -55,7 +59,8 @@ const dispatch = useDispatch<AppDispatch>()
 
           }
         } catch (error: any) {
-          await Swal.fire({
+          Swal.hideLoading()
+          Swal.update({
             title: "Unexpected Error",
             text: error.message || "Something went wrong!",
             icon: "error",
@@ -70,20 +75,23 @@ const dispatch = useDispatch<AppDispatch>()
         {id, values}: {id: string, values: Partial<CategoryOut>}) => {
   
       // This item is a Category.
-      Swal.update({
+      Swal.fire({
         title: "Updating Category...",
         text: "Please wait while we update the category.",
         allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading(); // Show loading spinner
+        },
       });
       try {
         const resultAction = await dispatch(updateCategory({id, updatedData: values}));
         Swal.hideLoading();
         if (updateCategory.fulfilled.match(resultAction)) {
-          await Swal.fire({
+          Swal.update({
             title: "Category updated!",
-            text: `Category ${values.name} has been successfully updated.`,
+            text: `Category has been successfully updated.`,
             icon: "success",
-            confirmButtonText: "OK",
+            showConfirmButton: true,
           });
           setTimeout(() => {
               Swal.close();
@@ -92,7 +100,7 @@ const dispatch = useDispatch<AppDispatch>()
           router.push('/dashboard/products'); // 👈 Navigate here
           return true
         } else {
-          await Swal.fire({
+          Swal.update({
             title: "Error updating category",
             text: resultAction.payload
               ? String(resultAction.payload)
@@ -103,7 +111,7 @@ const dispatch = useDispatch<AppDispatch>()
           return false
         }
       } catch (error: any) {
-        await Swal.fire({
+        Swal.update({
           title: "Unexpected Error",
           text: error.message || "Something went wrong!",
           icon: "error",
@@ -143,7 +151,7 @@ const handleDelete = async (item: CategoryIn) => {
         const resultAction = await dispatch(deleteCategory(item._id));
         Swal.hideLoading();
         if (deleteCategory.fulfilled.match(resultAction)) {
-          await Swal.fire({
+          Swal.update({
             title: "Item Deleted!",
             text: `Item ${item.name} has been successfully deleted.`,
             icon: "success",
@@ -154,7 +162,7 @@ const handleDelete = async (item: CategoryIn) => {
           }, 500);
           dispatch(setRefreshData(refreshData+1));
         } else {
-          await Swal.fire({
+          Swal.update({
             title: "Error Deleting Item",
             text: resultAction.payload
               ? String(resultAction.payload)
@@ -164,7 +172,7 @@ const handleDelete = async (item: CategoryIn) => {
           });
         }
       } catch (error: any) {
-        await Swal.fire({
+        Swal.update({
           title: "Unexpected Error",
           text: error.message || "Something went wrong!",
           icon: "error",

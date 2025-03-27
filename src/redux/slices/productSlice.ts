@@ -5,6 +5,8 @@ import axios from '../../utils/axiosInstance';
 
 import { MRT_ColumnFiltersState, MRT_PaginationState, MRT_SortingState } from 'material-react-table';
 import { Product } from '@/components/dashboard/products/products-table';
+import { ProductIn, ProductOut } from '@/interfaces/productInterface';
+import { AxiosResponse } from 'axios';
 
 
 // Define the slice state type
@@ -44,7 +46,7 @@ const initialState: ProductsState = {
 };
 
 // Define the base URL for your API endpoint (adjust as needed)
-const API_URL = `${process.env.VITE_BASE_URL}product`;
+const API_URL = `https://fruits-heaven-api.vercel.app/api/v1/product`;
 
 // Fetch all products
 export const fetchProducts = createAsyncThunk<
@@ -85,25 +87,16 @@ export const fetchProducts = createAsyncThunk<
 
 // Add a new product
 export const addProduct = createAsyncThunk<
-  any, // Return type on success
-  Product, // Argument type (new product data without an id)
+  ProductIn, // Return type on success
+  ProductOut, // Argument type (new product data without an id)
   { rejectValue: string }
 >(
   "products/addProduct",
   async (productData, { rejectWithValue }) => {
     try {
-      const { _id, ...dataWithoutId } = productData;
 
-      // Prepare the new product data
-      const newProductData: Record<string, any> = {
-        ...dataWithoutId,
-        branch: "65e2c7f4d5a4c9b0f1a2d3e4", // Valid 24-character ObjectId
-        size: "MD",  // At least 2 characters long
-        color: "Black",
-      };
-
-      const response = await axios.post<Product>(API_URL, newProductData);
-      return response.data;
+      const response = await axios.post<ProductOut, AxiosResponse<{message: string, product: ProductIn}, any>>(API_URL, productData);
+      return response.data.product;
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || error.message || "Failed to add product"
@@ -112,51 +105,17 @@ export const addProduct = createAsyncThunk<
   }
 );
 
-// Fetch allcompanies
-export const fetchProductById = createAsyncThunk<
-  {product: Product;}, // Return type withcompanies and total count
-  { id: string},
-  { rejectValue: string }
->(
-  'companies/fetchProductById',
-  async (params, { rejectWithValue }) => {
-    try {
-      const url = new URL(`${API_URL}/${params.id}`);
-
-      const response = await axios.get(url.href);
-
-      const { product } = response.data;
-      return {product: product };
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || error.message || 'Failed to fetchcompanies'
-      );
-    }
-  }
-);
-
 // Update an existing product
 export const updateProduct = createAsyncThunk<
-  Product, // Return type on success
-  { id: number; updatedData: Partial<Product> }, // Argument type
+  ProductIn, // Return type on success
+  { id: string; updatedData: Partial<ProductOut> }, // Argument type
   { rejectValue: string }
 >(
   'products/updateProduct',
   async ({ id, updatedData }, { rejectWithValue }) => {    
-
     try {
-      const { _id, ...dataWithoutId } = updatedData;
-
-      // Prepare the new product data
-      const newProductData: Record<string, any> = {
-        ...dataWithoutId,
-        branch: "65e2c7f4d5a4c9b0f1a2d3e4", // Valid 24-character ObjectId
-        size: "MD",  // At least 2 characters long
-        color: "Black",
-      };
-
-      const response = await axios.put<Product>(`${API_URL}/${id}`, newProductData);
-      return response.data;
+      const response = await axios.put<ProductOut, AxiosResponse<{message: string, product: ProductIn}, any>>(`${API_URL}/${id}`, updatedData);
+      return response.data.product;
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || error.message || 'Failed to update product'
@@ -226,21 +185,6 @@ const productsSlice = createSlice({
           state.error = action.payload || 'Failed to fetch products';
         });
         
-      // Fetch product by ID
-      builder
-        .addCase(fetchProductById.pending, (state) => {
-          state.loading = true;
-          state.error = null;
-        })
-        .addCase(fetchProductById.fulfilled, (state, action) => {
-          state.loading = false;
-          state.product = action.payload.product; // Store the product
-        })
-        .addCase(fetchProductById.rejected, (state, action) => {
-          state.loading = false;
-          state.error = action.payload || 'Failed to fetch product';
-        });
-        
       // Add product
       builder
         .addCase(addProduct.pending, (state) => {
@@ -261,7 +205,7 @@ const productsSlice = createSlice({
           state.loading = true;
           state.error = null;
         })
-        .addCase(updateProduct.fulfilled, (state, action: PayloadAction<Product>) => {
+        .addCase(updateProduct.fulfilled, (state, action: PayloadAction<ProductIn>) => {
           state.loading = false;
           const index = state.products.findIndex((product) => product._id === action.payload._id);
           if (index !== -1) {

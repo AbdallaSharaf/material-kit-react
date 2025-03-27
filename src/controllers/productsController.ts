@@ -3,10 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store/store";
 import { addProduct, deleteProduct, fetchProducts, setRefreshData, setRowCount, updateProduct } from "../redux/slices/productSlice";
 import { Product } from "@/components/dashboard/products/products-table";
+import { ProductIn, ProductOut } from "@/interfaces/productInterface";
+import { useRouter } from "next/navigation";
    
 export const useProductHandlers = () => {
 
 const dispatch = useDispatch<AppDispatch>()
+const router = useRouter();
 
   const {
     pagination,
@@ -17,7 +20,7 @@ const dispatch = useDispatch<AppDispatch>()
 } = useSelector((state: RootState) => state.products);
 
 
-const handleUpdateProduct = async (values: any) => {
+const handleUpdateProduct = async ({id, values}: {id: string, values: Partial<ProductOut>}) => {
     Swal.fire({
       title: 'Updating Product...',
       text: 'Please wait while we update the product.',
@@ -27,17 +30,22 @@ const handleUpdateProduct = async (values: any) => {
       },
     });
     try {
-      const resultAction = await dispatch(updateProduct({id: values._id, updatedData: values}));
+      const resultAction = await dispatch(updateProduct({id, updatedData: values}));
       Swal.hideLoading()
       if (updateProduct.fulfilled.match(resultAction)) {
         // Update the existing Swal instead of reopening it
         Swal.update({
           title: 'Product Updated!',
-          text: `Product Details: ${values.name}`,
+          text: `Product has been successfully updated.`,
           icon: 'success',
           showConfirmButton: true,
         });
+        setTimeout(() => {
+            Swal.close();
+          }, 500);
         dispatch(setRefreshData(refreshData + 1));
+        router.push('/dashboard/products'); // 👈 Navigate here
+        return true
       } else {  
         // Update the Swal alert with an error
         Swal.update({
@@ -46,6 +54,7 @@ const handleUpdateProduct = async (values: any) => {
           icon: 'error',
           showConfirmButton: true,
         });
+        return false
       }
     } catch (error: any) {
       // Update the Swal alert for unexpected errors
@@ -55,6 +64,7 @@ const handleUpdateProduct = async (values: any) => {
         icon: 'error',
         showConfirmButton: true,
       });
+      return false
     }
   };
 
@@ -80,7 +90,7 @@ const handleUpdateProduct = async (values: any) => {
         }
       };
 
-const handleDelete = async (product: Product) => {
+const handleDelete = async (product: ProductIn) => {
     const confirmation = await Swal.fire({
       title: 'Are you sure?',
       text: `You are about to delete ${product.name}. This action cannot be undone.`,
@@ -115,6 +125,9 @@ const handleDelete = async (product: Product) => {
           icon: 'success',
           showConfirmButton: true,
         });
+      setTimeout(() => {
+        Swal.close();
+      }, 500);
         dispatch(setRefreshData(refreshData + 1));
       } else {
         Swal.update({
@@ -135,7 +148,7 @@ const handleDelete = async (product: Product) => {
   };
 
   const handleCreateProduct = async (
-      values: any) => {
+      values: ProductOut) => {
       // Show the Swal alert immediately (only once)
       Swal.fire({
         title: 'Adding Product...',
@@ -152,11 +165,16 @@ const handleDelete = async (product: Product) => {
           // Update the existing Swal instead of reopening it
           Swal.update({
             title: 'Product Added!',
-            text: `Product Details: ${values.name}`,
+            text: `Product has been successfully added.`,
             icon: 'success',
             showConfirmButton: true,
           });
+          setTimeout(() => {
+              Swal.close();
+            }, 500);
           dispatch(setRefreshData(refreshData + 1));
+          router.push('/dashboard/products'); // 👈 Navigate here
+          return true
         } else {  
           // Update the Swal alert with an error
           Swal.update({
@@ -165,6 +183,7 @@ const handleDelete = async (product: Product) => {
             icon: 'error',
             showConfirmButton: true,
           });
+          return false
         }
       } catch (error: any) {
         Swal.hideLoading()
@@ -175,6 +194,7 @@ const handleDelete = async (product: Product) => {
           icon: 'error',
           showConfirmButton: true,
         });
+        return false
       }
     };
 

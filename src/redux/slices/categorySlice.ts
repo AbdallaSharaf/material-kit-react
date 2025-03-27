@@ -63,14 +63,8 @@ CategoryOut,
   async (categoryData, { rejectWithValue }) => {
       try {
 
-    const transformedData: CategoryOut = {
-      name: {ar: categoryData.name?.ar, en: categoryData.name?.en},
-      description: {ar: categoryData.description?.ar, en: categoryData.description?.en},
-      order: categoryData.order,
-      available: categoryData.available
-    }
-
-    const response = await axios.post<CategoryOut, AxiosResponse<{message: string, category: CategoryIn}, any>>(API_URL, transformedData);
+    const response = await axios.post<CategoryOut, AxiosResponse<{message: string, category: CategoryIn}, any>>(API_URL, categoryData);
+    console.log(response)
       return response.data.category;
     } catch (error: any) {
       return rejectWithValue(
@@ -88,18 +82,12 @@ export const updateCategory = createAsyncThunk<
 >(
   'categories/updateCategory',
   async ({ id, updatedData }, { rejectWithValue }) => {
-    
-    const transformedData: CategoryOut = {
-      name: {ar: updatedData.name?.ar, en: updatedData.name?.en},
-      description: {ar: updatedData.description?.ar, en: updatedData.description?.en},
-      order: updatedData.order,
-      available: updatedData.available
-    }
 
     try {
-      const response = await axios.put<CategoryOut, AxiosResponse<{message: string, category: CategoryIn}, any>>(`${API_URL}/${id}`, transformedData);
-      return response.data.category;
+      const response = await axios.put<CategoryOut, AxiosResponse<{message: string, Category: CategoryIn}, any>>(`${API_URL}/${id}`, updatedData);
+      return response.data.Category;
     } catch (error: any) {
+      console.log( error.response)
       return rejectWithValue(
         error.response?.data?.message || error.message || 'Failed to update caCategory'
       );
@@ -173,6 +161,7 @@ const categoriesSlice = createSlice({
         })
         .addCase(updateCategory.fulfilled, (state, action: PayloadAction<CategoryIn>) => {
           state.loading = false;
+          console.log(action.payload._id)
           const index = state.categories.findIndex((z) => z._id === action.payload._id);
           if (index !== -1) {
             state.categories[index] = action.payload;

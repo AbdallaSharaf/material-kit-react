@@ -10,6 +10,7 @@ export type CategoryOut = {
     },
     order?: number,
     available?: boolean,
+    showInTopMenu?: boolean,
   }
 
 export type CategoryIn = {

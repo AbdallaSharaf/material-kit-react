@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 
 import type { Metadata } from 'next';
 import { config } from '@/config';
-import TagsModal from '@/components/dashboard/products/tags-modal';
+import TagsModal from '@/components/dashboard/categories/tags-modal';
 
 export const metadata: Metadata = {
   title: `Products | Dashboard | ${config.site.name}`,

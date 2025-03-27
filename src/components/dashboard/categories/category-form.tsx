@@ -28,13 +28,45 @@ const CategoryForm = ({category}: CategoryFormProps) => {
       description_ar: category?.description?.ar || "",
       description_en: category?.description?.ar ||"",
       available: category?.available || true,
+      showInTopMenu: category?.showInTopMenu || true,
     },
-    validationSchema: Yup.object({
-      name_ar: Yup.string().required("Arabic name is required"),
-      name_en: Yup.string().required("English name is required"),
-      description_en: Yup.string().required("English description is required"),
-      description_ar: Yup.string().required("Arabic description is required"),
-    }),
+    enableReinitialize: true,
+     validationSchema: Yup.object({
+      name_ar: Yup.string()
+        .trim()
+        .required("Arabic name is required")
+        .min(2, "Too short category name"), // Matches minlength constraint
+    
+      name_en: Yup.string()
+        .trim()
+        .required("English name is required")
+        .min(2, "Too short category name"),
+    
+      description_ar: Yup.string()
+        .trim()
+        .required("Arabic description is required")
+        .min(5, "Too short category description"), // Matches minlength constraint
+    
+      description_en: Yup.string()
+        .trim()
+        .required("English description is required")
+        .min(5, "Too short category description"),
+    
+      imgCover: Yup.string()
+        .url("Invalid image URL") // Assuming it's a URL
+        .nullable(), // Can be empty
+    
+      photos: Yup.array().of(Yup.string().url("Invalid image URL")),
+    
+      order: Yup.number()
+        .integer("Order must be an integer")
+        .min(1, "Order must be at least 1")
+        .required("Order is required"),
+    
+      available: Yup.boolean().required("Availability status is required"),
+    
+      showInTopMenu: Yup.boolean().required("Show in top menu status is required"),
+    }),    
     onSubmit: async (values) => {
         const { name_ar, name_en, description_ar, description_en, ...rest } = values;
 
@@ -145,6 +177,20 @@ const CategoryForm = ({category}: CategoryFormProps) => {
             label="Available:"
             labelPlacement="start"
             />
+
+        <FormControlLabel
+          control={
+              <Switch
+              checked={formik.values.showInTopMenu}
+              onChange={formik.handleChange}
+              name="showInTopMenu"
+              color="primary"
+              />
+            }
+            label="Show In top menu:"
+            labelPlacement="start"
+            />
+
         <div className="flex justify-end">
         <Button type="submit" variant="contained" color="primary" className="w-1/4 ml-auto">
           Submit
