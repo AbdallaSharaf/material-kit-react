@@ -64,6 +64,7 @@ export const fetchProducts = createAsyncThunk<
       url.searchParams.set('deleted', 'false');
       {params.id && url.searchParams.set('company', params.id);}
       url.searchParams.set('PageCount', params.pageSize);
+      url.searchParams.set('sort', "order");
       url.searchParams.set('page', page+1);
       if (params.columnFilters && params.columnFilters.length > 0) {
         params.columnFilters.forEach((filter: any) => {
@@ -114,8 +115,30 @@ export const updateProduct = createAsyncThunk<
   'products/updateProduct',
   async ({ id, updatedData }, { rejectWithValue }) => {    
     try {
-      const response = await axios.put<ProductOut, AxiosResponse<{message: string, product: ProductIn}, any>>(`${API_URL}/${id}`, updatedData);
-      return response.data.product;
+      console.log(updatedData.order)
+      const response = await axios.put<ProductOut, AxiosResponse<{message: string, Product: ProductIn}, any>>(`${API_URL}/${id}`, updatedData);
+      console.log(response.data.Product)
+      return response.data.Product;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || error.message || 'Failed to update product'
+      );
+    }
+  }
+);
+
+// Update an existing product
+export const updateOrder = createAsyncThunk<
+  string, // Return type on success
+  { id: string; order: number }, // Argument type
+  { rejectValue: string }
+>(
+  'products/updateOrder',
+  async ({ id, order }, { rejectWithValue }) => {    
+    try {
+      console.log(order)
+      const response = await axios.put<ProductOut, AxiosResponse<{message: string}, any>>(`${API_URL}/order/${id}`, {order: order});
+      return response.data.message;
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || error.message || 'Failed to update product'
@@ -215,6 +238,19 @@ const productsSlice = createSlice({
         .addCase(updateProduct.rejected, (state, action) => {
           state.loading = false;
           state.error = action.payload || 'Failed to update product';
+        });
+
+      builder
+        .addCase(updateOrder.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(updateOrder.fulfilled, (state) => {
+          state.loading = false;
+        })
+        .addCase(updateOrder.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload || 'Failed to update order';
         });
         
       // Delete product

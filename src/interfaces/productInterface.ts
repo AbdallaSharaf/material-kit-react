@@ -9,6 +9,10 @@ export type ProductIn = {
         ar: string,
         en: string
     },
+    shortDesc: {
+        ar: string,
+        en: string
+    },
     _id: string,
     slug: string,
     metaTags: string[],
@@ -23,6 +27,7 @@ export type ProductIn = {
     sold: number,
     deleted: boolean,
     SKU: number,
+    order: number,
     imgCover: string[],
     createdAt: string,
     updatedAt: string,
@@ -45,5 +50,14 @@ export type ProductOut = {
         available?: boolean,
         price?: number,
         SKU?: number,
+        order?: number,
+        description?: {
+            ar?: string,
+            en?: string
+        },
+        shortDesc?: {
+            ar?: string,
+            en?: string
+        },
         trackQty?:boolean
     }

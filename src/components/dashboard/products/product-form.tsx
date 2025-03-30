@@ -1,6 +1,6 @@
 'use client'
 import React from 'react';
-import { Box, Button, Checkbox, FormControlLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { Box, Button, Checkbox, FormControlLabel, IconButton, MenuItem, Select, TextField, Typography } from '@mui/material';
 import { Formik, Form, FieldArray, useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import { useSelector } from 'react-redux';
@@ -10,7 +10,7 @@ import { ProductIn, ProductOut } from '@/interfaces/productInterface';
 import Swal from 'sweetalert2';
 import { useProductHandlers } from '@/controllers/productsController';
 import { CategoryIn } from '@/interfaces/categoryInterface';
-
+import CloseIcon from '@mui/icons-material/Close';
 
 // Validation Schema
 
@@ -27,6 +27,10 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
     initialValues: {
       name_ar: product?.name?.ar ||"",
       name_en: product?.name?.en || "",
+      description_ar: product?.description?.ar ||"",
+      description_en: product?.description?.en || "",
+      shortDesc_ar: product?.shortDesc?.ar ||"",
+      shortDesc_en: product?.shortDesc?.en || "",
       metaTags: product?.metaTags || [] as string[],
       category: product?.category?.map(cat => ({
         category: cat.category._id || '', // Mapping `_id` to `category`
@@ -37,108 +41,42 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
       SKU: product?.SKU || 0,
       trackQty: product?.trackQty ?? true,
     },
+    validateOnBlur: true,      // ✅ Validate when user leaves the field
+    validateOnChange: false, // ✅ Optional: Don't validate on typing
+    validateOnMount: false,    // ✅ Prevent validation when modal opens
     enableReinitialize: true,
     validationSchema: Yup.object({
-      name_ar: Yup.string()
-        .trim()
-        .required("Arabic name is required")
-        .min(2, "Too short product name"),
-    
-      name_en: Yup.string()
-        .trim()
-        .required("English name is required")
-        .min(2, "Too short product name"),
-    
-      slug: Yup.string()
-        .trim()
-        .matches(/^[a-z0-9-]+$/, "Slug must be lowercase and contain only letters, numbers, and dashes")
-        .nullable(),
-    
-      description_ar: Yup.string().trim().nullable(),
-      description_en: Yup.string().trim().nullable(),
-    
-      shortDesc_ar: Yup.string().trim().nullable(),
-      shortDesc_en: Yup.string().trim().nullable(),
-    
-      metaTags: Yup.array().of(Yup.string().trim().required("Meta tag is required")),
-    
-      category: Yup.array().of(
-        Yup.object({
-          category: Yup.string().required("Please select a category"),
-          order: Yup.number()
-            .integer("Order must be an integer")
-            .min(1, "Order must be at least 1")
-            .required("Order is required"),
-        })
-      ),
-    
-      stock: Yup.string().trim().nullable(),
-    
-      available: Yup.boolean().required("Availability status is required"),
-      parentAvailable: Yup.boolean().required("Parent availability status is required"),
-    
-      price: Yup.number()
-        .positive("Price must be a positive number")
-        .required("Price is required"),
-    
-      priceAfterDiscount: Yup.number()
-        .min(0, "Discounted price must be 0 or higher")
-        .nullable(),
-    
-      priceAfterExpiresAt: Yup.date().nullable(),
-    
-      imgCover: Yup.array().of(
-        Yup.object({
-          url: Yup.string().url("Invalid image URL").required("Image URL is required"),
-          size: Yup.string().trim().nullable(),
-        })
-      ),
-    
-      images: Yup.array().of(Yup.string().url("Invalid image URL")),
-    
-      showWeight: Yup.boolean().required(),
-    
-      minQty: Yup.number().integer().min(0, "Minimum quantity must be 0 or higher").required(),
-    
-      trackQty: Yup.boolean().required(),
-    
-      lowStockQty: Yup.number()
-        .integer()
-        .min(0, "Low stock quantity must be 0 or higher")
-        .nullable(),
-    
-      Length: Yup.string().trim().nullable(),
-      width: Yup.string().trim().nullable(),
-      height: Yup.string().trim().nullable(),
-      Weight: Yup.string().trim().nullable(),
-    
-      rewardPoint: Yup.string().trim().nullable(),
-    
-      sold: Yup.number()
-        .integer()
-        .min(0, "Sold quantity must be 0 or higher")
-        .default(0),
-    
-      deleted: Yup.boolean().default(false),
-    
-      order: Yup.number()
-        .integer()
-        .min(1, "Order must be at least 1")
-        .nullable(),
-    
-      SKU: Yup.string()
-        .trim()
-        .matches(/^[a-zA-Z0-9_-]*$/, "SKU must contain only letters, numbers, underscores, or dashes")
-        .nullable(),
+      name_ar: Yup.string().required("Arabic name is required"),
+      name_en: Yup.string().required("English name is required"),
+      metaTags: Yup.array().of(Yup.string().required('Meta tag is required')),
+      category: Yup.array()
+        .of(
+          Yup.object().shape({
+            category: Yup.string().required('Please select a category'),
+            order: Yup.number().min(1, 'Order must be at least 1').required('Order is required'),
+          })
+        ),
+      available: Yup.boolean(),
+      price: Yup.number().positive('Price must be positive').required('Price is required'),
+      SKU: Yup.number().min(1, 'SKU must be positive'),
+      // trackQty: Yup.boolean(),
     }),
     onSubmit: async (values) => {
-        const { name_ar, name_en, ...rest } = values;
+        const { name_ar, name_en, description_ar, description_en, shortDesc_ar, shortDesc_en, ...rest } = values;
 
         const formattedData: ProductOut = {
           ...rest,
           name: {
             ar: name_ar,
             en: name_en,
+          },
+          description: {
+            ar: description_ar,
+            en: description_en,
+          },
+          shortDesc: {
+            ar: shortDesc_ar,
+            en: shortDesc_en,
           },
         };
         let isSuccess = false;
@@ -178,10 +116,11 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
         handleSubmit
         }
       }} noValidate>
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-x-10'>
+          <div className=''>
 
             {/* Left Section */}
-            <div className='grid gap-4'>
+
+            <div className='grid md:grid-cols-2 gap-4'>
               <TextField
                 fullWidth
                 margin="normal"
@@ -193,7 +132,7 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                 onBlur={formik.handleBlur}
                 error={Boolean(formik.touched.name_ar && formik.errors.name_ar)}
                 helperText={formik.touched.name_ar && formik.errors.name_ar}
-              />
+                />
 
               <TextField
                 fullWidth
@@ -206,11 +145,63 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                 onBlur={formik.handleBlur}
                 error={Boolean(formik.touched.name_en && formik.errors.name_en)}
                 helperText={formik.touched.name_en && formik.errors.name_en}
-              />
+                />
+                </div>
 
-              <FieldArray name="metaTags">
+            <div className='grid md:grid-cols-2 gap-4 my-6'>
+              <TextField
+                fullWidth
+                label="Arabic Description"
+                name="description_ar"
+                multiline
+                rows={3}
+                value={formik.values.description_ar}
+                onChange={formik.handleChange}
+                error={formik.touched.description_ar && Boolean(formik.errors.description_ar)}
+                helperText={formik.touched.description_ar && formik.errors.description_ar}
+                />
+
+              <TextField
+                fullWidth
+                label="English Description"
+                name="description_en"
+                multiline
+                rows={3}
+                value={formik.values.description_en}
+                onChange={formik.handleChange}
+                error={formik.touched.description_en && Boolean(formik.errors.description_en)}
+                helperText={formik.touched.description_en && formik.errors.description_en}
+                />
+            </div>
+
+            <div className='grid md:grid-cols-2 gap-4 my-6'>
+            <TextField
+                fullWidth
+                label="Arabic Short Description"
+                name="shortDesc_ar"
+                multiline
+                value={formik.values.shortDesc_ar}
+                onChange={formik.handleChange}
+                error={formik.touched.shortDesc_ar && Boolean(formik.errors.shortDesc_ar)}
+                helperText={formik.touched.shortDesc_ar && formik.errors.shortDesc_ar}
+                />
+
+              <TextField
+                fullWidth
+                label="English Short Description"
+                name="shortDesc_en"
+                multiline
+                value={formik.values.shortDesc_en}
+                onChange={formik.handleChange}
+                error={formik.touched.shortDesc_en && Boolean(formik.errors.shortDesc_en)}
+                helperText={formik.touched.shortDesc_en && formik.errors.shortDesc_en}
+                />
+                </div>
+
+              <FieldArray name="metaTags" >
                 {({ push, remove }) => (
                   <>
+                  <div className='flex flex-wrap gap-6'>
                     {formik.values.metaTags.map((tag, index) => (
                       <Box key={index} className="flex items-center gap-2">
                         <TextField
@@ -223,50 +214,25 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                           onBlur={formik.handleBlur}
                           error={Boolean((formik.touched.metaTags as any)?.[index] && formik.errors.metaTags?.[index])}
                           helperText={(formik.touched.metaTags as any)?.[index] && formik.errors.metaTags?.[index]}
-                        />
-                        <Button onClick={() => remove(index)} color="error">X</Button>
+                          />
+                          <IconButton onClick={() => remove(index)} color="error">
+                            <CloseIcon />
+                          </IconButton>
                       </Box>
                     ))}
-                    <Button onClick={() => push('')} color="primary">+ Add Meta Tag</Button>
-                  </>
+                  </div>
+                  <Button onClick={() => push('')} color="primary">+ Add Meta Tag</Button>
+                </>
                 )}
               </FieldArray>
-
-              <TextField
-                fullWidth
-                margin="normal"
-                name="price"
-                label="Price"
-                type="number"
-                variant="outlined"
-                value={formik.values.price}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={Boolean(formik.touched.price && formik.errors.price)}
-                helperText={formik.touched.price && formik.errors.price}
-              />
-
-              <TextField
-                fullWidth
-                margin="normal"
-                name="SKU"
-                label="SKU"
-                type="number"
-                variant="outlined"
-                value={formik.values.SKU}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={Boolean(formik.touched.SKU && formik.errors.SKU)}
-                helperText={formik.touched.SKU && formik.errors.SKU}
-              />
-            </div>
-
             {/* Right Section */}
-            <div className='grid gap-4'>
+            <div className=''>
               <FieldArray name="category">
                 {({ push, remove }) => (
                   <>
+                  <div className='grid md:grid-cols-2 gap-4 gap-y-6'>
                     {formik.values.category.map((cat, index) => (<>
+                    <div>
                       <Box key={index} className="flex items-center gap-2">
                         <Select
                           fullWidth
@@ -294,17 +260,20 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                           error={Boolean(formik.touched.category?.[index]?.order && (formik.errors.category?.[index] as any)?.order)}
                           helperText={formik.touched.category?.[index]?.order && (formik.errors.category?.[index] as any)?.order}
                           />
-
-                        <Button onClick={() => remove(index)} color="error">X</Button>
-                      </Box>
-                      {((formik.errors.category?.[index] as any)?.category as string) !==
-                      'At least one category is required' && (
-                        <div className="text-red-500 text-sm mt-1">
-                        {(formik.errors.category?.[index] as any)?.category}
-                      </div>
-                    )}
+                          <IconButton onClick={() => remove(index)} color="error">
+                            <CloseIcon />
+                          </IconButton>                      
+                          </Box>
+                            {((formik.errors.category?.[index] as any)?.category as string) !==
+                            'At least one category is required' && (
+                              <div className="text-red-500 text-sm mt-1">
+                              {(formik.errors.category?.[index] as any)?.category}
+                            </div>
+                          )}
+                          </div>
                     </>
                     ))}
+                    </div>
                     <Button onClick={() => push({ category: '', order: 1 })} color="primary">+ Add Category</Button>
                   </>
                 )}
@@ -314,6 +283,38 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                 (formik.errors.category as string) === 'At least one category is required' && (
                   <div className="text-red-500 text-sm mt-2">{formik.errors.category.toString()}</div>
                 )}
+
+              <div className='grid md:grid-cols-2 gap-4 my-6'>
+              <TextField
+                fullWidth
+                margin="normal"
+                name="price"
+                label="Price"
+                type="number"
+                variant="outlined"
+                value={formik.values.price}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={Boolean(formik.touched.price && formik.errors.price)}
+                helperText={formik.touched.price && formik.errors.price}
+              />
+
+              <TextField
+                fullWidth
+                margin="normal"
+                name="SKU"
+                label="SKU"
+                type="number"
+                variant="outlined"
+                value={formik.values.SKU}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={Boolean(formik.touched.SKU && formik.errors.SKU)}
+                helperText={formik.touched.SKU && formik.errors.SKU}
+              />
+              </div>
+
+              <div className='grid md:grid-cols-2 gap-4'>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -325,7 +326,7 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                 label="Available"
               />
 
-              <FormControlLabel
+              {/* <FormControlLabel
                 control={
                   <Checkbox
                     name="trackQty"
@@ -334,12 +335,12 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                   />
                 }
                 label="Track Quantity"
-              />
+              /> */}
             </div>
-
+            </div>
             {/* Submit Button */}
             <Box sx={{ mt: 4 }} className='col-start-2 w-1/4 ms-auto'>
-              <Button type="submit" variant="contained" color="primary" className="w-1/4 ml-auto">
+              <Button type="submit" variant="contained" color="primary" className="ml-auto w-full">
                 Submit
               </Button>
             </Box>

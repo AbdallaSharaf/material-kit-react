@@ -21,9 +21,11 @@ import { useCategoryHandlers } from "@/controllers/categoriesController";
 
 export default function CategoriesModal(): React.JSX.Element {
   const [categoriesOpen, setCategoriesOpen] = React.useState(false);
-  const { handleDelete } = useCategoryHandlers();
+  const { handleDelete, fetchData } = useCategoryHandlers();
+  
   const { 
     categories, 
+    refreshData
   } = useSelector((state: RootState) => state.categories);
   const router = useRouter();
 
@@ -42,6 +44,10 @@ export default function CategoriesModal(): React.JSX.Element {
   const handleAddCategory = () => {
     router.push("/dashboard/categories/add");
   };
+
+  React.useEffect(() => {
+    fetchData();
+  }, [refreshData]);
 
   return (
     <>
