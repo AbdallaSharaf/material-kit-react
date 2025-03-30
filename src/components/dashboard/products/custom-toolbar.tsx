@@ -6,8 +6,8 @@ import { mkConfig, generateCsv, download } from 'export-to-csv'; //or use your l
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { MRT_Row } from 'material-react-table';
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
-import { Product } from './products-table';
 import { useRouter } from 'next/navigation';
+import { ProductIn } from '@/interfaces/productInterface';
 
 const csvConfig = mkConfig({
   fieldSeparator: ',',
@@ -20,7 +20,7 @@ export default function CustomToolbar({table, data}: any) {
 
     const router = useRouter()
 
-  const handleExportRows = (rows: MRT_Row<Product>[]) => {
+  const handleExportRows = (rows: MRT_Row<ProductIn>[]) => {
     const rowData = rows.map((row) => ({
       id: row.original._id,
     }));
@@ -34,7 +34,7 @@ export default function CustomToolbar({table, data}: any) {
   const handleExportData = () => {
     if (data.length === 0) return; // Prevent exporting empty data
   
-    const rowData = data.map((product: Product) => ({
+    const rowData = data.map((product: ProductIn) => ({
       id: product._id,
     }));
   
