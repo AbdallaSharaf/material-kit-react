@@ -13,9 +13,19 @@ import { TotalProfit } from '@/components/dashboard/overview/total-profit';
 import { Traffic } from '@/components/dashboard/overview/traffic';
 import { orders } from './orders/page';
 import dayjs from 'dayjs';
-import { Product } from '../../components/dashboard/products/products-table';
-
+import { CategoryOut } from '@/interfaces/categoryInterface';
 export const metadata = { title: `Overview | Dashboard | ${config.site.name}` } satisfies Metadata;
+
+export interface Product {
+  _id: string;
+  image: string;
+  name: string;
+  price: number;
+  updatedAt: Date;
+  categories: CategoryOut[];
+  isPricePerKilo: boolean; // true if the price is per kilogram, false if per piece
+  isActive: boolean;
+}  
 
 
 export default function Page(): React.JSX.Element {
