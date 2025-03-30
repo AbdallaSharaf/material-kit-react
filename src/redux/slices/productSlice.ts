@@ -4,18 +4,18 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from '../../utils/axiosInstance';
 
 import { MRT_ColumnFiltersState, MRT_PaginationState, MRT_SortingState } from 'material-react-table';
-import { Product } from '@/components/dashboard/products/products-table';
 import { ProductIn, ProductOut } from '@/interfaces/productInterface';
 import { AxiosResponse } from 'axios';
 
 
 // Define the slice state type
 interface ProductsState {
-  products: any[];
+  products: ProductIn[];
+  productsByCategory: ProductIn[];
   loading: boolean;
   error: string | null;
   totalCount: number, // Total number of products
-  product: any | null;
+  product: ProductIn | null;
 
   // UI state variables to be shared across controller and view
   refreshData: number;
@@ -29,6 +29,7 @@ interface ProductsState {
 // Define the initial state
 const initialState: ProductsState = {
   products: [],
+  productsByCategory: [],
   loading: false,
   error: null,
   totalCount: 0, // Total number of products
@@ -50,7 +51,7 @@ const API_URL = `https://fruits-heaven-api.vercel.app/api/v1/product`;
 
 // Fetch all products
 export const fetchProducts = createAsyncThunk<
-  { products: Product[]; totalCount: number }, // Return type with products and total count
+  { products: ProductIn[]; totalCount: number }, // Return type with products and total count
   { id?: string, columnFilters: any, page: any, pageSize: any, sorting: any, globalFilter: any }, // Arguments
   { rejectValue: string }
 >(
@@ -62,7 +63,41 @@ export const fetchProducts = createAsyncThunk<
       const url = new URL(API_URL);
       { params.globalFilter && url.searchParams.set('_id', params.globalFilter ?? '')}
       url.searchParams.set('deleted', 'false');
-      {params.id && url.searchParams.set('company', params.id);}
+      url.searchParams.set('PageCount', params.pageSize);
+      url.searchParams.set('sort', "order");
+      url.searchParams.set('page', page+1);
+      if (params.columnFilters && params.columnFilters.length > 0) {
+        params.columnFilters.forEach((filter: any) => {
+          url.searchParams.append(filter.id, filter.value);
+        });
+      }
+      { params.sorting && params.sorting.length > 0 && params.sorting.forEach((sort:any) => {
+        url.searchParams.append('sort', sort.desc ? `-${sort.id}` : sort.id);
+      });}
+      const response = await axios.get(url.href);
+      const { data, TotalCount } = response.data;
+      return { products: data, totalCount: TotalCount };
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || error.message || 'Failed to fetch products'
+      );
+    }
+  }
+);
+
+// Fetch all products
+export const fetchProductsByCategory = createAsyncThunk<
+  { products: ProductIn[]; totalCount: number }, // Return type with products and total count
+  { id?: string, columnFilters: any, page: any, pageSize: any, sorting: any, globalFilter: any }, // Arguments
+  { rejectValue: string }
+>(
+  'products/fetchProductsByCategory',
+  async (params, { rejectWithValue }) => {
+    try {
+      const { page } = params;
+
+      const url = new URL(`${API_URL}/category/${params.id}`);
+      url.searchParams.set('deleted', 'false');
       url.searchParams.set('PageCount', params.pageSize);
       url.searchParams.set('sort', "order");
       url.searchParams.set('page', page+1);
@@ -127,12 +162,12 @@ export const updateProduct = createAsyncThunk<
 );
 
 // Update an existing product
-export const updateOrder = createAsyncThunk<
+export const updateProductOrder = createAsyncThunk<
   string, // Return type on success
   { id: string; order: number }, // Argument type
   { rejectValue: string }
 >(
-  'products/updateOrder',
+  'products/updateProductOrder',
   async ({ id, order }, { rejectWithValue }) => {    
     try {
       const response = await axios.put<ProductOut, AxiosResponse<{message: string}, any>>(`${API_URL}/order/${id}`, {order: order});
@@ -206,6 +241,21 @@ const productsSlice = createSlice({
           state.error = action.payload || 'Failed to fetch products';
         });
         
+      builder
+        .addCase(fetchProductsByCategory.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(fetchProductsByCategory.fulfilled, (state, action) => {
+          state.loading = false;
+          state.productsByCategory = action.payload.products; // Store the products
+          state.totalCount = action.payload.totalCount; // Store the total count
+        })
+        .addCase(fetchProductsByCategory.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload || 'Failed to fetch products';
+        });
+        
       // Add product
       builder
         .addCase(addProduct.pending, (state) => {
@@ -239,14 +289,14 @@ const productsSlice = createSlice({
         });
 
       builder
-        .addCase(updateOrder.pending, (state) => {
+        .addCase(updateProductOrder.pending, (state) => {
           state.loading = true;
           state.error = null;
         })
-        .addCase(updateOrder.fulfilled, (state) => {
+        .addCase(updateProductOrder.fulfilled, (state) => {
           state.loading = false;
         })
-        .addCase(updateOrder.rejected, (state, action) => {
+        .addCase(updateProductOrder.rejected, (state, action) => {
           state.loading = false;
           state.error = action.payload || 'Failed to update order';
         });

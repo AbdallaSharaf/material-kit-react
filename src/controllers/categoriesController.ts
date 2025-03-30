@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import { addCategory, setRefreshData, updateCategory } from "../redux/slices/categorySlice";
+import { addCategory, setRefreshData, updateCategory, updateCategoryOrder } from "../redux/slices/categorySlice";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store/store";
 import { deleteCategory, fetchCategories } from "../redux/slices/categorySlice";
@@ -122,11 +122,64 @@ const dispatch = useDispatch<AppDispatch>()
       }
     };
 
+    const handleChangeOrder = async ({id, newOrder}: {id: string, newOrder: number}) => {
+      try {
+          const resultAction = await dispatch(updateCategoryOrder({id,  order: newOrder}));
+          if (updateCategoryOrder.fulfilled.match(resultAction)) {
+            // Update the existing Swal instead of reopening it
+            dispatch(setRefreshData(refreshData + 1));
+          }
+          else {  
+            // Update the Swal alert with an error
+            Swal.fire({
+              title: 'Error Updating Product',
+              text: resultAction.payload ? String(resultAction.payload) : 'Unknown error',
+              icon: 'error',
+              showConfirmButton: true,
+            });
+          }
+        } catch (error: any) {
+          // Fire the Swal alert for unexpected errors
+          Swal.fire({
+            title: 'Unexpected Error',
+            text: error.message,
+            icon: 'error',
+            showConfirmButton: true,
+          });
+        }
+      };
+
+const handleChangeStatus = async (product: CategoryIn) => {
+  try {
+      const resultAction = await dispatch(updateCategory({id: product._id!, updatedData: {available: !product.available}}));
+      if (updateCategory.fulfilled.match(resultAction)) {
+        // Update the existing Swal instead of reopening it
+        dispatch(setRefreshData(refreshData + 1));
+      }
+      else {  
+        // Update the Swal alert with an error
+        Swal.fire({
+          title: 'Error Updating Product',
+          text: resultAction.payload ? String(resultAction.payload) : 'Unknown error',
+          icon: 'error',
+          showConfirmButton: true,
+        });
+      }
+    } catch (error: any) {
+      // Fire the Swal alert for unexpected errors
+      Swal.fire({
+        title: 'Unexpected Error',
+        text: error.message,
+        icon: 'error',
+        showConfirmButton: true,
+      });
+    }
+  };
 
 const handleDelete = async (item: CategoryIn) => {
     // Show confirmation dialog and await the user's response.
     const result = await Swal.fire({
-      title: `Are you sure you want to delete ${item.name}?`,
+      title: `Are you sure you want to delete ${item.name["en"]}?`,
       text: "This action cannot be undone.",
       icon: "warning",
       showCancelButton: true,
@@ -153,7 +206,7 @@ const handleDelete = async (item: CategoryIn) => {
         if (deleteCategory.fulfilled.match(resultAction)) {
           Swal.update({
             title: "Item Deleted!",
-            text: `Item ${item.name} has been successfully deleted.`,
+            text: `Item ${item.name["en"]} has been successfully deleted.`,
             icon: "success",
             confirmButtonText: "OK",
           });
@@ -197,6 +250,8 @@ const handleDelete = async (item: CategoryIn) => {
     handleDelete,
     fetchData,
     handleUpdateCategory,
-    handleCreateCategory
+    handleCreateCategory,
+    handleChangeOrder,
+    handleChangeStatus
   };
 }

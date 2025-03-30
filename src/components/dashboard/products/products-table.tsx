@@ -6,25 +6,13 @@ import { IconButton, Paper, Switch, Tooltip } from '@mui/material';
 import CustomToolbar from './custom-toolbar';
 import { Box } from '@mui/system';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import { useRouter } from 'next/navigation';
-import { CategoryIn } from '@/interfaces/categoryInterface';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store/store';
 import { useCategoryHandlers } from '@/controllers/categoriesController';
 import { useProductHandlers } from '@/controllers/productsController';
 import { ProductIn } from '@/interfaces/productInterface';
 import { setColumnFilters, setPagination, setSearchQuery } from '@/redux/slices/productSlice';
-
-export interface Product {
-    _id: string;
-    image: string;
-    name: string;
-    price: number;
-    updatedAt: Date;
-    categories: CategoryIn[];
-    isPricePerKilo: boolean; // true if the price is per kilogram, false if per piece
-    isActive: boolean;
-  }  
   
 
 const handleSaveRow: MRT_TableOptions<ProductIn>['onEditingRowSave'] = ({
@@ -38,8 +26,10 @@ const handleSaveRow: MRT_TableOptions<ProductIn>['onEditingRowSave'] = ({
 export function ProductsTable(): React.JSX.Element {
 
     const { fetchData : fetchDataCategories } = useCategoryHandlers();
-    const { fetchData : fetchDataProducts, handleDelete, handleChangeStatus, handleChangeOrder } = useProductHandlers();
+    const { fetchData : fetchDataProducts, handleDelete, handleChangeStatus, fetchDataByCategory, handleChangeOrder } = useProductHandlers();
     const dispatch = useDispatch<AppDispatch>()
+    const searchParams = useSearchParams();
+    const categoryId = searchParams.get("category"); // Get category ID from params
 
     const { 
       refreshData : refreshDataCategories,
@@ -49,12 +39,13 @@ export function ProductsTable(): React.JSX.Element {
     const { 
       refreshData : refreshDataProducts,
       products,
+      productsByCategory,
       columnFilters,
       pagination,
       rowCount,
       searchQuery,
       loading
-    } = useSelector((state: RootState) => state.products,);
+    } = useSelector((state: RootState) => state.products);
 
     const columns: MRT_ColumnDef<ProductIn>[] = [
       {
@@ -177,15 +168,21 @@ export function ProductsTable(): React.JSX.Element {
     React.useEffect(() => {
       fetchDataCategories();
     }, [refreshDataCategories]);
+  
     React.useEffect(() => {
-      fetchDataProducts();
-    }, [refreshDataProducts, searchQuery, columnFilters, pagination]);
+      if (categoryId) {
+        fetchDataByCategory(categoryId); // Fetch products by category
+      } else {
+        fetchDataProducts(); // Fetch all products
+      }
+    }, [refreshDataProducts, searchQuery, columnFilters, pagination, categoryId]);
+
     const router = useRouter()
   return (
     <Paper>
       <MaterialReactTable 
         columns={columns} 
-        data={products} 
+        data={categoryId ? productsByCategory : products} 
         enableRowSelection
         enableRowActions
         enableColumnResizing

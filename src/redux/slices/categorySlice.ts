@@ -41,6 +41,7 @@ export const fetchCategories = createAsyncThunk<
 
       url.searchParams.set('deleted', 'false');
       url.searchParams.set('page', `1`);
+      url.searchParams.set('sort', "order");
       url.searchParams.set('PageCount', "1000");
       const response = await axios.get(url.href);
       const { data } = response.data;
@@ -94,6 +95,26 @@ export const updateCategory = createAsyncThunk<
     }
   }
 );
+
+// Update an existing product
+export const updateCategoryOrder = createAsyncThunk<
+  string, // Return type on success
+  { id: string; order: number }, // Argument type
+  { rejectValue: string }
+>(
+  'products/updateCategoryOrder',
+  async ({ id, order }, { rejectWithValue }) => {    
+    try {
+      const response = await axios.patch<CategoryOut, AxiosResponse<{message: string}, any>>(`${API_URL}/${id}`, {order: order});
+      return response.data.message;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || error.message || 'Failed to update product'
+      );
+    }
+  }
+);
+
 
 // Delete a caCategory
 export const deleteCategory = createAsyncThunk<
@@ -172,6 +193,19 @@ const categoriesSlice = createSlice({
           state.error = action.payload || 'Failed to update caCategory';
         });
         
+      builder
+        .addCase(updateCategoryOrder.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(updateCategoryOrder.fulfilled, (state) => {
+          state.loading = false;
+        })
+        .addCase(updateCategoryOrder.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload || 'Failed to update order';
+        });
+
       // Delete caCategory
       builder
         .addCase(deleteCategory.pending, (state) => {

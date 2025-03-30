@@ -1,8 +1,7 @@
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store/store";
-import { addProduct, deleteProduct, fetchProducts, setRefreshData, setRowCount, updateOrder, updateProduct } from "../redux/slices/productSlice";
-import { Product } from "@/components/dashboard/products/products-table";
+import { addProduct, deleteProduct, fetchProducts, setRefreshData, setRowCount, updateProductOrder, updateProduct, fetchProductsByCategory } from "../redux/slices/productSlice";
 import { ProductIn, ProductOut } from "@/interfaces/productInterface";
 import { useRouter } from "next/navigation";
 import { uploadPhoto } from "@/cloudinary";
@@ -49,8 +48,8 @@ const handleChangeStatus = async (product: ProductIn) => {
 
 const handleChangeOrder = async ({id, newOrder}: {id: string, newOrder: number}) => {
   try {
-      const resultAction = await dispatch(updateOrder({id,  order: newOrder}));
-      if (updateOrder.fulfilled.match(resultAction)) {
+      const resultAction = await dispatch(updateProductOrder({id,  order: newOrder}));
+      if (updateProductOrder.fulfilled.match(resultAction)) {
         // Update the existing Swal instead of reopening it
         dispatch(setRefreshData(refreshData + 1));
       }
@@ -141,6 +140,28 @@ const handleChangeOrder = async ({id, newOrder}: {id: string, newOrder: number})
         }));
         // Check if the action was fulfilled and extract data
         if (fetchProducts.fulfilled.match(resultAction)) {
+          const { totalCount } = resultAction.payload;
+          dispatch(setRowCount(totalCount)); // Set the total row count from the response
+        } else {
+          // Handle errors (e.g., by showing a message or updating UI)
+          console.error('Error fetching products:', resultAction.payload);
+        }
+      };
+
+  const fetchDataByCategory = async (categoryID: string) => {
+        const { pageIndex, pageSize } = pagination;
+  
+        // Dispatch the action with the necessary parameters
+        const resultAction = await dispatch(fetchProductsByCategory({
+          id: categoryID,
+          page: pageIndex,
+          pageSize,
+          sorting,
+          globalFilter: searchQuery,
+          columnFilters
+        }));
+        // Check if the action was fulfilled and extract data
+        if (fetchProductsByCategory.fulfilled.match(resultAction)) {
           const { totalCount } = resultAction.payload;
           dispatch(setRowCount(totalCount)); // Set the total row count from the response
         } else {
@@ -284,6 +305,7 @@ const fetchOptions = async (id: string) => {
         handleCreateProduct,
         handleUpdateProduct,
         handleChangeOrder,
-        handleChangeStatus
+        handleChangeStatus,
+        fetchDataByCategory
       };
 }

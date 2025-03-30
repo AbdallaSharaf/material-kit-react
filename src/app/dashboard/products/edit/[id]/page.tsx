@@ -2,8 +2,6 @@ import { Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import React from 'react';
 import ProductForm from '@/components/dashboard/products/product-form';
-import dayjs from 'dayjs';
-import { Product } from '@/components/dashboard/products/products-table';
 
 interface PageProps {
   params: { id: string };

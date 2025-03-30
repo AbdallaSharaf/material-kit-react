@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 // Set your Cloudinary upload preset and cloud name here
-const cloudName = 'dxhej7ldl';
-const uploadPreset = 'saber-crm'; // set this in your Cloudinary settings
+const cloudName = 'dhrk71pn9';
+const uploadPreset = 'fruits-heaven'; // set this in your Cloudinary settings
 
 /**
  * Uploads a photo to Cloudinary.
