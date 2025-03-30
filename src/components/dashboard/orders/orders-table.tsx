@@ -208,13 +208,13 @@ export function OrdersTable({
                     return product ? (
                         <Box key={item.id} className='flex items-center'>
                         <img
-                            src={product.image}
-                            alt={product.name}
+                            src={product.images[0]}
+                            alt={product.name["en"]}
                             className='w-20 h-20 mr-3'
                         />
                         <Box className="flex flex-col gap-1">
                             <Typography><strong>ID:</strong> {item.id}</Typography>
-                            <Typography><strong>Name:</strong> {product.name}</Typography>
+                            <Typography><strong>Name:</strong> {product.name["en"]}</Typography>
                             <Typography><strong>Quantity:</strong> {item.quantity}</Typography>
                         </Box>
                         </Box>
