@@ -42,6 +42,7 @@ export type ProductOut = {
             en?: string
         },
         metaTags?: string[],
+        images?: string,
         category?: 
             {
                 category?: string,

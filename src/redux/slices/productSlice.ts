@@ -115,7 +115,6 @@ export const updateProduct = createAsyncThunk<
   'products/updateProduct',
   async ({ id, updatedData }, { rejectWithValue }) => {    
     try {
-      console.log(updatedData.order)
       const response = await axios.put<ProductOut, AxiosResponse<{message: string, Product: ProductIn}, any>>(`${API_URL}/${id}`, updatedData);
       console.log(response.data.Product)
       return response.data.Product;
@@ -136,7 +135,6 @@ export const updateOrder = createAsyncThunk<
   'products/updateOrder',
   async ({ id, order }, { rejectWithValue }) => {    
     try {
-      console.log(order)
       const response = await axios.put<ProductOut, AxiosResponse<{message: string}, any>>(`${API_URL}/order/${id}`, {order: order});
       return response.data.message;
     } catch (error: any) {

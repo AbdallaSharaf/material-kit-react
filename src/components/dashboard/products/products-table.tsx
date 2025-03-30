@@ -67,15 +67,15 @@ export function ProductsTable(): React.JSX.Element {
         // enableColumnFilter: false,
       },
       {
-        accessorKey: 'image',
+        accessorKey: 'images',
         header: 'Image',
         enableColumnActions: false,
         enableSorting: false,
         enableColumnFilter: false,
         size: 60,
-        Cell: ({ cell }) => (
+        Cell: ({ row }) => (
           <img
-            src={cell.getValue<string>()}
+            src={row.original.images[0]}
             alt="product image"
             style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }}
           />

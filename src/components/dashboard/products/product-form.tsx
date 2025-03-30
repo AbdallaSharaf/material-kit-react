@@ -1,5 +1,5 @@
 'use client'
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { Box, Button, Checkbox, FormControlLabel, IconButton, MenuItem, Select, TextField, Typography } from '@mui/material';
 import { Formik, Form, FieldArray, useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
@@ -11,6 +11,7 @@ import Swal from 'sweetalert2';
 import { useProductHandlers } from '@/controllers/productsController';
 import { CategoryIn } from '@/interfaces/categoryInterface';
 import CloseIcon from '@mui/icons-material/Close';
+import EditIcon from "@mui/icons-material/Edit";
 
 // Validation Schema
 
@@ -18,6 +19,8 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
   const { fetchData } = useCategoryHandlers();
   const { handleCreateProduct, handleUpdateProduct } = useProductHandlers();
   const { categories, refreshData } = useSelector((state: RootState) => state.categories);
+  const [thumbnail, setThumbnail] = useState<string>(product?.images[0] || "");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   React.useEffect(() => {
     fetchData();
@@ -40,6 +43,7 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
       price: product?.price || 0,
       SKU: product?.SKU || 0,
       trackQty: product?.trackQty ?? true,
+      images: product?.images[0] || undefined,  // Add image field
     },
     validateOnBlur: true,      // ✅ Validate when user leaves the field
     validateOnChange: false, // ✅ Optional: Don't validate on typing
@@ -60,6 +64,8 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
       price: Yup.number().positive('Price must be positive').required('Price is required'),
       SKU: Yup.number().min(1, 'SKU must be positive'),
       // trackQty: Yup.boolean(),
+      images: Yup.mixed()
+        .required("Image is required"),
     }),
     onSubmit: async (values) => {
         const { name_ar, name_en, description_ar, description_en, shortDesc_ar, shortDesc_en, ...rest } = values;
@@ -92,6 +98,18 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
       },
   });
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setThumbnail(reader.result as string);
+        formik.setFieldValue("images", reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
    const handleSubmit = async (e: any) => {
      e.preventDefault();
      const errors = await formik.validateForm();
@@ -105,6 +123,7 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
      } 
      formik.handleSubmit(); // Trigger Formik's onSubmit
    };
+  console.log(formik.values.images)
 
   return (
     <FormikProvider value={formik}>
@@ -313,7 +332,52 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                 helperText={formik.touched.SKU && formik.errors.SKU}
               />
               </div>
+                <div className="my-7">
+                <div className="relative w-52 h-auto">
+                  {thumbnail ? (
+                    <img
+                      src={thumbnail}
+                      alt="Product Thumbnail"
+                      className="h-auto w-full shadow-lg object-cover rounded-md"
+                    />
+                  ) : (
+                    <button 
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="h-48 w-full border-dashed border-2 border-gray-300 flex items-center justify-center bg-gray-100 text-gray-500 rounded-md">
+                      Click to add a thumbnail
+                    </button>
+                  )}
 
+
+                  {thumbnail && (
+                    <>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="absolute -top-3 -right-3 bg-white w-8 h-8 rounded-full shadow-md hover:bg-gray-200 transition"
+                  >
+                    <EditIcon className="text-gray-500 w-3 h-3" />
+                  </button>
+                    </>
+                  )}
+                {formik.touched.images && formik.errors.images && (
+                  <div className="text-red-500 text-sm mt-4">{formik.errors.images}</div>
+                )}
+                </div>
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+
+                <p className="font-light text-sm mt-2">
+                  Set the product thumbnail image. Only *.png, *.jpg, and *.jpeg image files are accepted.
+                </p>
+              </div>
               <div className='grid md:grid-cols-2 gap-4'>
               <FormControlLabel
                 control={
@@ -336,6 +400,8 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                 }
                 label="Track Quantity"
               /> */}
+
+              
             </div>
             </div>
             {/* Submit Button */}

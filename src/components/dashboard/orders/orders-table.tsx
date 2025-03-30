@@ -9,7 +9,8 @@ import Swal from 'sweetalert2';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import dayjs from 'dayjs';
 import EditOrderDialog from './edit-order-dialog';
-import { products } from '../products/products-table';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store/store';
 
 type ChipColor = ChipProps['color']; 
 
@@ -159,7 +160,10 @@ export function OrdersTable({
   data = [],
 }: OrdersTableProps): React.JSX.Element {
 
-
+  const { 
+    products
+  } = useSelector((state: RootState) => state.products);
+  
   return (
     <Paper>
       <MaterialReactTable 

@@ -5,6 +5,7 @@ import { addProduct, deleteProduct, fetchProducts, setRefreshData, setRowCount, 
 import { Product } from "@/components/dashboard/products/products-table";
 import { ProductIn, ProductOut } from "@/interfaces/productInterface";
 import { useRouter } from "next/navigation";
+import { uploadPhoto } from "@/cloudinary";
    
 export const useProductHandlers = () => {
 
@@ -74,51 +75,56 @@ const handleChangeOrder = async ({id, newOrder}: {id: string, newOrder: number})
   };
 
 
-const handleUpdateProduct = async ({id, values}: {id: string, values: Partial<ProductOut>}) => {
+  const handleUpdateProduct = async ({ id, values }: { id: string; values: Partial<ProductOut> }) => {
     Swal.fire({
-      title: 'Updating Product...',
-      text: 'Please wait while we update the product.',
+      title: "Updating Product...",
+      text: "Please wait while we update the product.",
       allowOutsideClick: false,
       didOpen: () => {
-        Swal.showLoading(); // Show loading spinner
+        Swal.showLoading();
       },
     });
+  
     try {
-      const resultAction = await dispatch(updateProduct({id, updatedData: values}));
-      Swal.hideLoading()
+      let imageUrl = values.images && await uploadPhoto(values.images);
+  
+      if (values.images && !imageUrl) throw new Error("Image upload failed");
+  
+      // Update values with the new image URL
+      const updatedValues = { ...values, images: imageUrl };
+  
+      // Dispatch updated values to Redux
+      const resultAction = await dispatch(updateProduct({ id, updatedData: updatedValues }));
+      Swal.hideLoading();
+  
       if (updateProduct.fulfilled.match(resultAction)) {
-        // Update the existing Swal instead of reopening it
         Swal.update({
-          title: 'Product Updated!',
-          text: `Product has been successfully updated.`,
-          icon: 'success',
+          title: "Product Updated!",
+          text: "Product has been successfully updated.",
+          icon: "success",
           showConfirmButton: true,
         });
-        setTimeout(() => {
-            Swal.close();
-          }, 500);
+        setTimeout(() => Swal.close(), 500);
         dispatch(setRefreshData(refreshData + 1));
-        router.push('/dashboard/products'); // 👈 Navigate here
-        return true
-      } else {  
-        // Update the Swal alert with an error
+        router.push("/dashboard/products");
+        return true;
+      } else {
         Swal.update({
-          title: 'Error Updating Product',
-          text: resultAction.payload ? String(resultAction.payload) : 'Unknown error',
-          icon: 'error',
+          title: "Error Updating Product",
+          text: resultAction.payload ? String(resultAction.payload) : "Unknown error",
+          icon: "error",
           showConfirmButton: true,
         });
-        return false
+        return false;
       }
     } catch (error: any) {
-      // Update the Swal alert for unexpected errors
       Swal.update({
-        title: 'Unexpected Error',
+        title: "Unexpected Error",
         text: error.message,
-        icon: 'error',
+        icon: "error",
         showConfirmButton: true,
       });
-      return false
+      return false;
     }
   };
 
@@ -212,7 +218,14 @@ const handleDelete = async (product: ProductIn) => {
         },
       });
       try {
-        const resultAction = await dispatch(addProduct(values));
+        let imageUrl = values.images && await uploadPhoto(values.images);
+
+        if (values.images && !imageUrl) throw new Error("Image upload failed");
+    
+        // Update values with the new image URL
+        const updatedValues = { ...values, images: imageUrl };
+
+        const resultAction = await dispatch(addProduct(updatedValues));
         Swal.hideLoading()
         if (addProduct.fulfilled.match(resultAction)) {
           // Update the existing Swal instead of reopening it
