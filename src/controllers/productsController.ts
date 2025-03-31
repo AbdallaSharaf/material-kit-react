@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store/store";
-import { addProduct, deleteProduct, fetchProducts, setRefreshData, setRowCount, updateProductOrder, updateProduct, fetchProductsByCategory } from "../redux/slices/productSlice";
+import { addProduct, deleteProduct, fetchProducts, setRefreshData, setRowCount, updateProductOrder, updateProduct, fetchProductsByCategory, updateProductOrderInCategory } from "../redux/slices/productSlice";
 import { ProductIn, ProductOut } from "@/interfaces/productInterface";
 import { useRouter } from "next/navigation";
 import { uploadPhoto } from "@/cloudinary";
@@ -50,6 +50,33 @@ const handleChangeOrder = async ({id, newOrder}: {id: string, newOrder: number})
   try {
       const resultAction = await dispatch(updateProductOrder({id,  order: newOrder}));
       if (updateProductOrder.fulfilled.match(resultAction)) {
+        // Update the existing Swal instead of reopening it
+        dispatch(setRefreshData(refreshData + 1));
+      }
+      else {  
+        // Update the Swal alert with an error
+        Swal.fire({
+          title: 'Error Updating Product',
+          text: resultAction.payload ? String(resultAction.payload) : 'Unknown error',
+          icon: 'error',
+          showConfirmButton: true,
+        });
+      }
+    } catch (error: any) {
+      // Fire the Swal alert for unexpected errors
+      Swal.fire({
+        title: 'Unexpected Error',
+        text: error.message,
+        icon: 'error',
+        showConfirmButton: true,
+      });
+    }
+  };
+
+const handleChangeOrderInCategory = async ({id, newOrder, category}: {id: string, newOrder: number, category: string}) => {
+  try {
+      const resultAction = await dispatch(updateProductOrderInCategory({id,  order: newOrder, category: category}));
+      if (updateProductOrderInCategory.fulfilled.match(resultAction)) {
         // Update the existing Swal instead of reopening it
         dispatch(setRefreshData(refreshData + 1));
       }
@@ -306,6 +333,7 @@ const fetchOptions = async (id: string) => {
         handleUpdateProduct,
         handleChangeOrder,
         handleChangeStatus,
-        fetchDataByCategory
+        fetchDataByCategory,
+        handleChangeOrderInCategory
       };
 }

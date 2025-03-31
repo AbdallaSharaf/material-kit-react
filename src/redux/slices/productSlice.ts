@@ -111,8 +111,8 @@ export const fetchProductsByCategory = createAsyncThunk<
         url.searchParams.append('sort', sort.desc ? `-${sort.id}` : sort.id);
       });}
       const response = await axios.get(url.href);
-      const { data, TotalCount } = response.data;
-      return { products: data, totalCount: TotalCount };
+      const { products, TotalCount } = response.data;
+      return { products: products, totalCount: TotalCount };
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || error.message || 'Failed to fetch products'
@@ -171,6 +171,26 @@ export const updateProductOrder = createAsyncThunk<
   async ({ id, order }, { rejectWithValue }) => {    
     try {
       const response = await axios.put<ProductOut, AxiosResponse<{message: string}, any>>(`${API_URL}/order/${id}`, {order: order});
+      return response.data.message;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || error.message || 'Failed to update product'
+      );
+    }
+  }
+);
+
+// Update an existing product
+export const updateProductOrderInCategory = createAsyncThunk<
+  string, // Return type on success
+  { id: string; order: number; category: string }, // Argument type
+  { rejectValue: string }
+>(
+  'products/updateProductOrderInCategory',
+  async ({ id, order, category }, { rejectWithValue }) => {    
+    try {
+      console.log(id)
+      const response = await axios.put<ProductOut, AxiosResponse<{message: string}, any>>(`${API_URL}/category/${id}`, {order: order, Category: category});
       return response.data.message;
     } catch (error: any) {
       return rejectWithValue(
@@ -297,6 +317,19 @@ const productsSlice = createSlice({
           state.loading = false;
         })
         .addCase(updateProductOrder.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload || 'Failed to update order';
+        });
+
+      builder
+        .addCase(updateProductOrderInCategory.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(updateProductOrderInCategory.fulfilled, (state) => {
+          state.loading = false;
+        })
+        .addCase(updateProductOrderInCategory.rejected, (state, action) => {
           state.loading = false;
           state.error = action.payload || 'Failed to update order';
         });

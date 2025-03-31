@@ -54,7 +54,7 @@ export default function CustomToolbar({table, data}: any) {
         <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={()=>router.push(`products/add`)}>
           Add
         </Button>
-        <Button
+        {/* <Button
         //export all data that is currently in the table (ignore pagination, sorting, filtering, etc.)
         onClick={handleExportData}
         startIcon={<FileDownloadIcon />}
@@ -63,14 +63,14 @@ export default function CustomToolbar({table, data}: any) {
         </Button>
         <Button
         disabled={
-            !table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()
+            table && !table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()
         }
         //only export selected rows
         onClick={() => handleExportRows(table.getSelectedRowModel().rows)}
         startIcon={<FileDownloadIcon />}
         >
         Export Selected Rows
-        </Button>
+        </Button> */}
     </Box>
   )
 }
