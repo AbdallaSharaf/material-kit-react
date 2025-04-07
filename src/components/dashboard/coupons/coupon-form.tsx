@@ -106,14 +106,19 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
       let isSuccess = false;
     
       // Convert discount to string
-      const { discount, ...rest } = values;
-      const formattedValues = {
+      const { discount, appliedOn, ...rest } = values;
+      const formattedValues: CouponOut = {
         ...rest,
         userLimit: values.userLimit.mode === "unlimited" ? "unlimited" : values.userLimit.value,
         limit: values.limit.mode === "unlimited" ? "unlimited" : values.limit.value,
         discount: String(discount),
       };
     
+        // Remove appliedOn if validFor is "all" or "shipping"
+      if (values.validFor !== "all" && values.validFor !== "shipping") {
+        formattedValues.appliedOn = appliedOn;
+      }
+
       if (coupon) {
         isSuccess = await handleUpdateCoupon({ id: coupon._id, values: formattedValues });
       } else {
@@ -378,18 +383,21 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
           </FormControl>
         )}
 
+        <div className="w-full flex justify-end">
         <FormControlLabel
+        className="w-fit"
           control={
             <Switch
-              checked={formik.values.isActive}
-              onChange={formik.handleChange}
-              name="isActive"
-              color="primary"
+            checked={formik.values.isActive}
+            onChange={formik.handleChange}
+            name="isActive"
+            color="primary"
             />
           }
           label="Active"
           labelPlacement="start"
-        />
+          />
+        </div>
 
         <div className="flex justify-end">
           <Button type="submit" variant="contained" color="primary" className="w-1/4 ml-auto">

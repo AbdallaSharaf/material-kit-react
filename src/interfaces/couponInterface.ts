@@ -3,6 +3,7 @@ export interface CouponOut {
     type?: "percentage" | "fixed"; // type of discount
     discount?: string; // value of discount (e.g., 10%)
     limit?: string; // max string of times it can be used
+    userLimit?: string;
     isActive?: boolean; // active/inactive status
     expiresAt?: string; // ISO string
     validFor?: "category" | "product" | "shipping" | "all";

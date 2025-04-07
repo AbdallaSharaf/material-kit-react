@@ -1,7 +1,7 @@
 "use client"
 import * as React from 'react';
 import { MaterialReactTable, MRT_ColumnDef, MRT_TableOptions } from 'material-react-table';
-import { IconButton, Paper, Switch, Tooltip } from '@mui/material';
+import { Button, IconButton, Paper, Switch, Tooltip } from '@mui/material';
 import { Box } from '@mui/system';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
@@ -13,7 +13,9 @@ import { CouponIn } from '@/interfaces/couponInterface';
 
 export function CouponsTable(): React.JSX.Element {
   const { fetchData, handleDelete, handleChangeStatus, fetchOptions } = useCouponHandlers();
-  const { refreshData: refreshDataCoupons, activeCoupons, loading } = useSelector(
+  const [showActive, setShowActive] = React.useState(true);
+
+  const { refreshData: refreshDataCoupons, activeCoupons, expiredCoupons, loading } = useSelector(
     (state: RootState) => state.coupons
   );
     const { refreshData: refreshDataCategories, categories } = useSelector(
@@ -22,7 +24,6 @@ export function CouponsTable(): React.JSX.Element {
     const { refreshData: refreshDataProducts, products } = useSelector(
     (state: RootState) => state.products
     );
-
     const columns: MRT_ColumnDef<CouponIn>[] = [
         // General Information
         { 
@@ -166,6 +167,7 @@ export function CouponsTable(): React.JSX.Element {
       
   React.useEffect(() => {
     fetchData(true);
+    fetchData(false);
   }, [refreshDataCoupons]);
 
   const router = useRouter();
@@ -178,7 +180,7 @@ export function CouponsTable(): React.JSX.Element {
     <Paper>
       <MaterialReactTable
         columns={columns}
-        data={activeCoupons}
+        data={showActive? activeCoupons : expiredCoupons}
         enableRowActions
         enableColumnResizing
         enableGlobalFilter={false}
@@ -187,6 +189,24 @@ export function CouponsTable(): React.JSX.Element {
         positionActionsColumn="last"
         state={{ isLoading: loading }}
         getRowId={(row) => row._id}
+        renderTopToolbarCustomActions={() => (
+            <Box sx={{ display: 'flex', gap: 2, padding: 1 }}>
+              <Button
+                variant={showActive ? 'contained' : 'outlined'}
+                color="primary"
+                onClick={() => setShowActive(true)}
+              >
+                Active Coupons
+              </Button>
+              <Button
+                variant={!showActive ? 'contained' : 'outlined'}
+                color="secondary"
+                onClick={() => setShowActive(false)}
+              >
+                Inactive Coupons
+              </Button>
+            </Box>
+          )}
         renderRowActions={({ row }) => (
           <Box sx={{ display: 'flex', gap: '4px' }}>
             <Tooltip title="Edit">
