@@ -8,7 +8,7 @@ export const paths = {
     products: '/dashboard/products',
     categories: '/dashboard/categories',
     ui: '/dashboard/ui',
-    offers: '/dashboard/offers',
+    offers: '/dashboard/coupons',
     customers: '/dashboard/customers',
     integrations: '/dashboard/integrations',
     reviews: '/dashboard/reviews',

@@ -3,6 +3,7 @@ import productsReducer from '../slices/productSlice';
 import categoriesReducer from '../slices/categorySlice';
 import usersReducer from '../slices/userSlice';
 import authReducer from '../slices/authSlice';
+import couponsReducer from '../slices/couponSlice';
 
 // import Cookies from 'js-cookie';
 import { User } from '../../types/user';
@@ -18,6 +19,7 @@ const initialUser = userData ? (JSON.parse(userData) as User) : null;
 const store = configureStore({
   reducer: {
     products: productsReducer,
+    coupons: couponsReducer,
     categories: categoriesReducer,
     users: usersReducer,
     auth: authReducer,
