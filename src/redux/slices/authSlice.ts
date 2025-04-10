@@ -27,7 +27,7 @@ export const fetchUserData = createAsyncThunk<
   { rejectValue: string }
 >('auth/fetchUserData', async (_, { rejectWithValue }) => {
   try {
-    const response = await axios.get('/user/myData');
+    const response = await axios.get('https://fruits-heaven-api.vercel.app/api/v1/user/myData');
     return response.data.user;
   } catch (error: any) {
     return rejectWithValue(error.response?.data?.error || 'Failed to fetch user data');

@@ -137,25 +137,6 @@ const columns: MRT_ColumnDef<Order>[] = [
   },
 ];
 
-const handleDelete = async (id: string) => {
-  const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: 'This user will be deleted!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
-  });
-  console.log(id)
-  if (result.isConfirmed) {
-      try {
-          Swal.fire('Deleted!', 'The user has been deleted.', 'success');
-      } catch (error) {
-          console.error('Error deleting user:', error);
-          Swal.fire('Error!', 'There was a problem deleting the user.', 'error');
-      }
-  }
-};
-
 export function OrdersTable({
   data = [],
 }: OrdersTableProps): React.JSX.Element {
@@ -170,9 +151,6 @@ export function OrdersTable({
         columns={columns} 
         data={data} 
         enableRowSelection
-        createDisplayMode= 'modal' //default ('row', and 'custom' are also available)
-        editDisplayMode= 'modal' //default ('row', 'cell', 'table', and 'custom' are also available)
-        enableEditing = {true}
         enableRowActions
         enableColumnResizing
         
@@ -181,14 +159,6 @@ export function OrdersTable({
         positionToolbarAlertBanner= 'bottom'
         getRowId = {(row) => row.id}
         positionActionsColumn="last" 
-        renderCreateRowDialogContent={ ({ table, row, internalEditComponents }) => (
-            <EditOrderDialog table={table} row={row} internalEditComponents={internalEditComponents} products={products} />
-        )}
-
-        renderEditRowDialogContent={({ table, row, internalEditComponents }) => (
-            <EditOrderDialog table={table} row={row} internalEditComponents={internalEditComponents} products={products} isEditing/>
-          )}
-          
         enableExpandAll= {false} //disable expand all button
         muiDetailPanelProps= {() => ({
           sx: (theme) => ({

@@ -15,6 +15,7 @@ export type ProductIn = {
     },
     _id: string,
     slug: string,
+    isTopProduct: boolean,
     metaTags: string[],
     category: {category: CategoryIn, order: number, _id: string}[],
     available: boolean,
@@ -50,6 +51,7 @@ export type ProductOut = {
             }[],
         available?: boolean,
         price?: number,
+        isTopProduct?: boolean,
         SKU?: number,
         order?: number,
         description?: {

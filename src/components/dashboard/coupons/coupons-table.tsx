@@ -15,9 +15,9 @@ export function CouponsTable(): React.JSX.Element {
   const { fetchData, handleDelete, handleChangeStatus, fetchOptions } = useCouponHandlers();
   const [showActive, setShowActive] = React.useState(true);
 
-  const { refreshData: refreshDataCoupons, activeCoupons, expiredCoupons, loading } = useSelector(
-    (state: RootState) => state.coupons
-  );
+    const { refreshData: refreshDataCoupons, activeCoupons, expiredCoupons, loading } = useSelector(
+      (state: RootState) => state.coupons
+    );
     const { refreshData: refreshDataCategories, categories } = useSelector(
     (state: RootState) => state.categories
     );

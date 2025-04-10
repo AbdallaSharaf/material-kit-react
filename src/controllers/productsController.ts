@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store/store";
-import { addProduct, deleteProduct, fetchProducts, setRefreshData, setRowCount, updateProductOrder, updateProduct, fetchProductsByCategory, updateProductOrderInCategory } from "../redux/slices/productSlice";
+import { addProduct, deleteProduct, fetchProducts, setRefreshData, setRowCount, updateProductOrder, updateProduct, fetchProductsByCategory, updateProductOrderInCategory, fetchTopProducts } from "../redux/slices/productSlice";
 import { ProductIn, ProductOut } from "@/interfaces/productInterface";
 import { useRouter } from "next/navigation";
 import { uploadPhoto } from "@/cloudinary";
@@ -35,6 +35,34 @@ const handleChangeStatus = async (product: ProductIn) => {
           showConfirmButton: true,
         });
       }
+    } catch (error: any) {
+      // Fire the Swal alert for unexpected errors
+      Swal.fire({
+        title: 'Unexpected Error',
+        text: error.message,
+        icon: 'error',
+        showConfirmButton: true,
+      });
+    }
+  };
+
+const handleMarkTopProduct = async (SKU: string) => {
+  try {
+      // const resultAction = await dispatch(updateProduct({SKU:SKU}));
+      // if (updateProduct.fulfilled.match(resultAction)) {
+      //   // Update the existing Swal instead of reopening it
+      //   dispatch(setRefreshData(refreshData + 1));
+      // }
+      // else {  
+      //   // Update the Swal alert with an error
+      //   Swal.fire({
+      //     title: 'Error Updating Product',
+      //     text: resultAction.payload ? String(resultAction.payload) : 'Unknown error',
+      //     icon: 'error',
+      //     showConfirmButton: true,
+      //   });
+      // }
+      console.log(SKU)
     } catch (error: any) {
       // Fire the Swal alert for unexpected errors
       Swal.fire({
@@ -132,7 +160,6 @@ const handleChangeOrderInCategory = async ({id, newOrder, category}: {id: string
         });
         setTimeout(() => Swal.close(), 500);
         dispatch(setRefreshData(refreshData + 1));
-        router.push("/dashboard/products");
         return true;
       } else {
         Swal.update({
@@ -170,6 +197,16 @@ const handleChangeOrderInCategory = async ({id, newOrder, category}: {id: string
           const { totalCount } = resultAction.payload;
           dispatch(setRowCount(totalCount)); // Set the total row count from the response
         } else {
+          // Handle errors (e.g., by showing a message or updating UI)
+          console.error('Error fetching products:', resultAction.payload);
+        }
+      };
+
+  const fetchTopProductData = async () => {  
+        // Dispatch the action with the necessary parameters
+        const resultAction = await dispatch(fetchTopProducts());
+        // Check if the action was fulfilled and extract data
+        if (!fetchTopProducts.fulfilled.match(resultAction)) {
           // Handle errors (e.g., by showing a message or updating UI)
           console.error('Error fetching products:', resultAction.payload);
         }
@@ -334,6 +371,8 @@ const fetchOptions = async (id: string) => {
         handleChangeOrder,
         handleChangeStatus,
         fetchDataByCategory,
-        handleChangeOrderInCategory
+        fetchTopProductData,
+        handleChangeOrderInCategory,
+        handleMarkTopProduct
       };
 }

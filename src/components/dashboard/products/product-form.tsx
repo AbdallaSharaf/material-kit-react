@@ -12,11 +12,13 @@ import { useProductHandlers } from '@/controllers/productsController';
 import { CategoryIn } from '@/interfaces/categoryInterface';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from "@mui/icons-material/Edit";
+import { useRouter } from 'next/navigation';
 
 // Validation Schema
 
 const ProductForm = ({ product }: { product?: ProductIn }) => {
   const { fetchData } = useCategoryHandlers();
+  const router = useRouter();
   const { handleCreateProduct, handleUpdateProduct } = useProductHandlers();
   const { categories, refreshData } = useSelector((state: RootState) => state.categories);
   const [thumbnail, setThumbnail] = useState<string>(product?.images[0] || "");
@@ -88,6 +90,7 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
         let isSuccess = false;
         if (product) {
           isSuccess = await handleUpdateProduct({ id: product._id, values: formattedData });
+          router.push("/dashboard/products");
         } else {
           isSuccess = await handleCreateProduct(formattedData);
         }

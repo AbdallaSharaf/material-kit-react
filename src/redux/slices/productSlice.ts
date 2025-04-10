@@ -12,6 +12,7 @@ import { AxiosResponse } from 'axios';
 interface ProductsState {
   products: ProductIn[];
   productsByCategory: ProductIn[];
+  topProducts: ProductIn[];
   loading: boolean;
   error: string | null;
   totalCount: number, // Total number of products
@@ -30,6 +31,7 @@ interface ProductsState {
 const initialState: ProductsState = {
   products: [],
   productsByCategory: [],
+  topProducts: [],
   loading: false,
   error: null,
   totalCount: 0, // Total number of products
@@ -77,6 +79,33 @@ export const fetchProducts = createAsyncThunk<
       const response = await axios.get(url.href);
       const { data, TotalCount } = response.data;
       return { products: data, totalCount: TotalCount };
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || error.message || 'Failed to fetch products'
+      );
+    }
+  }
+);
+
+// Fetch all products
+export const fetchTopProducts = createAsyncThunk<
+  { topProducts: ProductIn[] }, // Return type with products and total count
+  void, // Arguments
+  { rejectValue: string }
+>(
+  'products/fetchTopProducts',
+  async ( _, { rejectWithValue }) => {
+    try {
+      console.log("Fetching top products");
+      const url = new URL(API_URL);
+      url.searchParams.set('deleted', 'false');
+      url.searchParams.set('PageCount', "100");
+      url.searchParams.set('isTopProduct', "true");
+      url.searchParams.set('sort', "order");
+      url.searchParams.set('page', "1");
+      const response = await axios.get(url.href);
+      const { data } = response.data;
+      return  {topProducts: data};
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || error.message || 'Failed to fetch products'
@@ -272,6 +301,20 @@ const productsSlice = createSlice({
           state.totalCount = action.payload.totalCount; // Store the total count
         })
         .addCase(fetchProductsByCategory.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload || 'Failed to fetch products';
+        });
+
+      builder
+        .addCase(fetchTopProducts.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(fetchTopProducts.fulfilled, (state, action) => {
+          state.loading = false;
+          state.topProducts = action.payload.topProducts; // Store the products
+        })
+        .addCase(fetchTopProducts.rejected, (state, action) => {
           state.loading = false;
           state.error = action.payload || 'Failed to fetch products';
         });

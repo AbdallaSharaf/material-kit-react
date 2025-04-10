@@ -58,9 +58,6 @@ export default function CustomToolbar({table, data}: any) {
         flexWrap: 'wrap',
         }}
     >
-        <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={()=>table.setCreatingRow(true)}>
-          Add
-        </Button>
         <Button
         //export all data that is currently in the table (ignore pagination, sorting, filtering, etc.)
         onClick={handleExportData}
