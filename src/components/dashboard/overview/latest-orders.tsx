@@ -14,7 +14,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { ArrowRight as ArrowRightIcon } from '@phosphor-icons/react/dist/ssr/ArrowRight';
 import dayjs from 'dayjs';
-import { Order } from '../orders/orders-table';
 
 const statusMap = {
   pending: { label: 'Pending', color: 'warning' },
@@ -26,7 +25,7 @@ const statusMap = {
 
 
 export interface LatestOrdersProps {
-  orders?: Order[];
+  orders?: any[];
   sx?: SxProps;
 }
 
@@ -46,7 +45,7 @@ export function LatestOrders({ orders = [], sx }: LatestOrdersProps): React.JSX.
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.map((order) => {
+            {/* {orders.map((order) => {
               const { label, color } = statusMap[order.shippingStatus] ?? { label: 'Unknown', color: 'default' };
 
               return (
@@ -59,7 +58,7 @@ export function LatestOrders({ orders = [], sx }: LatestOrdersProps): React.JSX.
                   </TableCell>
                 </TableRow>
               );
-            })}
+            })} */}
           </TableBody>
         </Table>
       </Box>
