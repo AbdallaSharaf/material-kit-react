@@ -5,9 +5,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { config } from '@/config';
 import { OrdersTable } from '@/components/dashboard/orders/orders-table';
-import dayjs from 'dayjs';
 import OrderSettingsModal from '@/components/dashboard/orders/order-settings-modal';
-import { Chip, CircularProgress } from '@mui/material';
 
 export const metadata = {
   title: `Orders | Dashboard | ${config.site.name}`,

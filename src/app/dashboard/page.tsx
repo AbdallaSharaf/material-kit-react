@@ -13,7 +13,6 @@ import { TotalProfit } from '@/components/dashboard/overview/total-profit';
 import { Traffic } from '@/components/dashboard/overview/traffic';
 import dayjs from 'dayjs';
 import { CategoryOut } from '@/interfaces/categoryInterface';
-import { Order } from '@/components/dashboard/orders/orders-table';
 export const metadata = { title: `Overview | Dashboard | ${config.site.name}` } satisfies Metadata;
 
 export interface Product {
@@ -50,7 +49,7 @@ export default function Page(): React.JSX.Element {
     __v: 0,
   }
   
-  const orders: Order[] = [
+  const orders = [
     {
       id: 'ORD-007',
       customer: { id: 'CUST-007', name: 'Ekaterina Tankova', phone: '123-456-7890' },
