@@ -4,6 +4,7 @@ import categoriesReducer from '../slices/categorySlice';
 import usersReducer from '../slices/userSlice';
 import authReducer from '../slices/authSlice';
 import couponsReducer from '../slices/couponSlice';
+import ordersReducer from '../slices/orderSlice';
 
 // import Cookies from 'js-cookie';
 import { User } from '../../types/user';
@@ -23,6 +24,7 @@ const store = configureStore({
     categories: categoriesReducer,
     users: usersReducer,
     auth: authReducer,
+    orders: ordersReducer,
   },
   preloadedState: {
     auth: {

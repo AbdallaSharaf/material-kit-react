@@ -5,160 +5,195 @@ import { MaterialReactTable, MRT_ColumnDef, MRT_TableOptions } from 'material-re
 import { Chip, ChipProps, IconButton, Paper, Tooltip, Typography } from '@mui/material';
 import CustomToolbar from './custom-toolbar';
 import { Box } from '@mui/system';
-import Swal from 'sweetalert2';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/redux/store/store';
+import { OrderIn } from '@/interfaces/orderInterface';
 import dayjs from 'dayjs';
-import EditOrderDialog from './edit-order-dialog';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store/store';
-
-type ChipColor = ChipProps['color']; 
-
-const statusColors: Record<Order['shippingStatus'], ChipColor> = {
-    pending: 'warning',
-    shipped: 'primary',
-    delivered: 'success',
-    returned: 'error',
-    canceled: 'default',
-  };
-  
-  const paymentColors: Record<Order['paymentStatus'], ChipColor> = {
-    pending: 'warning',
-    paid: 'success',
-    failed: 'error',
-    refunded: 'info',
-  };
-
-export interface Order {
-    id: string;
-    customer: {
-      id: string;
-      name: string;
-      phone: string;
-    };
-    amount: number;
-    shippingStatus: 'pending' | 'shipped' | 'delivered' | 'returned' | 'canceled';
-    paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
-    createdAt: Date;
-    notes?: string; // Optional field for extra info
-    items: {
-      id: string;
-      quantity: number;
-    }[];
-  }
-  
-
-interface OrdersTableProps {
-  data?: Order[];
-}
-
-const handleSaveRow: MRT_TableOptions<Order>['onEditingRowSave'] = ({
-  exitEditingMode,
-}) => {
-  exitEditingMode();
-};
+import { useOrderHandlers } from '@/controllers/ordersController';
+import { setColumnFilters, setPagination, setSearchQuery } from '@/redux/slices/orderSlice';
 
 // Define columns outside the component to avoid defining them during render
-const columns: MRT_ColumnDef<Order>[] = [
-  {
-    accessorKey: 'id',
-    header: 'Number',
-    enableEditing: false,
-    grow: true,
 
-    size: 70,
-    enableColumnActions: false,
-    enableSorting: false,
-    enableColumnFilter: false
-},
-{ 
-    accessorKey: 'customer.name', // Accessing phone inside customer object
-    header: 'Name',
-    grow: true,
-    size: 140
-},
-{
-    accessorKey: 'createdAt',
-    enableEditing: false,
-    filterVariant: 'datetime-range',
-    size: 120,
-    header: 'Date',
-    Cell: ({ cell }) => <div>{dayjs(cell.getValue<Date>()).format('MMMM D, YYYY, h:mm A')}</div>, // Format the date
-},
+export const orderColumns: MRT_ColumnDef<OrderIn>[] = [
   { 
-    accessorKey: 'customer.phone', // Accessing phone inside customer object
+    accessorKey: 'name',
+    header: 'Name',
+    size: 140,
+    Cell: ({ row }) => row.original.shippingAddress?.name ?? row.original.user?.name ?? "N/A",
+    enableColumnFilter: true,
+    enableSorting: false,
+  },
+  {
+    accessorKey: 'shippingAddress.phone',
     header: 'Phone',
     size: 110,
-},
-{
-    accessorKey: 'paymentStatus',
-    header: 'Payment',
+    enableColumnFilter: true,
+    enableSorting: false,
+  },
+  {
+    accessorKey: 'email',
+    header: 'Email',
+    size: 150,
+    Cell: ({ row }) => row.original.shippingAddress.email,
+    enableColumnFilter: false,
+    enableSorting: false,
+    enableColumnActions: false,
+  },
+  {
+    accessorKey: 'createdAt',
+    header: 'Date',
+    filterVariant: 'datetime-range',
+    size: 120,
+    Cell: ({ cell }) => <div>{dayjs(cell.getValue<string>()).format('MMMM D, YYYY, h:mm A')}</div>,
+    enableColumnFilter: false,
+    enableSorting: false,
+    enableColumnActions: false,
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
     editVariant: 'select',
-    filterVariant: "select",
-    filterSelectOptions: ['pending' , 'paid' , 'failed' , 'refunded'],
-    editSelectOptions: ['pending' , 'paid' , 'failed' , 'refunded'],
+    filterVariant: 'select',
+    filterSelectOptions: ['newOrder', 'accepted', 'shipped', 'delivered', 'cancelled', 'returned'],
     size: 100,
+    editSelectOptions: ['newOrder', 'accepted', 'shipped', 'delivered', 'cancelled', 'returned'],
     Cell: ({ cell }) => {
-        const status = cell.getValue<Order['paymentStatus']>();
-        return <Chip label={status.toUpperCase()} color={paymentColors[status]}/>;
-    },
-},
-{
-    accessorKey: 'shippingStatus',
-    header: 'Shipping',
-    editVariant: 'select',
-    filterVariant: "select",
-    filterSelectOptions: ['pending' , 'shipped' , 'delivered' , 'returned' , 'canceled'],
-    editSelectOptions: ['pending' , 'shipped' , 'delivered' , 'returned' , 'canceled'],
-    size: 100,
-    Cell: ({ cell }) => {
-      const status = cell.getValue<Order['shippingStatus']>();
-      return <Chip label={status.toUpperCase()} color={statusColors[status]} />;
+      const status = cell.getValue<string>();
+      const color: ChipProps['color'] = 
+        status === 'newOrder' ? 'default' :
+        status === 'accepted' ? 'primary' :
+        status === 'shipped' ? 'info' :
+        status === 'delivered' ? 'success' :
+        status === 'cancelled' ? 'error' : 'warning';
+      
+      return <Chip label={status} color={color} size="small" />;
     },
   },
   {
-    accessorKey: 'amount',
+    accessorKey: 'paymentMethod',
+    header: 'Payment Method',
+    size: 100,
+    filterVariant: 'select',
+    filterSelectOptions: ['cod', 'credit_card', 'bank_transfer', 'wallet'],
+  },
+  {
+    accessorKey: 'isPaid',
+    header: 'Payment Status',
+    size: 100,
+    Cell: ({ cell }) => <div>{cell.getValue<boolean>() ? 'Paid' : 'Unpaid'}</div>,
+    filterVariant: 'checkbox',
+  },
+  {
+    accessorKey: 'totalPrice',
     header: 'Total',
-    enableEditing: false,
     size: 100,
     filterVariant: 'range-slider',
     muiFilterSliderProps: {
       marks: true,
-      max: 10000, //custom max (as opposed to faceted max)
-      min: 100, //custom min (as opposed to faceted min)
+      max: 10000,
+      min: 100,
       step: 100,
-      valueLabelFormat: (value) =>
-        value.toLocaleString('en-US', {
-          style: 'currency',
-          currency: 'SAR',
-        }),
+      valueLabelFormat: (value) => `${value} EGP`,
     },
-    Cell: ({ cell }) => <div>{cell.getValue<number>()} SAR</div>,
+    Cell: ({ cell }) => <div>{cell.getValue<number>()} EGP</div>,
+    enableColumnFilter: false,
+    enableSorting: false,
+    enableColumnActions: false,
+  },
+  {
+    accessorKey: 'shippingAddress.street',
+    header: 'Street',
+    size: 100,
+    enableColumnFilter: false,
+    enableSorting: false,
+    enableColumnActions: false,
+  },
+  {
+    accessorKey: 'shippingAddress.city',
+    header: 'City',
+    size: 100,
+    enableColumnFilter: false,
+    enableSorting: false,
+    enableColumnActions: false,
+  },
+  {
+    accessorKey: 'country',
+    header: 'Country',
+    size: 100,
+    Cell: ({ row }) => row.original.shippingAddress?.country ?? "N/A",
+    enableColumnFilter: false,
+    enableSorting: false,
+    enableColumnActions: false,
   },
 ];
 
-export function OrdersTable({
-  data = [],
-}: OrdersTableProps): React.JSX.Element {
+export function OrdersTable(): React.JSX.Element {
+    const { fetchData, handleChangeStatus } = useOrderHandlers();
+    const dispatch = useDispatch<AppDispatch>()
 
-  const { 
-    products
-  } = useSelector((state: RootState) => state.products);
-  
+  const { refreshData, loading, orders, rowCount, pagination, columnFilters, searchQuery } = useSelector(
+    (state: RootState) => state.orders
+  );
+  console.log(orders)
+  React.useEffect(() => {
+    fetchData();
+  }, [refreshData, searchQuery, columnFilters, pagination]);
+
   return (
     <Paper>
       <MaterialReactTable 
-        columns={columns} 
-        data={data} 
+        columns={orderColumns} 
+        data={orders} 
         enableRowSelection
-        enableRowActions
         enableColumnResizing
-        
-        onEditingRowSave={handleSaveRow} 
-        columnFilterDisplayMode = 'popover'
+        enableGlobalFilter={true}
+        enableSorting={true}
+        initialState={{
+          columnVisibility: {
+            email: false,
+            country: false,
+          }
+        }}
+        enableEditing
+        editDisplayMode="cell" // or "cell" depending on your preference
+        onEditingRowSave={({ table, row, values }) => {
+          // Call your status update handler here
+          handleChangeStatus({_id: row.original._id, status: values.status})
+            .then(() => {
+              table.setEditingRow(null); // exit editing mode
+            })
+            .catch((error) => {
+              console.error('Error updating status:', error);
+            });
+        }}
+        columnFilterDisplayMode='popover'
+        state={{
+          globalFilter: searchQuery,
+          isLoading: loading,
+          pagination,
+          columnFilters,
+        }}
         positionToolbarAlertBanner= 'bottom'
-        getRowId = {(row) => row.id}
-        positionActionsColumn="last" 
+        manualFiltering={true}
+        manualPagination={true}
+        onColumnFiltersChange={(updaterOrValue) => {
+            const newColumnFilters =
+            typeof updaterOrValue === "function"
+                ? updaterOrValue(columnFilters)
+                : updaterOrValue;
+            dispatch(setColumnFilters(newColumnFilters));
+        }}
+        onGlobalFilterChange={(newGlobalFilter: string) => dispatch(setSearchQuery(newGlobalFilter))}        
+
+        onPaginationChange={(updaterOrValue) => {
+          const newPagination =
+          typeof updaterOrValue === "function"
+              ? updaterOrValue(pagination)
+              : updaterOrValue;
+          dispatch(setPagination(newPagination));
+        }}
+        rowCount={rowCount}
         enableExpandAll= {false} //disable expand all button
         muiDetailPanelProps= {() => ({
           sx: (theme) => ({
@@ -171,30 +206,27 @@ export function OrdersTable({
  
         //conditionally render detail panel
         renderDetailPanel= {({ row }) =>
-            row.original.items ? (
+            row.original.items.length > 0 ? (
                 <Box className="flex flex-col gap-3">
                     {row.original.items.map((item) => {
-                    const product = products.find((prod) => prod._id === item.id); // Find the product by item.id
-                    return product ? (
-                        <Box key={item.id} className='flex items-center'>
-                        <img
-                            src={product.images[0]}
-                            alt={product.name["en"]}
-                            className='w-20 h-20 mr-3'
-                        />
+                    return(
+                        <Box key={item._id} className='grid grid-cols-2 items-center'>
                         <Box className="flex flex-col gap-1">
-                            <Typography><strong>ID:</strong> {item.id}</Typography>
-                            <Typography><strong>Name:</strong> {product.name["en"]}</Typography>
+                            <Typography><strong>Name:</strong> {item.name?.["en"] || item.name?.["ar"]}</Typography>
                             <Typography><strong>Quantity:</strong> {item.quantity}</Typography>
                         </Box>
+                        <Box className="flex flex-col gap-1">
+                            <Typography><strong>Item price:</strong> {item.itemPrice}</Typography>
+                            <Typography><strong>Total Price:</strong> {item.totalPrice}</Typography>
                         </Box>
-                    ) : null;
+                        </Box>
+                    )
                     })}
                 </Box>
             ) : null
         }
         layoutMode='grid'
-        renderTopToolbarCustomActions = {({ table }) => (<CustomToolbar table={table} data={data}/>)}
+        renderTopToolbarCustomActions = {({ table }) => (<CustomToolbar table={table} data={orders}/>)}
       />
     </Paper>
   );

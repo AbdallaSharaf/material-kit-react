@@ -218,7 +218,8 @@ export function ProductsTable(): React.JSX.Element {
                 : updaterOrValue;
             dispatch(setColumnFilters(newColumnFilters));
         }}
-        onGlobalFilterChange={(newGlobalFilter: string) => dispatch(setSearchQuery(newGlobalFilter))}        muiDetailPanelProps= {() => ({
+        onGlobalFilterChange={(newGlobalFilter: string) => dispatch(setSearchQuery(newGlobalFilter))}        
+        muiDetailPanelProps= {() => ({
           sx: (theme) => ({
             backgroundColor:
               theme.palette.mode === 'dark'

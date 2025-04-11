@@ -5,9 +5,8 @@ import React from 'react'
 import { mkConfig, generateCsv, download } from 'export-to-csv'; //or use your library of choice here
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { MRT_Row } from 'material-react-table';
-import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
-import { Order } from './orders-table';
 import dayjs from 'dayjs';
+import { OrderIn } from '@/interfaces/orderInterface';
 
 const csvConfig = mkConfig({
   fieldSeparator: ',',
@@ -17,14 +16,24 @@ const csvConfig = mkConfig({
 
 
 export default function CustomToolbar({table, data}: any) {
-  const handleExportRows = (rows: MRT_Row<Order>[]) => {
+  const handleExportRows = (rows: MRT_Row<OrderIn>[]) => {
     const rowData = rows.map((row) => ({
-      id: row.original.id,
-      customer: row.original.customer.name, // Extracting only customer name
-      createdAt: dayjs(row.original.createdAt).format('YYYY-MM-DD HH:mm:ss'), // Format date
-      amount: row.original.amount.toFixed(2), // Ensure proper currency format
-      shippingStatus: row.original.shippingStatus,
-      paymentStatus: row.original.paymentStatus,
+      OrderID: row.original._id,
+      Customer: row.original.shippingAddress.name,
+      Email: row.original.shippingAddress.email,
+      Phone: row.original.shippingAddress.phone,
+      City: row.original.shippingAddress.city,
+      Country: row.original.shippingAddress.country,
+      Date: dayjs(row.original.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+      Status: row.original.status,
+      PaymentMethod: row.original.paymentMethod,
+      PaymentStatus: row.original.isPaid ? 'Paid' : 'Unpaid',
+      DeliveryStatus: row.original.isDelivered ? 'Delivered' : 'Pending',
+      Items: row.original.items.map(item => `${item.quantity} x ${item.name.en}`).join('; '),
+      Subtotal: row.original.subTotal.toFixed(2),
+      ShippingFee: row.original.shippingFee.toFixed(2),
+      Total: row.original.totalPrice.toFixed(2),
+      Notes: row.original.notes || '',
     }));
   
     if (rowData.length > 0) {
@@ -34,20 +43,30 @@ export default function CustomToolbar({table, data}: any) {
   };
   
   const handleExportData = () => {
-    if (data.length === 0) return; // Prevent exporting empty data
+    if (!data || data.length === 0) return;
   
-    const rowData = data.map((order: Order) => ({
-      id: order.id,
-      customer: order.customer.name, // Extract customer name
-      createdAt: dayjs(order.createdAt).format('YYYY-MM-DD HH:mm:ss'), // Format date
-      amount: order.amount.toFixed(2), // Ensure proper number format
-      shippingStatus: order.shippingStatus,
-      paymentStatus: order.paymentStatus,
+    const rowData = data.map((order: OrderIn) => ({
+      OrderID: order._id,
+      Customer: order.shippingAddress.name,
+      Email: order.shippingAddress.email,
+      Phone: order.shippingAddress.phone,
+      City: order.shippingAddress.city,
+      Country: order.shippingAddress.country,
+      Date: dayjs(order.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+      Status: order.status,
+      PaymentMethod: order.paymentMethod,
+      PaymentStatus: order.isPaid ? 'Paid' : 'Unpaid',
+      DeliveryStatus: order.isDelivered ? 'Delivered' : 'Pending',
+      Items: order.items.map(item => `${item.quantity} x ${item.name.en}`).join('; '),
+      Subtotal: order.subTotal.toFixed(2),
+      ShippingFee: order.shippingFee.toFixed(2),
+      Total: order.totalPrice.toFixed(2),
+      Notes: order.notes || '',
     }));
   
     const csv = generateCsv(csvConfig)(rowData);
     download(csvConfig)(csv);
-  };  
+  };
   
   return (
         <Box
