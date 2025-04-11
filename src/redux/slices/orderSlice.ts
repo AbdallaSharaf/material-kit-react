@@ -89,7 +89,7 @@ export const updateOrder = createAsyncThunk<
   'orders/updateOrder',
   async ({ id, updatedData }, { rejectWithValue }) => {    
     try {
-      const response = await axios.put<OrderOut, AxiosResponse<{message: string, Order: OrderIn}, any>>(`${API_URL}/${id}`, updatedData);
+      const response = await axios.patch<OrderOut, AxiosResponse<{message: string, Order: OrderIn}, any>>(`${API_URL}/${id}`, updatedData);
       console.log(response.data.Order)
       return response.data.Order;
     } catch (error: any) {
