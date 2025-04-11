@@ -128,7 +128,7 @@ export function OrdersTable(): React.JSX.Element {
       filterSelectOptions: ['cod', 'credit_card'],
       Cell: ({ cell }) => {
         const value = cell.getValue<string>();
-        const label = value === 'cod' ? 'Cash on Delivery' : 'Credit Card';
+        const label = value === 'cod' ? 'COD' : 'CC';
         const color: ChipProps['color'] = value === 'cod' ? 'default' : 'primary';
     
         return (
