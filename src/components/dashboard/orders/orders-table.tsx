@@ -120,20 +120,47 @@ export function OrdersTable(): React.JSX.Element {
         );
       }
     },
-      {
-        accessorKey: 'paymentMethod',
-        header: 'Payment Method',
-        size: 100,
-        filterVariant: 'select',
-        filterSelectOptions: ['cod', 'credit_card', 'bank_transfer', 'wallet'],
-      },
-      {
-        accessorKey: 'isPaid',
-        header: 'Payment Status',
-        size: 100,
-        Cell: ({ cell }) => <div>{cell.getValue<boolean>() ? 'Paid' : 'Unpaid'}</div>,
-        filterVariant: 'checkbox',
-      },
+    {
+      accessorKey: 'paymentMethod',
+      header: 'Payment Method',
+      size: 100,
+      filterVariant: 'select',
+      filterSelectOptions: ['cod', 'credit_card'],
+      Cell: ({ cell }) => {
+        const value = cell.getValue<string>();
+        const label = value === 'cod' ? 'Cash on Delivery' : 'Credit Card';
+        const color: ChipProps['color'] = value === 'cod' ? 'default' : 'primary';
+    
+        return (
+          <Chip
+            label={label}
+            color={color}
+            size="small"
+            variant="outlined"
+          />
+        );
+      }
+    },
+    {
+      accessorKey: 'isPaid',
+      header: 'Payment Status',
+      size: 100,
+      filterVariant: 'checkbox',
+      Cell: ({ cell }) => {
+        const value = cell.getValue<boolean>();
+        const label = value ? 'Paid' : 'Unpaid';
+        const color: ChipProps['color'] = value ? 'success' : 'warning';
+    
+        return (
+          <Chip
+            label={label}
+            color={color}
+            size="small"
+            variant="outlined"
+          />
+        );
+      }
+    },    
       {
         accessorKey: 'totalPrice',
         header: 'Total',

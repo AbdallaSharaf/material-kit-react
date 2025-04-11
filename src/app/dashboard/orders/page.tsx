@@ -6,7 +6,6 @@ import Typography from '@mui/material/Typography';
 import { config } from '@/config';
 import { OrdersTable } from '@/components/dashboard/orders/orders-table';
 import dayjs from 'dayjs';
-import { Order } from '@/components/dashboard/orders/orders-table';
 import OrderSettingsModal from '@/components/dashboard/orders/order-settings-modal';
 import { Chip, CircularProgress } from '@mui/material';
 
