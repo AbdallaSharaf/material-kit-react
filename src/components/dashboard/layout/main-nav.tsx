@@ -10,6 +10,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { Bell as BellIcon } from '@phosphor-icons/react/dist/ssr/Bell';
 import { Globe as GlobeIcon } from '@phosphor-icons/react/dist/ssr/Globe';
 import { List as ListIcon } from '@phosphor-icons/react/dist/ssr/List';
+import { Eye as EyeIcon } from '@phosphor-icons/react/dist/ssr/Eye';
 
 import { usePopover } from '@/hooks/use-popover';
 
@@ -19,12 +20,13 @@ import LanguagePopover from './language-popover';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store/store';
 import { restoreSession } from '@/redux/slices/authSlice';
+import { useRouter } from 'next/navigation';
 
 
 export function MainNav(): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>()
-
+  const router = useRouter()
   const userPopover = usePopover<HTMLDivElement>();
   const languagePopover = usePopover<HTMLButtonElement>(); // Updated ref type
   React.useEffect(() => {
@@ -59,6 +61,11 @@ export function MainNav(): React.JSX.Element {
             </IconButton>
           </Stack>
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
+            <Tooltip title="UI Page">
+                <IconButton onClick={() => router.push("https://fruits-heaven.vercel.app/")}>
+                  <EyeIcon />
+                </IconButton>
+            </Tooltip>
             <Tooltip title="Notifications">
               <Badge badgeContent={4} color="success" variant="dot">
                 <IconButton>
