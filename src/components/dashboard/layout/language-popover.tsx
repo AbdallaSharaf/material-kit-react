@@ -1,6 +1,10 @@
+"use client"
 import { Popover, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
+import { useRouter } from 'next/navigation';
 import * as React from 'react';
+import CheckIcon from '@mui/icons-material/Check';
+
 
 export interface UserPopoverProps {
   anchorEl: Element | undefined;
@@ -22,6 +26,28 @@ export default function LanguagePopover({
   onClose,
   open,
 }: UserPopoverProps): React.JSX.Element {
+  const [locale, setLocale] = React.useState('ar');
+  const router = useRouter()
+  const isSelected = (lang: string) => locale === lang;
+
+  React.useEffect(() => {
+    const cookieLocale = document.cookie.split(';').find((row) => row.trim().startsWith('MYNEXTAPP_LOCALE='))?.split('=')[1];
+    console.log(cookieLocale)
+    if (cookieLocale) {
+      setLocale(cookieLocale);
+    } else {
+      const browserLocale = navigator.language.slice(0, 2);
+      setLocale(browserLocale);
+      document.cookie = `MYNEXTAPP_LOCALE=${browserLocale};`;
+      router.refresh();
+    }
+  }, [locale])
+  const handleLocaleChange = (newLocale: string) => {
+    setLocale(newLocale)
+    document.cookie = `MYNEXTAPP_LOCALE=${newLocale};`
+    router.refresh()
+  }
+
   return (
     <Popover
       anchorEl={anchorEl}
@@ -31,46 +57,50 @@ export default function LanguagePopover({
       slotProps={{ paper: { sx: { width: '160px' } } }}
     >
       <Box sx={{ p: 2, minWidth: '150px' }}>
-        <Stack direction="column" spacing={2}>
+      <Stack direction="column" spacing={2}>
+        {[
+          { code: 'EG', label: 'العربية', value: 'ar' },
+          { code: 'US', label: 'English', value: 'en' },
+        ].map(({ code, label, value }) => (
           <Stack
+            key={value}
             direction="row"
             alignItems="center"
+            justifyContent="space-between"
             spacing={1}
             sx={{
               cursor: 'pointer',
-              '&:hover': { backgroundColor: 'var(--mui-palette-action-hover)' },
-              px: 1,
-              py: 0.5,
+              backgroundColor: isSelected(value)
+                ? 'primary.main'
+                : 'transparent',
+              color: isSelected(value) ? 'white' : 'text.primary',
+              '&:hover': {
+                backgroundColor: isSelected(value)
+                  ? 'primary.dark'
+                  : 'action.hover',
+              },
+              px: 1.5,
+              py: 0.75,
               borderRadius: 1,
             }}
             onClick={() => {
-              // Handle switching to English
+              handleLocaleChange(value);
               onClose();
             }}
           >
-            <FlagIcon code="US" />
-            <Typography variant="button">English</Typography>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <FlagIcon code={code} />
+              <Typography
+                variant="button"
+                sx={{ fontWeight: isSelected(value) ? 600 : 400 }}
+              >
+                {label}
+              </Typography>
+            </Stack>
+            {isSelected(value) && <CheckIcon fontSize="small" />}
           </Stack>
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={1}
-            sx={{
-              cursor: 'pointer',
-              '&:hover': { backgroundColor: 'var(--mui-palette-action-hover)' },
-              px: 1,
-              py: 0.5,
-              borderRadius: 1,
-            }}
-            onClick={() => {
-              // Handle switching to Arabic
-              onClose();
-            }}
-          >
-            <FlagIcon code="EG" />
-            <Typography variant="button">العربية</Typography>
-          </Stack>
-        </Stack>
+        ))}
+      </Stack>
       </Box>
     </Popover>
   );

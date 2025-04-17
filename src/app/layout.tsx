@@ -7,6 +7,7 @@ import { UserProvider } from '@/contexts/user-context';
 import { LocalizationProvider } from '@/components/core/localization-provider';
 import { ThemeProvider } from '@/components/core/theme-provider/theme-provider';
 import ReduxProvider from '@/redux/store/provider';
+import { NextIntlClientProvider, useLocale, useMessages } from 'next-intl';
 
 export const viewport = { width: 'device-width', initialScale: 1 } satisfies Viewport;
 
@@ -14,10 +15,13 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
-export default function Layout({ children }: LayoutProps): React.JSX.Element {
+export default function Layout({ children }: LayoutProps){
+  const messages = useMessages();
+  const locale = useLocale();
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body>
+        <NextIntlClientProvider messages={messages}>
         <LocalizationProvider>
           <UserProvider>
             <ThemeProvider>
@@ -27,6 +31,7 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
               </ThemeProvider>
           </UserProvider>
         </LocalizationProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
