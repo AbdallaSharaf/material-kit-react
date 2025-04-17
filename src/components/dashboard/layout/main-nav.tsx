@@ -21,6 +21,7 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store/store';
 import { restoreSession } from '@/redux/slices/authSlice';
 import { useRouter } from 'next/navigation';
+import MobileNavWrapper from './MobileNavWrapper';
 
 
 export function MainNav(): React.JSX.Element {
@@ -92,7 +93,7 @@ export function MainNav(): React.JSX.Element {
       </Box>
       <UserPopover anchorEl={userPopover.anchorRef.current || undefined} onClose={userPopover.handleClose} open={userPopover.open} />
       <LanguagePopover anchorEl={languagePopover.anchorRef.current || undefined} onClose={languagePopover.handleClose} open={languagePopover.open} />
-      <MobileNav
+      <MobileNavWrapper
         onClose={() => {
           setOpenNav(false);
         }}
