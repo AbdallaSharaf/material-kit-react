@@ -23,16 +23,23 @@ import { restoreSession } from '@/redux/slices/authSlice';
 import { useRouter } from 'next/navigation';
 import MobileNavWrapper from './MobileNavWrapper';
 
-
 export function MainNav(): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);
-  const dispatch = useDispatch<AppDispatch>()
-  const router = useRouter()
+  const [isNavReady, setIsNavReady] = React.useState<boolean>(false); 
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
   const userPopover = usePopover<HTMLDivElement>();
   const languagePopover = usePopover<HTMLButtonElement>(); // Updated ref type
+
   React.useEffect(() => {
-    dispatch(restoreSession());
-  }, []);
+    dispatch(restoreSession())
+      .then(() => {
+        setIsNavReady(true); // Ensure the nav is ready after async logic is complete
+      })
+      .catch((error) => {
+        console.error('Error restoring session:', error);
+      });
+  }, [dispatch]);
 
   return (
     <React.Fragment>
@@ -93,12 +100,14 @@ export function MainNav(): React.JSX.Element {
       </Box>
       <UserPopover anchorEl={userPopover.anchorRef.current || undefined} onClose={userPopover.handleClose} open={userPopover.open} />
       <LanguagePopover anchorEl={languagePopover.anchorRef.current || undefined} onClose={languagePopover.handleClose} open={languagePopover.open} />
-      <MobileNavWrapper
-        onClose={() => {
-          setOpenNav(false);
-        }}
-        open={openNav}
-      />
+      {isNavReady && (
+        <MobileNavWrapper
+          onClose={() => {
+            setOpenNav(false);
+          }}
+          open={openNav}
+        />
+      )}
     </React.Fragment>
   );
 }

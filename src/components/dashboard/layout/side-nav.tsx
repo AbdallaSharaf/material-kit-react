@@ -12,7 +12,6 @@ import type { NavItemConfig } from '@/types/nav';
 import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 import { Logo } from '@/components/core/logo';
-import { useState, useEffect } from 'react';
 import { navIcons } from './nav-icons';
 
 interface SideNavProps {
