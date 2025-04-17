@@ -23,8 +23,8 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
     >
       <Box sx={{ display: 'flex', flex: '1 1 auto', flexDirection: 'column' }}>
         <Box sx={{ p: 3 }}>
-          <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-block', fontSize: 0 }}>
-            <DynamicLogo colorDark="light" colorLight="dark" height={32} width={122} />
+          <Box component={RouterLink} href={paths.home} sx={{ display: 'flex',  justifyContent:"center", fontSize: 0 }}>
+            <DynamicLogo colorDark="light" colorLight="dark" height={160} width={150} />
           </Box>
         </Box>
         <Box sx={{ alignItems: 'center', display: 'flex', flex: '1 1 auto', justifyContent: 'center', p: 3 }}>
@@ -41,7 +41,7 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
           p: 3,
         }}
       >
-        <Stack spacing={3}>
+        {/* <Stack spacing={3}>
           <Stack spacing={1}>
             <Typography color="inherit" sx={{ fontSize: '24px', lineHeight: '32px', textAlign: 'center' }} variant="h1">
               Welcome to{' '}
@@ -61,7 +61,7 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
               sx={{ height: 'auto', width: '100%', maxWidth: '600px' }}
             />
           </Box>
-        </Stack>
+        </Stack> */}
       </Box>
     </Box>
   );

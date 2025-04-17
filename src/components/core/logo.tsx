@@ -22,9 +22,9 @@ export function Logo({ color = 'dark', emblem, height = HEIGHT, width = WIDTH }:
   let url: string;
 
   if (emblem) {
-    url = color === 'light' ? '/assets/logo-emblem.svg' : '/assets/logo-emblem--dark.svg';
+    url = color === 'light' ? '/assets/fruitslogo.png' : '/assets/fruitslogo.png';
   } else {
-    url = color === 'light' ? '/assets/makane-logo-type-purple-en.svg' : '/assets/logo--dark.svg';
+    url = color === 'light' ? '/assets/fruitslogo.png' : '/assets/fruitslogo.png';
   }
 
   return <Box alt="logo" component="img" height={height} src={url} width={width} />;
