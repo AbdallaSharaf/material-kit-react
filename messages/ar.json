@@ -3,6 +3,15 @@
         "home": "جنة الفواكه"
     },
     "common":{
-        "products": "المنتجات"
+        "products": "المنتجات",
+        "Overview": "نظرة عامة",
+        "Account": "الحساب",
+        "Orders": "الطلبات",
+        "Customers": "العملاء",
+        "Categories": "الفئات",
+        "Offers": "العروض",
+        "Ui": "الواجهة",
+        "Reviews": "المراجعات",
+        "Settings": "الإعدادات"
     }
 }

@@ -12,11 +12,14 @@ import type { NavItemConfig } from '@/types/nav';
 import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 import { Logo } from '@/components/core/logo';
-
-import { navItems } from './config';
+import { useState, useEffect } from 'react';
 import { navIcons } from './nav-icons';
 
-export function SideNav(): React.JSX.Element {
+interface SideNavProps {
+  navItems: NavItemConfig[];
+}
+
+export function SideNav({ navItems }: SideNavProps): React.JSX.Element {
   const pathname = usePathname();
 
   return (
@@ -48,26 +51,26 @@ export function SideNav(): React.JSX.Element {
       }}
     >
       <Stack spacing={2} sx={{ p: 3 }}>
-        <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex ' }}>
-          <Logo color="light" height={119} width={136} />
+        <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex ', justifyContent:"center", fontSize: 0 }}>
+          <Logo color="light" height={91} width={125} />
         </Box>
       </Stack>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
-      <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' }}>
-        {renderNavItems({ pathname, items: navItems })}
+      <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' , overflow:"auto" }}>
+        {renderNavItems({ pathname, items: navItems  })}
       </Box>
     </Box>
   );
 }
 
 function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pathname: string }): React.JSX.Element {
-  const children = items.reduce((acc: React.ReactNode[], curr: NavItemConfig): React.ReactNode[] => {
+  const children = Array.isArray(items) ? items.reduce((acc: React.ReactNode[], curr: NavItemConfig): React.ReactNode[] => {
     const { key, ...item } = curr;
 
     acc.push(<NavItem key={key} pathname={pathname} {...item} />);
 
     return acc;
-  }, []);
+  }, []) : [];
 
   return (
     <Stack component="ul" spacing={1} sx={{ listStyle: 'none', m: 0, p: 0 }}>

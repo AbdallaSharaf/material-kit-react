@@ -3,6 +3,15 @@
         "home": "Fruits Heaven"
     },
     "common":{
-        "products": "Products"
+        "products": "Products",
+        "Overview": "Overview",
+        "Account": "Account",
+        "Orders": "Orders",
+        "Customers": "Customers",
+        "Categories": "Categories",
+        "Offers": "Offers",
+        "Ui": "Ui",
+        "Reviews": "Reviews",
+        "Settings": "Settings"
     }
 }
