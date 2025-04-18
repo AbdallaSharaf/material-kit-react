@@ -25,22 +25,26 @@ import { RootState } from "@/redux/store/store";
 import { useSelector } from "react-redux";
 import { useCategoryHandlers } from "@/controllers/categoriesController";
 import { useProductHandlers } from "@/controllers/productsController";
+import { useLocale, useTranslations } from "next-intl";
 
 interface CouponFormProps {
   coupon?: CouponIn;
 }
 
 const CouponForm = ({ coupon }: CouponFormProps) => {
+  const t = useTranslations('common');
+  const locale = useLocale() as "en" | "ar";
+  const { fetchOptions } = useCouponHandlers();
   const { handleCreateCoupon, handleUpdateCoupon } = useCouponHandlers(); // implement this logic
     // Get categories, products, and refresh flags from Redux
-    const { categories, loading: categoriesLoading } = useSelector(
+    const { categories, loading: categoriesLoading, refreshData: refreshDataCategories } = useSelector(
       (state: RootState) => state.categories
     );
-    const { products, loading: productsLoading } = useSelector(
+    
+    const { products, loading: productsLoading, refreshData: refreshDataProducts } = useSelector(
       (state: RootState) => state.products
     );
 
-    
   const formik = useFormik({
     initialValues: {
       code: coupon?.code || "",
@@ -144,13 +148,19 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
     formik.handleSubmit();
   };
 
+  React.useEffect(() => {
+    if (products.length === 0 || categories.length === 0) {
+    fetchOptions()
+  }
+  }, [refreshDataCategories, refreshDataProducts]);
+
   return (
     <Box component="form" onSubmit={handleSubmit} noValidate>
       <div className="flex flex-col gap-3">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <TextField
             fullWidth
-            label="Coupon Code"
+            label={t("code")}
             name="code"
             value={formik.values.code}
             onChange={formik.handleChange}
@@ -162,15 +172,15 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
           <TextField
             fullWidth
             select
-            label="Type"
+            label={t("type")}
             name="type"
             value={formik.values.type}
             onChange={formik.handleChange}
             error={formik.touched.type && Boolean(formik.errors.type)}
             helperText={formik.touched.type && formik.errors.type}
           >
-            <MenuItem value="percentage">Percentage</MenuItem>
-            <MenuItem value="fixed">Fixed</MenuItem>
+            <MenuItem value="percentage">{t("percentage")}</MenuItem>
+            <MenuItem value="fixed">{t("fixed")}</MenuItem>
           </TextField>
         </div>
 
@@ -178,26 +188,24 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
           <TextField
             fullWidth
             type="number"
-            label="Discount"
+            label={t("discount")}
             name="discount"
             value={formik.values.discount}
             onChange={(e) => {
               const inputValue = e.target.value;
               const numericValue = parseFloat(inputValue);
-          
-              // Allow empty string for clearing the field
+
               if (inputValue === "") {
                 formik.setFieldValue("discount", "");
                 return;
               }
-          
-              // Prevent invalid values based on type
+
               if (formik.values.type === "percentage") {
                 if (numericValue > 100 || numericValue < 0) return;
               } else {
                 if (numericValue < 0) return;
               }
-          
+
               formik.setFieldValue("discount", inputValue);
             }}
             error={formik.touched.discount && Boolean(formik.errors.discount)}
@@ -209,33 +217,33 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
             }}
           />
 
-        <TextField
-          fullWidth
-          type="date"
-          label="Expires At"
-          name="expiresAt"
-          InputLabelProps={{ shrink: true }}
-          value={formik.values.expiresAt}
-          onChange={formik.handleChange}
-          error={formik.touched.expiresAt && Boolean(formik.errors.expiresAt)}
-          helperText={formik.touched.expiresAt && formik.errors.expiresAt}
-          inputProps={{
-            min: new Date(new Date().setHours(0, 0, 0, 0)).toISOString().split("T")[0],
-          }}
-        />
+          <TextField
+            fullWidth
+            type="date"
+            label={t("expiresAt")}
+            name="expiresAt"
+            InputLabelProps={{ shrink: true }}
+            value={formik.values.expiresAt}
+            onChange={formik.handleChange}
+            error={formik.touched.expiresAt && Boolean(formik.errors.expiresAt)}
+            helperText={formik.touched.expiresAt && formik.errors.expiresAt}
+            inputProps={{
+              min: new Date(new Date().setHours(0, 0, 0, 0)).toISOString().split("T")[0],
+            }}
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <TextField
             fullWidth
-            label="Min Amount"
+            label={t("minAmount")}
             name="minAmount"
             value={formik.values.minAmount}
             onChange={formik.handleChange}
           />
           <TextField
             fullWidth
-            label="Max Amount"
+            label={t("maxAmount")}
             name="maxAmount"
             value={formik.values.maxAmount}
             onChange={formik.handleChange}
@@ -246,20 +254,20 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
         <TextField
           select
           fullWidth
-          label="User Limit"
+          label={t("userLimit")}
           name="userLimit.mode"
           value={formik.values.userLimit.mode}
           onChange={formik.handleChange}
         >
-          <MenuItem value="unlimited">Unlimited</MenuItem>
-          <MenuItem value="limited">Limited</MenuItem>
+          <MenuItem value="unlimited">{t("unlimited")}</MenuItem>
+          <MenuItem value="limited">{t("limited")}</MenuItem>
         </TextField>
 
         {formik.values.userLimit.mode === "limited" && (
           <TextField
             fullWidth
             type="number"
-            label="User Limit Value"
+            label={t("userLimitValue")}
             name="userLimit.value"
             value={formik.values.userLimit.value}
             onChange={formik.handleChange}
@@ -280,128 +288,122 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
         )}
       </div>
 
-        {/* GLOBAL LIMIT */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <TextField
-            select
-            fullWidth
-            label="Global Limit"
-            name="limit.mode"
-            value={formik.values.limit.mode}
-            onChange={formik.handleChange}
-          >
-            <MenuItem value="unlimited">Unlimited</MenuItem>
-            <MenuItem value="limited">Limited</MenuItem>
-          </TextField>
-
-          {formik.values.limit.mode === "limited" && (
-            <TextField
-              fullWidth
-              type="number"
-              label="Global Limit Value"
-              name="limit.value"
-              value={formik.values.limit.value}
-              onChange={formik.handleChange}
-              error={formik.touched.limit?.value && Boolean(formik.errors.limit?.value)}
-              helperText={formik.touched.limit?.value && formik.errors.limit?.value}
-              inputProps={{
-                min: 1,
-                onKeyDown: (e) => {
-                  if (
-                    ["e", "E", "+", "-", "."].includes(e.key) ||
-                    (e.key === "0" && e.currentTarget.value.length === 0)
-                  ) {
-                    e.preventDefault();
-                  }
-                },
-              }}
-            />
-          )}
-        </div>
-
+      {/* GLOBAL LIMIT */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextField
-          fullWidth
           select
-          label="Valid For"
-          name="validFor"
-          value={formik.values.validFor}
+          fullWidth
+          label={t("globalLimit")}
+          name="limit.mode"
+          value={formik.values.limit.mode}
           onChange={formik.handleChange}
-          error={formik.touched.validFor && Boolean(formik.errors.validFor)}
-          helperText={formik.touched.validFor && formik.errors.validFor}
         >
-          <MenuItem value="all">All</MenuItem>
-          <MenuItem value="category">Category</MenuItem>
-          <MenuItem value="product">Product</MenuItem>
-          <MenuItem value="shipping">Shipping</MenuItem>
+          <MenuItem value="unlimited">{t("unlimited")}</MenuItem>
+          <MenuItem value="limited">{t("limited")}</MenuItem>
         </TextField>
 
-        {/* Multi-select based on validFor */}
-        {(formik.values.validFor === "category" || formik.values.validFor === "product") && (
-          <FormControl fullWidth error={formik.touched.appliedOn && Boolean(formik.errors.appliedOn)}>
-            <InputLabel>{formik.values.validFor === "category" ? "Categories" : "Products"}</InputLabel>
-
-            {/* Show loading spinner while data is being fetched */}
-            <Select
-              multiple
-              label={formik.values.validFor === "category" ? "Categories" : "Products"}
-              name="appliedOn"
-              value={formik.values.appliedOn}
-              onChange={formik.handleChange}
-              renderValue={(selected) => (
-                <div>
-                  {selected.map((value) => {
-                    // Find the corresponding item (category or product) by id
-                    const item = (formik.values.validFor === "category"
-                      ? categories
-                      : products
-                    ).find((item) => item._id === value);
-              
-                    // If item is found, return its name (use 'en' or 'ar' based on your localization)
-                    return item ? (
-                      <Chip key={value} label={item.name["en"] || item.name["ar"]} />
-                    ) : null;
-                  })}
-                </div>
-              )}              
-              // disabled={categoriesLoading || productsLoading} // Disable select if data is loading
-            >
-              {/* Show loading spinner */}
-              {(categoriesLoading || productsLoading) ? (
-                <MenuItem disabled>
-                  <CircularProgress size={24} />
-                </MenuItem>
-              ) : (
-                // Show categories or products options when not loading
-                (formik.values.validFor === "category" ? categories : products).map((item) => (
-                  <MenuItem key={item._id} value={item._id}>
-                    <Checkbox checked={formik.values.appliedOn.indexOf(item._id) > -1} />
-                    {item.name["en"] ?? item.name["ar"]}
-                  </MenuItem>
-                ))
-              )}
-            </Select>
-          </FormControl>
+        {formik.values.limit.mode === "limited" && (
+          <TextField
+            fullWidth
+            type="number"
+            label={t("globalLimitValue")}
+            name="limit.value"
+            value={formik.values.limit.value}
+            onChange={formik.handleChange}
+            error={formik.touched.limit?.value && Boolean(formik.errors.limit?.value)}
+            helperText={formik.touched.limit?.value && formik.errors.limit?.value}
+            inputProps={{
+              min: 1,
+              onKeyDown: (e) => {
+                if (
+                  ["e", "E", "+", "-", "."].includes(e.key) ||
+                  (e.key === "0" && e.currentTarget.value.length === 0)
+                ) {
+                  e.preventDefault();
+                }
+              },
+            }}
+          />
         )}
+      </div>
 
-        <div className="w-full flex justify-end">
+      <TextField
+        fullWidth
+        select
+        label={t("validFor")}
+        name="validFor"
+        value={formik.values.validFor}
+        onChange={formik.handleChange}
+        error={formik.touched.validFor && Boolean(formik.errors.validFor)}
+        helperText={formik.touched.validFor && formik.errors.validFor}
+      >
+        <MenuItem value="all">{t("all")}</MenuItem>
+        <MenuItem value="category">{t("category")}</MenuItem>
+        <MenuItem value="product">{t("product")}</MenuItem>
+        <MenuItem value="shipping">{t("shipping")}</MenuItem>
+      </TextField>
+
+      {(formik.values.validFor === "category" || formik.values.validFor === "product") && (
+        <FormControl fullWidth error={formik.touched.appliedOn && Boolean(formik.errors.appliedOn)}>
+          <InputLabel>
+            {formik.values.validFor === "category" ? t("categories") : t("products")}
+          </InputLabel>
+
+          <Select
+            multiple
+            label={formik.values.validFor === "category" ? t("categories") : t("products")}
+            name="appliedOn"
+            value={formik.values.appliedOn}
+            onChange={formik.handleChange}
+            renderValue={(selected) => (
+              <div>
+                {selected.map((value) => {
+                  const item = (formik.values.validFor === "category" ? categories : products).find(
+                    (item) => item._id === value
+                  );
+                  return item ? (
+                    <Chip key={value} label={item.name[locale]} />
+                  ) : null;
+                })}
+              </div>
+            )}
+          >
+            {(categoriesLoading || productsLoading) ? (
+              <MenuItem disabled>
+                <CircularProgress size={24} />
+              </MenuItem>
+            ) : (
+              (formik.values.validFor === "category" ? categories : products).map((item) => (
+                <MenuItem key={item._id} value={item._id}>
+                  <Checkbox checked={formik.values.appliedOn.indexOf(item._id) > -1} />
+                  {item.name[locale]}
+                </MenuItem>
+              ))
+            )}
+          </Select>
+        </FormControl>
+      )}
+
+      <div className="w-full flex justify-end">
         <FormControlLabel
-        className="w-fit"
+          className="w-fit"
           control={
             <Switch
-            checked={formik.values.isActive}
-            onChange={formik.handleChange}
-            name="isActive"
-            color="primary"
+              checked={formik.values.isActive}
+              onChange={formik.handleChange}
+              name="isActive"
+              color="primary"
             />
           }
-          label="Active"
+          label={t("active")}
           labelPlacement="start"
-          />
-        </div>
+        />
+      </div>
+
 
         <div className="flex justify-end">
           <Button type="submit" variant="contained" color="primary" className="w-1/4 ml-auto">
-            Submit
+            {t("Submit")}
           </Button>
         </div>
       </div>

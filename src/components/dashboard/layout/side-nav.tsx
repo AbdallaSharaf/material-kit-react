@@ -13,6 +13,7 @@ import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 import { Logo } from '@/components/core/logo';
 import { navIcons } from './nav-icons';
+import { useLocale } from 'next-intl';
 
 interface SideNavProps {
   navItems: NavItemConfig[];
@@ -20,7 +21,7 @@ interface SideNavProps {
 
 export function SideNav({ navItems }: SideNavProps): React.JSX.Element {
   const pathname = usePathname();
-
+  const locale = useLocale();
   return (
     <Box
       sx={{
@@ -35,6 +36,7 @@ export function SideNav({ navItems }: SideNavProps): React.JSX.Element {
         '--NavItem-icon-active-color': 'var(--mui-palette-primary-contrastText)',
         '--NavItem-icon-disabled-color': 'var(--mui-palette-neutral-600)',
         bgcolor: 'var(--SideNav-background)',
+        [locale === 'ar' ? 'right' : 'left']: 0,
         color: 'var(--SideNav-color)',
         display: { xs: 'none', lg: 'flex' },
         flexDirection: 'column',
