@@ -2,6 +2,7 @@ import { Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import React from 'react';
 import ProductForm from '@/components/dashboard/products/product-form';
+import { getLocale, getTranslations } from 'next-intl/server';
 
 interface PageProps {
   params: { id: string };
@@ -35,11 +36,13 @@ export default async function ProductPage({ params }: PageProps) {
   if (!id) throw new Error("No product ID provided");
 
   const product = await getProductById(id);
+  const t = await getTranslations("common")
+  const locale = await getLocale()
 
   if (!product) {
     return (
       <Stack spacing={3}>
-        <Typography variant="h4">Product Not Found</Typography>
+        <Typography variant="h4">{t("Product Not Found")}</Typography>
       </Stack>
     );
   }
@@ -49,7 +52,7 @@ export default async function ProductPage({ params }: PageProps) {
       <Stack direction="row" spacing={3}>
         <div className="flex w-full justify-between items-center">
           <Typography variant="h4">
-            {product && `Edit ${product.name["en"]}`}
+            {product && t("Edit") + " " + product.name[locale]}
           </Typography>
         </div>
       </Stack>

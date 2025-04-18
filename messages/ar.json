@@ -8,8 +8,13 @@
         "Account": "الحساب",
         "Orders": "الطلبات",
         "Customers": "العملاء",
+        "Product Not Found": "المنتج غير موجود",
         "Categories": "الفئات",
+        "Add Product": "اضافة منتج",
         "Offers": "العروض",
+        "Coupons": "كوبونات",
+        "Add": "إضافة",
+        "Edit": "تحرير",
         "Ui": "الواجهة",
         "Reviews": "المراجعات",
         "Settings": "الإعدادات"

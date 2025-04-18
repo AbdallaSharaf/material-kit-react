@@ -12,6 +12,11 @@
         "Offers": "Offers",
         "Ui": "Ui",
         "Reviews": "Reviews",
-        "Settings": "Settings"
+        "Edit": "Edit",
+        "Coupons": "Coupons",
+        "Add": "Add",      
+        "Settings": "Settings",
+        "Add Product": "Add Product",
+        "Product Not Found": "Product Not Found"
     }
 }
