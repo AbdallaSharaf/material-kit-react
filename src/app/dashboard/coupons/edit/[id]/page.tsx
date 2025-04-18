@@ -48,7 +48,7 @@ const CouponPage = async ({ params }: PageProps) => {
       <Stack direction="row" spacing={3}>
         <div className="flex w-full justify-between items-center">
           <Typography variant="h4">
-            {t("EditCoupon", { code: coupon.code })}
+            {t("Edit")} {coupon.code}
           </Typography>
         </div>
       </Stack>
