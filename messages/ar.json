@@ -11,6 +11,8 @@
         "Product Not Found": "المنتج غير موجود",
         "Categories": "الفئات",
         "Add Product": "اضافة منتج",
+        "EditCoupon": "تعديل {{code}}",
+        "CouponNotFound": "لم يتم العثور على الكوبون",
         "Offers": "العروض",
         "Coupons": "كوبونات",
         "Add": "إضافة",

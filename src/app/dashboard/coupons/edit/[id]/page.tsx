@@ -2,6 +2,7 @@ import { Typography } from "@mui/material";
 import { Stack } from "@mui/system";
 import React from "react";
 import CouponForm from "@/components/dashboard/coupons/coupon-form";
+import { getTranslations } from "next-intl/server";
 
 interface PageProps {
   params: { id: string };
@@ -9,7 +10,6 @@ interface PageProps {
 
 const getCouponById = async (id: string) => {
   try {
-    console.log("Fetching coupon with ID:", id);
     const res = await fetch(`https://fruits-heaven-api.vercel.app/api/v1/coupon/${id}`, {
       method: "GET",
       headers: {
@@ -20,26 +20,25 @@ const getCouponById = async (id: string) => {
     if (!res.ok) throw new Error(`Failed to fetch coupon: ${res.status}`);
 
     const data = await res.json();
-    const coupon = data.coupon;
-    console.log("Fetched coupon data:", data.coupon);
-    return coupon;
+    return data.coupon;
   } catch (error) {
     console.error("Error fetching coupon:", error);
     return null;
   }
 };
 
-const couponPage = async ({ params }: PageProps) => {
+const CouponPage = async ({ params }: PageProps) => {
   const { id } = params;
+  const t = await getTranslations("common");
 
   if (!id) throw new Error("No coupon ID provided");
 
   const coupon = await getCouponById(id);
-    console.log("coupon", coupon)
+
   if (!coupon) {
     return (
       <Stack spacing={3}>
-        <Typography variant="h4">Coupon Not Found</Typography>
+        <Typography variant="h4">{t("CouponNotFound")}</Typography>
       </Stack>
     );
   }
@@ -49,14 +48,14 @@ const couponPage = async ({ params }: PageProps) => {
       <Stack direction="row" spacing={3}>
         <div className="flex w-full justify-between items-center">
           <Typography variant="h4">
-            {coupon && `Edit ${coupon.code}`}
+            {t("EditCoupon", { code: coupon.code })}
           </Typography>
         </div>
       </Stack>
 
-      {coupon &&  <CouponForm coupon={coupon} />}
+      <CouponForm coupon={coupon} />
     </Stack>
   );
 };
 
-export default couponPage;
+export default CouponPage;

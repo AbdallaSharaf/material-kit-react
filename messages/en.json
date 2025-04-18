@@ -11,6 +11,8 @@
         "Categories": "Categories",
         "Offers": "Offers",
         "Ui": "Ui",
+        "EditCoupon": "Edit {{code}}",
+        "CouponNotFound": "Coupon Not Found",
         "Reviews": "Reviews",
         "Edit": "Edit",
         "Coupons": "Coupons",
