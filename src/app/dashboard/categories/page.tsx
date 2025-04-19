@@ -23,10 +23,11 @@ export default function Page(): React.JSX.Element {
           <Typography variant="h4">{t("Categories")}</Typography>
           <Link href="categories/add" passHref>
             <Button
-              startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />}
               variant="contained"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             >
               {t("Add")}
+              <PlusIcon fontSize="var(--icon-fontSize-md)" />
             </Button>
           </Link>
         </div>

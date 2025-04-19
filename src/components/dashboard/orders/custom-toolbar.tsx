@@ -7,6 +7,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { MRT_Row } from 'material-react-table';
 import dayjs from 'dayjs';
 import { OrderIn } from '@/interfaces/orderInterface';
+import { useTranslations } from 'next-intl';
 
 const csvConfig = mkConfig({
   fieldSeparator: ',',
@@ -16,6 +17,8 @@ const csvConfig = mkConfig({
 
 
 export default function CustomToolbar({table, data}: any) {
+  const t = useTranslations('common');
+
   const handleExportRows = (rows: MRT_Row<OrderIn>[]) => {
     const rowData = rows.map((row) => ({
       OrderID: row.original._id,
@@ -80,9 +83,12 @@ export default function CustomToolbar({table, data}: any) {
         <Button
         //export all data that is currently in the table (ignore pagination, sorting, filtering, etc.)
         onClick={handleExportData}
-        startIcon={<FileDownloadIcon />}
+        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
         >
-        Export All Data
+          <span>
+            {t('Export All Data')}
+          </span>
+          <FileDownloadIcon style={{ fontSize: 'var(--icon-fontSize-md)'}} />
         </Button>
         <Button
         disabled={
@@ -90,9 +96,12 @@ export default function CustomToolbar({table, data}: any) {
         }
         //only export selected rows
         onClick={() => handleExportRows(table.getSelectedRowModel().rows)}
-        startIcon={<FileDownloadIcon />}
+        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
         >
-        Export Selected Rows
+          <span>
+            {t('Export Selected Rows')}
+          </span>
+          <FileDownloadIcon style={{ fontSize: 'var(--icon-fontSize-md)'}} />
         </Button>
     </Box>
   )

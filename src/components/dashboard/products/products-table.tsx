@@ -13,6 +13,7 @@ import { useCategoryHandlers } from '@/controllers/categoriesController';
 import { useProductHandlers } from '@/controllers/productsController';
 import { ProductIn } from '@/interfaces/productInterface';
 import { setColumnFilters, setPagination, setSearchQuery } from '@/redux/slices/productSlice';
+import { useTranslations } from 'next-intl';
   
 
 const handleSaveRow: MRT_TableOptions<ProductIn>['onEditingRowSave'] = ({
@@ -24,7 +25,7 @@ const handleSaveRow: MRT_TableOptions<ProductIn>['onEditingRowSave'] = ({
 // Define columns outside the component to avoid defining them during render
 
 export function ProductsTable(): React.JSX.Element {
-
+    const t = useTranslations("common");
     const { fetchData : fetchDataCategories } = useCategoryHandlers();
     const { fetchData : fetchDataProducts, handleDelete, handleChangeStatus, fetchDataByCategory, handleChangeOrder, handleChangeOrderInCategory } = useProductHandlers();
     const dispatch = useDispatch<AppDispatch>()
@@ -262,14 +263,14 @@ export function ProductsTable(): React.JSX.Element {
         renderTopToolbarCustomActions = {({ table }) => (<CustomToolbar table={table} data={products}/>)}
         renderRowActions= {({ row }) => (
           <Box sx={{ display: 'flex', gap: '4px'}}>
-            <Tooltip title="Edit">
+            <Tooltip title={t("Edit")}>
               <IconButton onClick={() => router.push(`products/edit/${row.original._id}`)}>
                 <i
                   className="fa fa-pencil !text-sm text-yellow-500 hover:text-yellow-600 cursor-pointer"
                 ></i>
               </IconButton>
             </Tooltip>
-            <Tooltip title="Delete">
+            <Tooltip title={t("Delete")}>
               <IconButton color="error" onClick={() => handleDelete(row.original)}>
                 <i
                   className="fa fa-trash !text-sm text-red-500 hover:text-red-600 cursor-pointer"

@@ -204,6 +204,7 @@ export function CouponsTable(): React.JSX.Element {
         enableGlobalFilter={false}
         enableSorting={true}
         columnFilterDisplayMode='popover'
+        columnResizeDirection= {locale ==='ar' ? 'rtl' : 'ltr'}
         positionActionsColumn="last"
         state={{ isLoading: loading }}
         getRowId={(row) => row._id}

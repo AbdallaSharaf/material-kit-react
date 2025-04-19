@@ -2,7 +2,7 @@ import { Typography } from "@mui/material";
 import { Stack } from "@mui/system";
 import React from "react";
 import CategoryForm from "@/components/dashboard/categories/category-form";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 interface PageProps {
   params: { id: string };
@@ -29,6 +29,7 @@ const getCategoryById = async (id: string) => {
 
 const categoryPage = async ({ params }: PageProps) => {
   const t = await getTranslations("common");
+  const locale = await getLocale();
   const { id } = params;
 
   if (!id) throw new Error("No category ID provided");
@@ -48,7 +49,7 @@ const categoryPage = async ({ params }: PageProps) => {
       <Stack direction="row" spacing={3}>
         <div className="flex w-full justify-between items-center">
           <Typography variant="h4">
-            {`${t("Edit")} ${category.name["en"]}`}
+            {`${t("Edit")} ${category.name[locale]}`}
           </Typography>
         </div>
       </Stack>
