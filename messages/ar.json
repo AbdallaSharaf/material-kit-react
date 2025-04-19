@@ -1,22 +1,52 @@
 {
-    "header":{
-        "home": "جنة الفواكه"
+    "header": {
+      "home": "جنة الفواكه"
     },
-    "common":{
-        "products": "المنتجات",
-        "Overview": "نظرة عامة",
-        "Account": "الحساب",
-        "Orders": "الطلبات",
-        "Customers": "العملاء",
-        "Product Not Found": "المنتج غير موجود",
-        "Categories": "الفئات",
-        "Add Product": "اضافة منتج",
-        "Offers": "العروض",
-        "Coupons": "كوبونات",
-        "Add": "إضافة",
-        "Edit": "تحرير",
-        "Ui": "الواجهة",
-        "Reviews": "المراجعات",
-        "Settings": "الإعدادات"
+    "common": {
+      "products": "المنتجات",
+      "Overview": "نظرة عامة",
+      "Account": "الحساب",
+      "Orders": "الطلبات",
+      "Customers": "العملاء",
+      "Product Not Found": "المنتج غير موجود",
+      "Categories": "الفئات",
+      "Add Product": "إضافة منتج",
+      "Offers": "العروض",
+      "Coupons": "القسائم",
+      "Add": "إضافة",
+      "Edit": "تعديل",
+      "Ui": "الواجهة",
+      "Reviews": "المراجعات",
+      "Settings": "الإعدادات",
+      "Paid": "مدفوع",
+      "Unpaid": "غير مدفوع",
+      "Delivered": "تم التوصيل",
+      "Pending": "قيد الانتظار",
+      "Export All Data": "تصدير جميع البيانات",
+      "Export Selected Rows": "تصدير الصفوف المحددة",
+      "Name": "الاسم",
+      "Phone": "رقم الهاتف",
+      "Email": "البريد الإلكتروني",
+      "Date": "التاريخ",
+      "Status": "الحالة",
+      "Payment Method": "طريقة الدفع",
+      "cod": "الدفع عند الاستلام",
+      "credit_card": "بطاقة ائتمان",
+      "COD": "الدفع عند الاستلام",
+      "CC": "بطاقة ائتمان",
+      "Payment Status": "حالة الدفع",
+      "Total": "الإجمالي",
+      "Street": "الشارع",
+      "City": "المدينة",
+      "Country": "الدولة",
+      "Quantity": "الكمية",
+      "Item price": "سعر الوحدة",
+      "Total Price": "السعر الإجمالي",
+      "Order Settings": "اعدادات الطلب",
+      "Order Status": "حالة الطلب",
+      "Order Date": "تاريخ الطلب",
+      "Cancel":"Cancel",
+      "Save":"Save"
     }
-}
+  }
+  

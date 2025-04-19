@@ -1,48 +1,95 @@
 'use client';
 
 import * as React from 'react';
-import { MaterialReactTable, MRT_ColumnDef, MRT_TableOptions } from 'material-react-table';
-import { Chip, ChipProps, IconButton, Menu, MenuItem, Paper, Select, SelectChangeEvent, Tooltip, Typography } from '@mui/material';
-import CustomToolbar from './custom-toolbar';
+import {
+  Button,
+  Chip,
+  ChipProps,
+  IconButton,
+  Menu,
+  MenuItem,
+  Paper,
+  Select,
+  SelectChangeEvent,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { Box } from '@mui/system';
+import { MaterialReactTable, MRT_ColumnDef, MRT_TableOptions } from 'material-react-table';
+
+import CustomToolbar from './custom-toolbar';
+
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/redux/store/store';
-import { OrderIn } from '@/interfaces/orderInterface';
-import dayjs from 'dayjs';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { useOrderHandlers } from '@/controllers/ordersController';
+import { OrderIn } from '@/interfaces/orderInterface';
 import { setColumnFilters, setPagination, setSearchQuery } from '@/redux/slices/orderSlice';
-
+import { AppDispatch, RootState } from '@/redux/store/store';
+import dayjs from 'dayjs';
+import { useDispatch, useSelector } from 'react-redux';
+import { useTranslations } from 'next-intl';
+import axios from 'axios';
 // Define columns outside the component to avoid defining them during render
-
-
 export function OrdersTable(): React.JSX.Element {
-  const { fetchData, handleChangeStatus } = useOrderHandlers();
-  const dispatch = useDispatch<AppDispatch>()
+
+  // const handleDownload = async (rowData:any) => {
+  //   const response = await axios.post('../../../app/api/generate-invoice', rowData, {
+  //     responseType: 'blob',
+  //   });
   
+  //   const url = window.URL.createObjectURL(new Blob([response.data]));
+  //   const link = document.createElement('a');
+  //   link.href = url;
+  //   link.setAttribute('download', `order_${rowData._id}.pdf`);
+  //   document.body.appendChild(link);
+  //   link.click();
+  // };
+
+  const handleDownload = async (rowData: any) => {
+    try {
+      const response = await axios.post('/api/download-invoice', rowData, {
+        responseType: 'blob',
+      });
+  
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `order_${rowData._id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+    }
+  };
+
+  const t = useTranslations("common")
+  const { fetchData, handleChangeStatus } = useOrderHandlers();
+  const dispatch = useDispatch<AppDispatch>();
+
   const { refreshData, loading, orders, rowCount, pagination, columnFilters, searchQuery } = useSelector(
     (state: RootState) => state.orders
-  )
+  );
 
   const orderColumns: MRT_ColumnDef<OrderIn>[] = [
-    { 
+    {
       accessorKey: 'name',
-      header: 'Name',
+      header: t('Name'),
       size: 140,
-      Cell: ({ row }) => row.original.shippingAddress?.name ?? row.original.user?.name ?? "N/A",
+      Cell: ({ row }) => row.original.shippingAddress?.name ?? row.original.user?.name ?? 'N/A',
       enableColumnFilter: true,
       enableSorting: false,
     },
     {
       accessorKey: 'shippingAddress.phone',
-      header: 'Phone',
+      header: t('Phone'),
       size: 110,
       enableColumnFilter: true,
       enableSorting: false,
     },
     {
       accessorKey: 'email',
-      header: 'Email',
+      header: t('Email'),
       size: 150,
       Cell: ({ row }) => row.original.shippingAddress.email,
       enableColumnFilter: false,
@@ -51,7 +98,7 @@ export function OrdersTable(): React.JSX.Element {
     },
     {
       accessorKey: 'createdAt',
-      header: 'Date',
+      header: t('Date'),
       filterVariant: 'datetime-range',
       size: 120,
       Cell: ({ cell }) => <div>{dayjs(cell.getValue<string>()).format('MMMM D, YYYY, h:mm A')}</div>,
@@ -61,21 +108,21 @@ export function OrdersTable(): React.JSX.Element {
     },
     {
       accessorKey: 'status',
-      header: 'Status',
+      header: t('Status'),
       size: 100,
       Cell: ({ cell, row }) => {
         const status = cell.getValue<string>();
         const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
         const open = Boolean(anchorEl);
-    
+
         const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
           setAnchorEl(event.currentTarget);
         };
-    
+
         const handleCloseMenu = () => {
           setAnchorEl(null);
         };
-    
+
         const handleStatusChange = async (newStatus: string) => {
           handleCloseMenu();
           try {
@@ -84,103 +131,81 @@ export function OrdersTable(): React.JSX.Element {
             console.error('Failed to update status:', error);
           }
         };
-    
+
         const color: ChipProps['color'] =
-          status === 'newOrder' ? 'default' :
-          status === 'accepted' ? 'primary' :
-          status === 'shipped' ? 'info' :
-          status === 'delivered' ? 'success' :
-          status === 'cancelled' ? 'error' : 'warning';
-    
+          status === 'newOrder'
+            ? 'default'
+            : status === 'accepted'
+              ? 'primary'
+              : status === 'shipped'
+                ? 'info'
+                : status === 'delivered'
+                  ? 'success'
+                  : status === 'cancelled'
+                    ? 'error'
+                    : 'warning';
+
         return (
           <>
-            <Chip
-              label={status}
-              color={color}
-              size="small"
-              onDoubleClick={handleOpenMenu}
-              sx={{ cursor: 'pointer' }}
-            />
-            <Menu
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleCloseMenu}
-            >
+            <Chip label={status} color={color} size="small" onDoubleClick={handleOpenMenu} sx={{ cursor: 'pointer' }} />
+            <Menu anchorEl={anchorEl} open={open} onClose={handleCloseMenu}>
               {['newOrder', 'accepted', 'shipped', 'delivered', 'cancelled', 'returned'].map((option) => (
-                <MenuItem
-                  key={option}
-                  selected={option === status}
-                  onClick={() => handleStatusChange(option)}
-                >
+                <MenuItem key={option} selected={option === status} onClick={() => handleStatusChange(option)}>
                   {option}
                 </MenuItem>
               ))}
             </Menu>
           </>
         );
-      }
+      },
     },
     {
       accessorKey: 'paymentMethod',
-      header: 'Payment Method',
+      header: t('Payment Method'),
       size: 100,
       filterVariant: 'select',
-      filterSelectOptions: ['cod', 'credit_card'],
+      filterSelectOptions: [t('cod'), t('credit_card')],
       Cell: ({ cell }) => {
         const value = cell.getValue<string>();
-        const label = value === 'cod' ? 'COD' : 'CC';
+        const label = value === 'cod' ? t('COD') : t('CC');
         const color: ChipProps['color'] = value === 'cod' ? 'default' : 'primary';
-    
-        return (
-          <Chip
-            label={label}
-            color={color}
-            size="small"
-            variant="outlined"
-          />
-        );
-      }
+
+        return <Chip label={label} color={color} size="small" variant="outlined" />;
+      },
     },
     {
       accessorKey: 'isPaid',
-      header: 'Payment Status',
+      header: t('Payment Status'),
       size: 100,
       filterVariant: 'checkbox',
       Cell: ({ cell }) => {
         const value = cell.getValue<boolean>();
         const label = value ? 'Paid' : 'Unpaid';
         const color: ChipProps['color'] = value ? 'success' : 'warning';
-    
-        return (
-          <Chip
-            label={label}
-            color={color}
-            size="small"
-            variant="outlined"
-          />
-        );
-      }
-    },    
-      {
-        accessorKey: 'totalPrice',
-        header: 'Total',
-        size: 100,
-        filterVariant: 'range-slider',
+
+        return <Chip label={label} color={color} size="small" variant="outlined" />;
+      },
+    },
+    {
+      accessorKey: 'totalPrice',
+      header: t('Total'),
+      size: 100,
+      filterVariant: 'range-slider',
       muiFilterSliderProps: {
         marks: true,
         max: 10000,
         min: 100,
         step: 100,
-        valueLabelFormat: (value) => `${value} EGP`,
+        valueLabelFormat: (value) => `${value} SAR`,
       },
-      Cell: ({ cell }) => <div>{cell.getValue<number>()} EGP</div>,
+      Cell: ({ cell }) => <div>{cell.getValue<number>()} SAR</div>,
       enableColumnFilter: false,
       enableSorting: false,
       enableColumnActions: false,
     },
     {
       accessorKey: 'shippingAddress.street',
-      header: 'Street',
+      header: t('Street'),
       size: 100,
       enableColumnFilter: false,
       enableSorting: false,
@@ -188,7 +213,7 @@ export function OrdersTable(): React.JSX.Element {
     },
     {
       accessorKey: 'shippingAddress.city',
-      header: 'City',
+      header: t('City'),
       size: 100,
       enableColumnFilter: false,
       enableSorting: false,
@@ -196,24 +221,32 @@ export function OrdersTable(): React.JSX.Element {
     },
     {
       accessorKey: 'country',
-      header: 'Country',
+      header: t('Country'),
       size: 100,
-      Cell: ({ row }) => row.original.shippingAddress?.country ?? "N/A",
+      Cell: ({ row }) => row.original.shippingAddress?.country ?? 'N/A',
       enableColumnFilter: false,
       enableSorting: false,
       enableColumnActions: false,
     },
+    {
+      header: 'Actions',
+      Cell: ({ row }) => (
+        <IconButton onClick={() => handleDownload(row.original)} aria-label="download pdf" color="primary">
+        <PictureAsPdfIcon />
+      </IconButton>
+        )
+    }
   ];
-  
+
   React.useEffect(() => {
     fetchData();
   }, [refreshData, searchQuery, columnFilters, pagination]);
 
   return (
     <Paper>
-      <MaterialReactTable 
-        columns={orderColumns} 
-        data={orders} 
+      <MaterialReactTable
+        columns={orderColumns}
+        data={orders}
         enableRowSelection
         enableColumnResizing
         enableGlobalFilter={true}
@@ -222,68 +255,66 @@ export function OrdersTable(): React.JSX.Element {
           columnVisibility: {
             email: false,
             country: false,
-          }
+          },
         }}
-        columnFilterDisplayMode='popover'
+        columnFilterDisplayMode="popover"
         state={{
           globalFilter: searchQuery,
           isLoading: loading,
           pagination,
           columnFilters,
         }}
-        positionToolbarAlertBanner= 'bottom'
+        positionToolbarAlertBanner="bottom"
         manualFiltering={true}
         manualPagination={true}
         onColumnFiltersChange={(updaterOrValue) => {
-            const newColumnFilters =
-            typeof updaterOrValue === "function"
-                ? updaterOrValue(columnFilters)
-                : updaterOrValue;
-            dispatch(setColumnFilters(newColumnFilters));
+          const newColumnFilters =
+            typeof updaterOrValue === 'function' ? updaterOrValue(columnFilters) : updaterOrValue;
+          dispatch(setColumnFilters(newColumnFilters));
         }}
-        onGlobalFilterChange={(newGlobalFilter: string) => dispatch(setSearchQuery(newGlobalFilter))}        
-
+        onGlobalFilterChange={(newGlobalFilter: string) => dispatch(setSearchQuery(newGlobalFilter))}
         onPaginationChange={(updaterOrValue) => {
-          const newPagination =
-          typeof updaterOrValue === "function"
-              ? updaterOrValue(pagination)
-              : updaterOrValue;
+          const newPagination = typeof updaterOrValue === 'function' ? updaterOrValue(pagination) : updaterOrValue;
           dispatch(setPagination(newPagination));
         }}
         rowCount={rowCount}
-        enableExpandAll= {false} //disable expand all button
-        muiDetailPanelProps= {() => ({
+        enableExpandAll={false} //disable expand all button
+        muiDetailPanelProps={() => ({
           sx: (theme) => ({
-            backgroundColor:
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,210,244,0.1)'
-                : 'rgba(0,0,0,0.1)',
+            backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,210,244,0.1)' : 'rgba(0,0,0,0.1)',
           }),
         })}
- 
         //conditionally render detail panel
-        renderDetailPanel= {({ row }) =>
-            row.original.items.length > 0 ? (
-                <Box className="flex flex-col gap-3">
-                    {row.original.items.map((item) => {
-                    return(
-                        <Box key={item._id} className='grid grid-cols-2 items-center'>
-                        <Box className="flex flex-col gap-1">
-                            <Typography><strong>Name:</strong> {item.name?.["en"] || item.name?.["ar"]}</Typography>
-                            <Typography><strong>Quantity:</strong> {item.quantity}</Typography>
-                        </Box>
-                        <Box className="flex flex-col gap-1">
-                            <Typography><strong>Item price:</strong> {item.itemPrice}</Typography>
-                            <Typography><strong>Total Price:</strong> {item.totalPrice}</Typography>
-                        </Box>
-                        </Box>
-                    )
-                    })}
-                </Box>
-            ) : null
+        renderDetailPanel={({ row }) =>
+          row.original.items.length > 0 ? (
+            <Box className="flex flex-col gap-3">
+              {row.original.items.map((item) => {
+                return (
+                  <Box key={item._id} className="grid grid-cols-2 items-center">
+                    <Box className="flex flex-col gap-1">
+                      <Typography>
+                        <strong>{t('Name')}:</strong> {item.name?.['en'] || item.name?.['ar']}
+                      </Typography>
+                      <Typography>
+                        <strong>{t("Quantity")}:</strong> {item.quantity}
+                      </Typography>
+                    </Box>
+                    <Box className="flex flex-col gap-1">
+                      <Typography>
+                        <strong>{t("Item price")}:</strong> {item.itemPrice}
+                      </Typography>
+                      <Typography>
+                        <strong>{t("Total Price")}:</strong> {item.totalPrice}
+                      </Typography>
+                    </Box>
+                  </Box>
+                );
+              })}
+            </Box>
+          ) : null
         }
-        layoutMode='grid'
-        renderTopToolbarCustomActions = {({ table }) => (<CustomToolbar table={table} data={orders}/>)}
+        layoutMode="grid"
+        renderTopToolbarCustomActions={({ table }) => <CustomToolbar table={table} data={orders} />}
       />
     </Paper>
   );
