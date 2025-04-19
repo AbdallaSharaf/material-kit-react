@@ -12,8 +12,10 @@ import {
   TextField,
 } from '@mui/material';
 import { Gear as GearIcon } from '@phosphor-icons/react/dist/ssr/Gear';
+import { useTranslations } from 'next-intl';
 
 export default function OrderSettingsModal(): React.JSX.Element {
+  const t = useTranslations("common")
   const [settingsOpen, setSettingsOpen] = React.useState(false);
 
   const handleSettingsOpen = () => setSettingsOpen(true);
@@ -42,11 +44,11 @@ export default function OrderSettingsModal(): React.JSX.Element {
         onClick={handleSettingsOpen}
         style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
       >
-        Settings
+        {t("Settings")}
         <GearIcon fontSize="var(--icon-fontSize-md)" />
       </Button>
       <Dialog open={settingsOpen} onClose={handleSettingsClose}>
-        <DialogTitle>Order Settings</DialogTitle>
+        <DialogTitle>{t("Order Settings")}</DialogTitle>
         <DialogContent>
           <FormControlLabel
             control={
@@ -79,9 +81,9 @@ export default function OrderSettingsModal(): React.JSX.Element {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleSettingsClose}>Cancel</Button>
+          <Button onClick={handleSettingsClose}>{t("Cancel")}</Button>
           <Button variant="contained" onClick={handleSave}>
-            Save
+            {t("Save")}
           </Button>
         </DialogActions>
       </Dialog>

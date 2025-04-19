@@ -1,12 +1,12 @@
-import { Button } from '@mui/material'
-import { Box } from '@mui/system'
-import React from 'react'
-
-import { mkConfig, generateCsv, download } from 'export-to-csv'; //or use your library of choice here
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import { MRT_Row } from 'material-react-table';
-import dayjs from 'dayjs';
+import React from 'react';
 import { OrderIn } from '@/interfaces/orderInterface';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import { Button } from '@mui/material';
+import { Box } from '@mui/system';
+import dayjs from 'dayjs';
+import { download, generateCsv, mkConfig } from 'export-to-csv'; //or use your library of choice here
+
+import { MRT_Row } from 'material-react-table';
 import { useTranslations } from 'next-intl';
 
 const csvConfig = mkConfig({
@@ -15,10 +15,8 @@ const csvConfig = mkConfig({
   useKeysAsHeaders: true,
 });
 
-
-export default function CustomToolbar({table, data}: any) {
+export default function CustomToolbar({ table, data }: any) {
   const t = useTranslations('common');
-
   const handleExportRows = (rows: MRT_Row<OrderIn>[]) => {
     const rowData = rows.map((row) => ({
       OrderID: row.original._id,
@@ -30,24 +28,26 @@ export default function CustomToolbar({table, data}: any) {
       Date: dayjs(row.original.createdAt).format('YYYY-MM-DD HH:mm:ss'),
       Status: row.original.status,
       PaymentMethod: row.original.paymentMethod,
-      PaymentStatus: row.original.isPaid ? 'Paid' : 'Unpaid',
-      DeliveryStatus: row.original.isDelivered ? 'Delivered' : 'Pending',
-      Items: row.original.items.map(item => `${item.quantity} x ${item.name.en}`).join('; '),
+      PaymentStatus: row.original.isPaid ? t('Paid') : t('Unpaid'),
+      DeliveryStatus: row.original.isDelivered ? t('Delivered') : t('Pending'),
+      Items: row.original.items
+        .map((item) => `${item.quantity} x ${item?.name?.en || item?.name?.ar || ''}`)
+        .join('; '),
       Subtotal: row.original.subTotal.toFixed(2),
       ShippingFee: row.original.shippingFee.toFixed(2),
       Total: row.original.totalPrice.toFixed(2),
       Notes: row.original.notes || '',
     }));
-  
+
     if (rowData.length > 0) {
       const csv = generateCsv(csvConfig)(rowData);
       download(csvConfig)(csv);
     }
   };
-  
+
   const handleExportData = () => {
     if (!data || data.length === 0) return;
-  
+
     const rowData = data.map((order: OrderIn) => ({
       OrderID: order._id,
       Customer: order.shippingAddress.name,
@@ -58,29 +58,29 @@ export default function CustomToolbar({table, data}: any) {
       Date: dayjs(order.createdAt).format('YYYY-MM-DD HH:mm:ss'),
       Status: order.status,
       PaymentMethod: order.paymentMethod,
-      PaymentStatus: order.isPaid ? 'Paid' : 'Unpaid',
-      DeliveryStatus: order.isDelivered ? 'Delivered' : 'Pending',
-      Items: order.items.map(item => `${item.quantity} x ${item.name.en}`).join('; '),
+      PaymentStatus: order.isPaid ? t('Paid') : t('Unpaid'),
+      DeliveryStatus: order.isDelivered ? t('Delivered') : t('Pending'),
+      Items: order.items.map((item) => `${item.quantity} x ${item?.name?.en || item?.name?.ar || ''}`).join('; '),
       Subtotal: order.subTotal.toFixed(2),
       ShippingFee: order.shippingFee.toFixed(2),
       Total: order.totalPrice.toFixed(2),
       Notes: order.notes || '',
     }));
-  
+
     const csv = generateCsv(csvConfig)(rowData);
     download(csvConfig)(csv);
   };
-  
+
   return (
-        <Box
-        sx={{
+    <Box
+      sx={{
         display: 'flex',
         gap: '16px',
         padding: '8px',
         flexWrap: 'wrap',
-        }}
+      }}
     >
-        <Button
+      <Button
         //export all data that is currently in the table (ignore pagination, sorting, filtering, etc.)
         onClick={handleExportData}
         style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
@@ -104,6 +104,5 @@ export default function CustomToolbar({table, data}: any) {
           <FileDownloadIcon style={{ fontSize: 'var(--icon-fontSize-md)'}} />
         </Button>
     </Box>
-  )
+  );
 }
-
