@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import puppeteer from 'puppeteer';
 import Handlebars from 'handlebars';
+import { getTranslations } from 'next-intl/server';
 interface LaunchOptions {
     headless?: boolean | "chrome";
   }
@@ -37,7 +38,9 @@ interface LaunchOptions {
     return tlvBuffer.toString('base64');
   }
   
-export const generateInvoicePdf = async (orderData: any) => {
+  export const generateInvoicePdf = async (orderData: any) => {
+  const t = await getTranslations("common")
+
     const filePath = path.join(process.cwd(), 'public', 'invoice.html');
   const templateHtml = fs.readFileSync(filePath, 'utf8');
   const template = Handlebars.compile(templateHtml);
@@ -50,7 +53,7 @@ export const generateInvoicePdf = async (orderData: any) => {
     vatNumber: '311213878300003',
     timestamp: new Date(orderData.createdAt).toISOString(),
     totalAmount: orderData.totalPrice.toFixed(2),
-    vatAmount: '0.00', // Adjust this if VAT applies
+    vatAmount: orderData.VAT.toFixed(2), // Adjust this if VAT applies
   });
   
   const qrCodeDataURL = await QRCode.toDataURL(qrPayload); // Base64 image
@@ -76,10 +79,11 @@ export const generateInvoicePdf = async (orderData: any) => {
     shippingFee: orderData?.shippingFee?.toFixed(2),
     total: orderData?.totalPrice?.toFixed(2),
     createdAt: new Date(orderData.createdAt).toLocaleDateString('ar-EG'),
-    status: orderData?.status,
-    paymentMethod: orderData?.paymentMethod === 'cash' ? 'الدفع عند الاستلام' : 'Credit card',
+    status: t(orderData?.status),
+    paymentMethod: orderData?.paymentMethod === 'cod' ? 'الدفع عند الاستلام' : 'Credit card',
     coupon: orderData?.coupon !== null && orderData?.coupon?.code ,
     discount: orderData?.discount !== null && orderData?.discount ,
+    vat: orderData?.VAT ,
     items,
     logo: logoBase64,
     qrCode: qrCodeDataURL,
