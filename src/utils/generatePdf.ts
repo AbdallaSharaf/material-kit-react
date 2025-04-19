@@ -1,3 +1,4 @@
+import QRCode  from 'qrcode';
 import fs from 'fs';
 import path from 'path';
 import puppeteer from 'puppeteer';
@@ -5,6 +6,37 @@ import Handlebars from 'handlebars';
 interface LaunchOptions {
     headless?: boolean | "chrome";
   }
+  function toTLV(tag: number, value: string) {
+    const encodedTag = Buffer.from([tag]);
+    const encodedLength = Buffer.from([value.length]);
+    const encodedValue = Buffer.from(value, 'utf8');
+    return Buffer.concat([encodedTag, encodedLength, encodedValue]);
+  }
+  
+  function generateZatcaTLV({
+    sellerName,
+    vatNumber,
+    timestamp,
+    totalAmount,
+    vatAmount,
+  }: {
+    sellerName: string;
+    vatNumber: string;
+    timestamp: string;
+    totalAmount: string;
+    vatAmount: string;
+  }) {
+    const tlvBuffer = Buffer.concat([
+      toTLV(1, sellerName),
+      toTLV(2, vatNumber),
+      toTLV(3, timestamp),
+      toTLV(4, totalAmount),
+      toTLV(5, vatAmount),
+    ]);
+  
+    return tlvBuffer.toString('base64');
+  }
+  
 export const generateInvoicePdf = async (orderData: any) => {
     const filePath = path.join(process.cwd(), 'public', 'invoice.html');
   const templateHtml = fs.readFileSync(filePath, 'utf8');
@@ -13,7 +45,15 @@ export const generateInvoicePdf = async (orderData: any) => {
   const logoImage = fs.readFileSync(logoPath);
   const logoBase64 = `data:image/png;base64,${logoImage.toString('base64')}`;
   
+  const qrPayload = generateZatcaTLV({
+    sellerName: 'Fruits Heaven',
+    vatNumber: '311213878300003',
+    timestamp: new Date(orderData.createdAt).toISOString(),
+    totalAmount: orderData.totalPrice.toFixed(2),
+    vatAmount: '0.00', // Adjust this if VAT applies
+  });
   
+  const qrCodeDataURL = await QRCode.toDataURL(qrPayload); // Base64 image
 
   Handlebars.registerHelper('inc', function (value) {
     return parseInt(value) + 1;
@@ -42,6 +82,7 @@ export const generateInvoicePdf = async (orderData: any) => {
     discount: orderData?.discount !== null && orderData?.discount ,
     items,
     logo: logoBase64,
+    qrCode: qrCodeDataURL,
   });
 
   const browser = await puppeteer.launch({
