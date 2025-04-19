@@ -10,8 +10,7 @@ import { CategoryIn } from '@/interfaces/categoryInterface';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store/store';
 import { useCategoryHandlers } from '@/controllers/categoriesController';
-import { useLocale } from 'next-intl';
-import { useTranslations } from 'use-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { MRT_Localization_AR } from 'material-react-table/locales/ar';
 import { MRT_Localization_EN } from 'material-react-table/locales/en';
   
