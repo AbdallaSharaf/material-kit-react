@@ -18,23 +18,27 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store/store";
 import { CategoryIn } from "@/interfaces/categoryInterface";
 import { useCategoryHandlers } from "@/controllers/categoriesController";
+import { useLocale } from "next-intl";
+import { useTranslations } from "use-intl";
 
 export default function CategoriesModal(): React.JSX.Element {
   const [categoriesOpen, setCategoriesOpen] = React.useState(false);
   const { handleDelete, fetchData } = useCategoryHandlers();
-  
-  const { 
-    categories, 
-    refreshData
+  const locale = useLocale() as "en" | "ar";
+  const t = useTranslations("common");
+
+  const {
+    categories,
+    refreshData,
   } = useSelector((state: RootState) => state.categories);
+
   const router = useRouter();
 
   const handleCategoriesOpen = () => setCategoriesOpen(true);
   const handleCategoriesClose = () => setCategoriesOpen(false);
 
   const handleDeleteCategory = (categoryToDelete: CategoryIn) => {
-    handleDelete(categoryToDelete)
-    // TODO: Add delete API call or logic here
+    handleDelete(categoryToDelete);
   };
 
   const handleEditCategory = (category: string) => {
@@ -54,22 +58,21 @@ export default function CategoriesModal(): React.JSX.Element {
       <Button
         variant="contained"
         onClick={handleCategoriesOpen}
-        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+        style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
       >
-        Categories
+        {t("Categories")}
         <TagIcon fontSize="var(--icon-fontSize-md)" />
       </Button>
 
       <Dialog open={categoriesOpen} onClose={handleCategoriesClose} fullWidth maxWidth="sm">
-        <DialogTitle>Manage Categories</DialogTitle>
+        <DialogTitle>{t("Manage Categories")}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} mt={1}>
-            {/* Render Categories as Chips */}
             <Stack direction="row" flexWrap="wrap" gap={1}>
               {categories?.map((category) => (
                 <Chip
                   key={category._id}
-                  label={category.name["en"]}
+                  label={category.name[locale]}
                   onDelete={() => handleDeleteCategory(category)}
                   onClick={() => handleEditCategory(category._id)}
                   color="primary"
@@ -77,7 +80,6 @@ export default function CategoriesModal(): React.JSX.Element {
                 />
               ))}
 
-              {/* Add New Category Button */}
               <IconButton
                 size="small"
                 color="primary"
@@ -92,7 +94,7 @@ export default function CategoriesModal(): React.JSX.Element {
 
         <DialogActions>
           <Button onClick={handleCategoriesClose} variant="outlined" color="primary">
-            Close
+            {t("Close")}
           </Button>
         </DialogActions>
       </Dialog>
