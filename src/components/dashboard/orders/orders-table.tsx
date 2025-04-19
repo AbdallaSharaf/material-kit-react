@@ -102,7 +102,7 @@ export function OrdersTable(): React.JSX.Element {
       accessorKey: 'createdAt',
       header: t('Date'),
       filterVariant: 'datetime-range',
-      size: 120,
+      size: 160,
       Cell: ({ cell }) => <div>{dayjs(cell.getValue<string>()).format('MMMM D, YYYY, h:mm A')}</div>,
       enableColumnFilter: false,
       enableSorting: false,
@@ -174,7 +174,7 @@ export function OrdersTable(): React.JSX.Element {
     {
       accessorKey: 'paymentMethod',
       header: t('Payment Method'),
-      size: 100,
+      size: 166,
       filterVariant: 'select',
       filterSelectOptions: [t('cod'), t('credit_card')],
       Cell: ({ cell }) => {
@@ -195,7 +195,7 @@ export function OrdersTable(): React.JSX.Element {
     {
       accessorKey: 'isPaid',
       header: t('Payment Status'),
-      size: 100,
+      size: 155,
       filterVariant: 'checkbox',
       Cell: ({ cell }) => {
         const value = cell.getValue<boolean>();
@@ -277,6 +277,7 @@ export function OrdersTable(): React.JSX.Element {
             email: false,
             country: false,
           },
+          density: 'compact'
         }}
         columnFilterDisplayMode="popover"
         state={{
@@ -336,6 +337,26 @@ export function OrdersTable(): React.JSX.Element {
         }
         layoutMode="grid"
         renderTopToolbarCustomActions={({ table }) => <CustomToolbar table={table} data={orders} />}
+        muiTableHeadRowProps={{
+          sx: {
+            height: '50px', // increase header row height
+            
+          },
+        }}
+        muiTableHeadCellProps={{
+          sx: {
+            '& .Mui-TableHeadCell-Content-Wrapper': {
+              overflow: 'visible !important', // override overflow
+            },
+            '& .Mui-TableHeadCell-Content': {
+              height: '100%',
+            },
+            '& .Mui-TableHeadCell-Content-Labels': {
+              height: '100%',
+            },
+          },
+        }}
+      
       />
     </Paper>
   );
