@@ -1,4 +1,18 @@
 {
+  "auth": {
+    "signupNotImplemented": "تسجيل حساب غير مدعوم",
+    "socialAuthNotImplemented": "التصفح الاجتماعي غير مدعوم",
+    "resetNotImplemented": "تغيير كلمة المرور غير مدعوم",
+    "updateNotImplemented": "تغيير كلمة المرور غير مدعوم",
+    "sessionFetchError": "غير قادر على جلب بيانات الجلسة",
+    "signIn": "تسجيل الدخول",
+    "dontHaveAccount": "لا تملك حسابًا؟",
+    "signUp": "إنشاء حساب",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "invalidCredentials": "بيانات اعتماد غير صالحة"
+  },
     "header": {
       "home": "جنة الفواكه"
     },
