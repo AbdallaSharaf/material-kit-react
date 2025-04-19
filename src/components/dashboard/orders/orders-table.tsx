@@ -249,6 +249,8 @@ export function OrdersTable(): React.JSX.Element {
     },
     {
       header: 'Actions',
+      enableColumnActions: false,
+      size: 80,
       Cell: ({ row }) => (
         <IconButton onClick={() => handleDownload(row.original)} aria-label="download pdf" color="primary">
         <PictureAsPdfIcon />
