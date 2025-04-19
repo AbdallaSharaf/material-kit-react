@@ -13,7 +13,9 @@ import { useCategoryHandlers } from '@/controllers/categoriesController';
 import { useProductHandlers } from '@/controllers/productsController';
 import { ProductIn } from '@/interfaces/productInterface';
 import { setColumnFilters, setPagination, setSearchQuery } from '@/redux/slices/productSlice';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import { MRT_Localization_AR } from 'material-react-table/locales/ar';
+import { MRT_Localization_EN } from 'material-react-table/locales/en';
   
 
 const handleSaveRow: MRT_TableOptions<ProductIn>['onEditingRowSave'] = ({
@@ -26,6 +28,7 @@ const handleSaveRow: MRT_TableOptions<ProductIn>['onEditingRowSave'] = ({
 
 export function ProductsTable(): React.JSX.Element {
     const t = useTranslations("common");
+    const locale = useLocale() as "ar" | "en";
     const { fetchData : fetchDataCategories } = useCategoryHandlers();
     const { fetchData : fetchDataProducts, handleDelete, handleChangeStatus, fetchDataByCategory, handleChangeOrder, handleChangeOrderInCategory } = useProductHandlers();
     const dispatch = useDispatch<AppDispatch>()
@@ -48,19 +51,19 @@ export function ProductsTable(): React.JSX.Element {
       loading
     } = useSelector((state: RootState) => state.products);
 
-    const getColumns = (hasCategoryId: boolean): MRT_ColumnDef<ProductIn>[] => {
+    const getColumns = (hasCategoryId: boolean): MRT_ColumnDef<ProductIn>[] => {    
       const baseColumns: MRT_ColumnDef<ProductIn>[] = [
         {
-          accessorKey: 'SKU',
-          header: 'SKU',
+          accessorKey: "SKU",
+          header: t("SKU"),
           grow: true,
           size: 70,
           enableColumnActions: false,
           enableSorting: false,
         },
         {
-          accessorKey: 'images',
-          header: 'Image',
+          accessorKey: "images",
+          header: t("Image"),
           enableColumnActions: false,
           enableSorting: false,
           enableColumnFilter: false,
@@ -69,33 +72,39 @@ export function ProductsTable(): React.JSX.Element {
             <img
               src={row.original.images?.[0]}
               alt="product image"
-              style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }}
+              style={{
+                width: "40px",
+                height: "40px",
+                objectFit: "cover",
+                borderRadius: "4px",
+              }}
             />
           ),
         },
         {
-          accessorKey: 'name',
-          header: 'Name',
+          accessorKey: "name",
+          header: t("Name"),
           grow: true,
           size: 140,
           enableColumnActions: false,
           enableColumnFilter: false,
-          Cell: ({ row }) => row.original.name?.['en'] ?? row.original.name?.['ar'],
+          Cell: ({ row }) =>
+            row.original.name?.[locale],
         },
         {
-          accessorKey: 'price',
-          header: 'Price',
+          accessorKey: "price",
+          header: t("Price"),
           size: 100,
-          filterVariant: 'range-slider',
+          filterVariant: "range-slider",
           muiFilterSliderProps: {
             marks: true,
             max: 10000,
             min: 100,
             step: 100,
             valueLabelFormat: (value) =>
-              value.toLocaleString('en-US', {
-                style: 'currency',
-                currency: 'SAR',
+              value.toLocaleString("en-US", {
+                style: "currency",
+                currency: "SAR",
               }),
           },
           enableColumnActions: false,
@@ -103,20 +112,20 @@ export function ProductsTable(): React.JSX.Element {
           Cell: ({ row }) => <div>{row.original.price} SAR</div>,
         },
         {
-          accessorKey: 'availability',
-          header: 'Availability',
+          accessorKey: "availability",
+          header: t("Availability"),
           size: 90,
           enableSorting: false,
           enableColumnFilter: false,
           enableColumnActions: false,
-          filterVariant: 'select',
+          filterVariant: "select",
           filterSelectOptions: [
-            { label: 'Active', value: 'true' },
-            { label: 'Inactive', value: 'false' },
+            { label: t("Active"), value: "true" },
+            { label: t("Inactive"), value: "false" },
           ],
           filterFn: (row, columnId, filterValue) => {
-            if (filterValue === 'true') return row.getValue(columnId) === true;
-            if (filterValue === 'false') return row.getValue(columnId) === false;
+            if (filterValue === "true") return row.getValue(columnId) === true;
+            if (filterValue === "false") return row.getValue(columnId) === false;
             return true;
           },
           Cell: ({ row }) => (
@@ -131,11 +140,11 @@ export function ProductsTable(): React.JSX.Element {
     
       const categoryColumn: MRT_ColumnDef<ProductIn> = {
         accessorFn: (row) => row.category?.map((category) => category.category?._id),
-        header: 'Categories',
+        header: t("Categories"),
         size: 140,
-        filterVariant: 'select',
+        filterVariant: "select",
         filterSelectOptions: categories?.map((category) => ({
-          label: category.name?.['en'],
+          label: category.name?.[locale],
           value: category?._id,
         })),
         Cell: ({ row }) => (
@@ -144,37 +153,49 @@ export function ProductsTable(): React.JSX.Element {
               <span
                 key={index}
                 style={{
-                  display: 'inline-block',
-                  backgroundColor: '#e0e0e0',
-                  borderRadius: '4px',
-                  padding: '2px 6px',
-                  marginRight: '4px',
-                  fontSize: '12px',
+                  display: "inline-block",
+                  backgroundColor: "#e0e0e0",
+                  borderRadius: "4px",
+                  padding: "2px 6px",
+                  marginRight: "4px",
+                  fontSize: "12px",
                 }}
               >
-                {category.category?.name?.['en']}
+                {category.category?.name?.[locale]}
               </span>
             ))}
           </div>
         ),
       };
+    
       const orderInCatColumn: MRT_ColumnDef<ProductIn> = {
         accessorFn: (row) => row.category?.map((category) => category.order),
-        header: 'Order in Category',
-        enableColumnFilter: false,
-        size: 140,
-      };
-
-      const orderColumn: MRT_ColumnDef<ProductIn> = {
-        accessorKey: 'order',
-        header: 'Order',
+        header: t("Order in Category"),
         enableColumnFilter: false,
         size: 140,
       };
     
-      // Conditionally include the Categories column
-      return !hasCategoryId ? [...baseColumns.slice(0, 3), categoryColumn, orderColumn, ...baseColumns.slice(3)] : [...baseColumns.slice(0, 3), orderInCatColumn, ...baseColumns.slice(3)];
+      const orderColumn: MRT_ColumnDef<ProductIn> = {
+        accessorKey: "order",
+        header: t("Order"),
+        enableColumnFilter: false,
+        size: 140,
+      };
+    
+      return !hasCategoryId
+        ? [
+            ...baseColumns.slice(0, 3),
+            categoryColumn,
+            orderColumn,
+            ...baseColumns.slice(3),
+          ]
+        : [
+            ...baseColumns.slice(0, 3),
+            orderInCatColumn,
+            ...baseColumns.slice(3),
+          ];
     };
+    
     
     // Usage example:
     const columns = getColumns(!!categoryId);
@@ -204,7 +225,9 @@ export function ProductsTable(): React.JSX.Element {
         enableGlobalFilter={false}
         onEditingRowSave={handleSaveRow} 
         enableRowOrdering= {true}
+        localization={locale === 'ar' ? MRT_Localization_AR : MRT_Localization_EN}
         columnFilterDisplayMode = 'popover'
+        columnResizeDirection= {locale ==='ar' ? 'rtl' : 'ltr'}
         positionToolbarAlertBanner= 'bottom'
         getRowId = {(row) => row._id}
         positionActionsColumn="last" 

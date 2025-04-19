@@ -24,7 +24,9 @@ export default function Page(): React.JSX.Element {
         <div className="flex w-full justify-between items-center">
           <Typography variant="h4">{t("Coupons")}</Typography>
           <Link href="coupons/add" passHref>
-            <Button variant="contained" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Button variant="contained" 
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            >
               {/* Text */}
               <span>{t("Add")}</span>
               {/* Icon */}

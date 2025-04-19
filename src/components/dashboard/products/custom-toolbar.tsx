@@ -8,6 +8,7 @@ import { MRT_Row } from 'material-react-table';
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { useRouter } from 'next/navigation';
 import { ProductIn } from '@/interfaces/productInterface';
+import { useTranslations } from 'next-intl';
 
 const csvConfig = mkConfig({
   fieldSeparator: ',',
@@ -17,6 +18,7 @@ const csvConfig = mkConfig({
 
 
 export default function CustomToolbar({table, data}: any) {
+  const t = useTranslations("common");
 
     const router = useRouter()
 
@@ -51,8 +53,10 @@ export default function CustomToolbar({table, data}: any) {
         flexWrap: 'wrap',
         }}
     >
-        <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={()=>router.push(`products/add`)}>
-          Add
+        <Button variant="contained" onClick={()=>router.push(`products/add`)}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span>{t("Add")}</span>
+          <PlusIcon style={{ fontSize: 'var(--icon-fontSize-md)'}} />
         </Button>
         {/* <Button
         //export all data that is currently in the table (ignore pagination, sorting, filtering, etc.)
