@@ -8,6 +8,7 @@ import { Button } from '@mui/material';
 import Link from 'next/link';
 import { CouponsTable } from '@/components/dashboard/coupons/coupons-table';
 import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 
 export const metadata: Metadata = {
   title: `Coupons | Dashboard | ${config.site.name}`,
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 
 export default function Page(): React.JSX.Element {
   const t = useTranslations("common");
+  // Define a flip class based on the dir
 
   return (
     <Stack spacing={3}>
@@ -22,11 +24,11 @@ export default function Page(): React.JSX.Element {
         <div className="flex w-full justify-between items-center">
           <Typography variant="h4">{t("Coupons")}</Typography>
           <Link href="coupons/add" passHref>
-            <Button
-              startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />}
-              variant="contained"
-            >
-              {t("Add")}
+            <Button variant="contained" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              {/* Text */}
+              <span>{t("Add")}</span>
+              {/* Icon */}
+              <PlusIcon style={{ fontSize: 'var(--icon-fontSize-md)'}} />
             </Button>
           </Link>
         </div>

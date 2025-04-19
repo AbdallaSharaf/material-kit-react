@@ -83,18 +83,26 @@ export default function CustomToolbar({ table, data }: any) {
       <Button
         //export all data that is currently in the table (ignore pagination, sorting, filtering, etc.)
         onClick={handleExportData}
-        startIcon={<FileDownloadIcon />}
-      >
-        {t("Export All Data")}
-      </Button>
-      <Button
-        disabled={!table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()}
+        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+        >
+          <span>
+            {t('Export All Data')}
+          </span>
+          <FileDownloadIcon style={{ fontSize: 'var(--icon-fontSize-md)'}} />
+        </Button>
+        <Button
+        disabled={
+            !table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()
+        }
         //only export selected rows
         onClick={() => handleExportRows(table.getSelectedRowModel().rows)}
-        startIcon={<FileDownloadIcon />}
-      >
-        {t('Export Selected Rows')}
-      </Button>
+        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+        >
+          <span>
+            {t('Export Selected Rows')}
+          </span>
+          <FileDownloadIcon style={{ fontSize: 'var(--icon-fontSize-md)'}} />
+        </Button>
     </Box>
   );
 }

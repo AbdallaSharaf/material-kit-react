@@ -52,11 +52,12 @@ export default function CategoriesModal(): React.JSX.Element {
   return (
     <>
       <Button
-        startIcon={<TagIcon fontSize="var(--icon-fontSize-md)" />}
         variant="contained"
         onClick={handleCategoriesOpen}
+        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
       >
         Categories
+        <TagIcon fontSize="var(--icon-fontSize-md)" />
       </Button>
 
       <Dialog open={categoriesOpen} onClose={handleCategoriesClose} fullWidth maxWidth="sm">

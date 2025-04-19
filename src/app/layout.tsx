@@ -19,7 +19,7 @@ export default function Layout({ children }: LayoutProps){
   const messages = useMessages();
   const locale = useLocale();
   return (
-    <html lang={locale}>
+    <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <body>
         <NextIntlClientProvider messages={messages}>
         <LocalizationProvider>

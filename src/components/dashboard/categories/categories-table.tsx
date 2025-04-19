@@ -10,6 +10,9 @@ import { CategoryIn } from '@/interfaces/categoryInterface';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store/store';
 import { useCategoryHandlers } from '@/controllers/categoriesController';
+import { useLocale, useTranslations } from 'next-intl';
+import { MRT_Localization_AR } from 'material-react-table/locales/ar';
+import { MRT_Localization_EN } from 'material-react-table/locales/en';
   
 const handleSaveRow: MRT_TableOptions<CategoryIn>['onEditingRowSave'] = ({
   exitEditingMode,
@@ -21,9 +24,10 @@ const handleSaveRow: MRT_TableOptions<CategoryIn>['onEditingRowSave'] = ({
 
 export function CategoriesTable(): React.JSX.Element {
 
+    const t = useTranslations('common');
     const { fetchData : fetchDataCategories, handleDelete, handleChangeOrder, handleChangeStatus } = useCategoryHandlers();
     const searchParams = useSearchParams();
-    
+    const locale = useLocale();
     const { 
       refreshData : refreshDataCategories,
       categories,
@@ -33,29 +37,25 @@ export function CategoriesTable(): React.JSX.Element {
     const columns: MRT_ColumnDef<CategoryIn>[] = [
       { 
         accessorKey: 'name.en',
-        header: 'Name',
+        header: 'Name (EN)',
         grow: true,
         size: 140,
-        Cell: ({ row }) => (
-          row.original.name['en']
-        ),
-      enableColumnActions: true,
-      enableColumnFilter: true,
+        Cell: ({ row }) => row.original.name['en'],
+        enableColumnActions: true,
+        enableColumnFilter: true,
       },
       { 
         accessorKey: 'name.ar',
-        header: 'Name',
+        header: 'الأسم (AR)',
         grow: true,
         size: 140,
-        Cell: ({ row }) => (
-          row.original.name['ar']
-        ),
-      enableColumnActions: true,
-      enableColumnFilter: true,
+        Cell: ({ row }) => row.original.name['ar'],
+        enableColumnActions: true,
+        enableColumnFilter: true,
       },
       { 
         accessorKey: 'order',
-        header: 'Order',
+        header: t('Order'),
         grow: true,
         size: 140,
         enableColumnActions: false,
@@ -63,20 +63,20 @@ export function CategoriesTable(): React.JSX.Element {
       },
       {
         accessorKey: 'availability',
-        header: 'Availability',
+        header: t('Availability'),
         size: 90,
         enableSorting: false,
         enableColumnFilter: false,
         enableColumnActions: false,
-        filterVariant: 'select', // Enable dropdown filter
+        filterVariant: 'select',
         filterSelectOptions: [
-          { label: 'Active', value: 'true' },
-          { label: 'Inactive', value: 'false' },
+          { label: t('Active'), value: 'true' },
+          { label: t('Inactive'), value: 'false' },
         ],
         filterFn: (row, columnId, filterValue) => {
           if (filterValue === 'true') return row.getValue(columnId) === true;
           if (filterValue === 'false') return row.getValue(columnId) === false;
-          return true; // Show all if no filter is selected
+          return true;
         },
         Cell: ({ row }) => (
           <Switch
@@ -85,7 +85,7 @@ export function CategoriesTable(): React.JSX.Element {
             color="primary"
           />
         ),
-      },    
+      },
     ];
 
     React.useEffect(() => {
@@ -99,6 +99,8 @@ export function CategoriesTable(): React.JSX.Element {
         columns={columns} 
         data={categories} 
         enableRowActions
+        localization={locale === 'ar' ? MRT_Localization_AR : MRT_Localization_EN}
+        columnResizeDirection= {locale ==='ar' ? 'rtl' : 'ltr'}
         enableColumnResizing
         enableGlobalFilter={false}
         onEditingRowSave={handleSaveRow} 

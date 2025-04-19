@@ -27,8 +27,10 @@ import { setColumnFilters, setPagination, setSearchQuery } from '@/redux/slices/
 import { AppDispatch, RootState } from '@/redux/store/store';
 import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
-import { useTranslations } from 'next-intl';
+import {useLocale, useTranslations } from 'next-intl';
 import axios from 'axios';
+import { MRT_Localization_AR } from 'material-react-table/locales/ar';
+import { MRT_Localization_EN } from 'material-react-table/locales/en';
 // Define columns outside the component to avoid defining them during render
 export function OrdersTable(): React.JSX.Element {
 
@@ -66,7 +68,7 @@ export function OrdersTable(): React.JSX.Element {
   const t = useTranslations("common")
   const { fetchData, handleChangeStatus } = useOrderHandlers();
   const dispatch = useDispatch<AppDispatch>();
-
+  const locale = useLocale() as "en" | "ar"
   const { refreshData, loading, orders, rowCount, pagination, columnFilters, searchQuery } = useSelector(
     (state: RootState) => state.orders
   );
@@ -147,11 +149,21 @@ export function OrdersTable(): React.JSX.Element {
 
         return (
           <>
-            <Chip label={status} color={color} size="small" onDoubleClick={handleOpenMenu} sx={{ cursor: 'pointer' }} />
+            <Chip
+              label={t(status)}
+              color={color}
+              size="small"
+              onDoubleClick={handleOpenMenu}
+              sx={{ cursor: 'pointer' }}
+            />
             <Menu anchorEl={anchorEl} open={open} onClose={handleCloseMenu}>
               {['newOrder', 'accepted', 'shipped', 'delivered', 'cancelled', 'returned'].map((option) => (
-                <MenuItem key={option} selected={option === status} onClick={() => handleStatusChange(option)}>
-                  {option}
+                <MenuItem
+                  key={option}
+                  selected={option === status}
+                  onClick={() => handleStatusChange(option)}
+                >
+                  {t(option)}
                 </MenuItem>
               ))}
             </Menu>
@@ -169,9 +181,16 @@ export function OrdersTable(): React.JSX.Element {
         const value = cell.getValue<string>();
         const label = value === 'cod' ? t('COD') : t('CC');
         const color: ChipProps['color'] = value === 'cod' ? 'default' : 'primary';
-
-        return <Chip label={label} color={color} size="small" variant="outlined" />;
-      },
+    
+        return (
+          <Chip
+            label={label}
+            color={color}
+            size="small"
+            variant="outlined"
+          />
+        );
+      }
     },
     {
       accessorKey: 'isPaid',
@@ -180,7 +199,7 @@ export function OrdersTable(): React.JSX.Element {
       filterVariant: 'checkbox',
       Cell: ({ cell }) => {
         const value = cell.getValue<boolean>();
-        const label = value ? 'Paid' : 'Unpaid';
+        const label = value ? t('Paid') : t('Unpaid');
         const color: ChipProps['color'] = value ? 'success' : 'warning';
 
         return <Chip label={label} color={color} size="small" variant="outlined" />;
@@ -248,9 +267,11 @@ export function OrdersTable(): React.JSX.Element {
         columns={orderColumns}
         data={orders}
         enableRowSelection
+        columnResizeDirection= {locale ==='ar' ? 'rtl' : 'ltr'}
         enableColumnResizing
         enableGlobalFilter={true}
         enableSorting={true}
+        localization={locale === 'ar' ? MRT_Localization_AR : MRT_Localization_EN}
         initialState={{
           columnVisibility: {
             email: false,

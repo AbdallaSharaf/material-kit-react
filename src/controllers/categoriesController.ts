@@ -5,6 +5,7 @@ import { AppDispatch, RootState } from "../redux/store/store";
 import { deleteCategory, fetchCategories } from "../redux/slices/categorySlice";
 import { CategoryIn, CategoryOut } from "../interfaces/categoryInterface";
 import { useRouter } from 'next/navigation'; // App Router
+import { useLocale } from "next-intl";
 
    
 export const useCategoryHandlers = () => {
@@ -14,7 +15,7 @@ export const useCategoryHandlers = () => {
   } = useSelector((state: RootState) => state.categories);
 
   const router = useRouter();
-
+  const locale = useLocale() as "en" | "ar"
 const dispatch = useDispatch<AppDispatch>()
   const handleCreateCategory = async (
     values: CategoryOut) => {
@@ -179,7 +180,7 @@ const handleChangeStatus = async (product: CategoryIn) => {
 const handleDelete = async (item: CategoryIn) => {
     // Show confirmation dialog and await the user's response.
     const result = await Swal.fire({
-      title: `Are you sure you want to delete ${item.name["en"]}?`,
+      title: `Are you sure you want to delete ${item.name[locale]}?`,
       text: "This action cannot be undone.",
       icon: "warning",
       showCancelButton: true,
@@ -206,7 +207,7 @@ const handleDelete = async (item: CategoryIn) => {
         if (deleteCategory.fulfilled.match(resultAction)) {
           Swal.update({
             title: "Item Deleted!",
-            text: `Item ${item.name["en"]} has been successfully deleted.`,
+            text: `Item ${item.name[locale]} has been successfully deleted.`,
             icon: "success",
             confirmButtonText: "OK",
           });

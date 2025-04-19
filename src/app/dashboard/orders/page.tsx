@@ -35,7 +35,7 @@ export default function Page() {
                 />
                 )} */}
             </div>
-          <OrderSettingsModal />
+          {/* <OrderSettingsModal /> */}
         </div>
       </Stack>
 

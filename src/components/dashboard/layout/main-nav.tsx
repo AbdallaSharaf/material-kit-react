@@ -84,10 +84,9 @@ export function MainNav(): React.JSX.Element {
             <Tooltip title="Switch Language">
               <IconButton
                 onClick={languagePopover.handleOpen}
-                ref={languagePopover.anchorRef} // Correctly typed ref
               >
-                <GlobeIcon />
-              </IconButton>
+              <LanguagePopover />
+            </IconButton>
             </Tooltip>
             <Avatar
               onClick={userPopover.handleOpen}
@@ -99,7 +98,6 @@ export function MainNav(): React.JSX.Element {
         </Stack>
       </Box>
       <UserPopover anchorEl={userPopover.anchorRef.current || undefined} onClose={userPopover.handleClose} open={userPopover.open} />
-      <LanguagePopover anchorEl={languagePopover.anchorRef.current || undefined} onClose={languagePopover.handleClose} open={languagePopover.open} />
       {isNavReady && (
         <MobileNavWrapper
           onClose={() => {

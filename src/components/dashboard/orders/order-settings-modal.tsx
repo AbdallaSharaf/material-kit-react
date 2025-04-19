@@ -40,11 +40,12 @@ export default function OrderSettingsModal(): React.JSX.Element {
   return (
     <>
       <Button
-        startIcon={<GearIcon fontSize="var(--icon-fontSize-md)" />}
         variant="contained"
         onClick={handleSettingsOpen}
+        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
       >
         {t("Settings")}
+        <GearIcon fontSize="var(--icon-fontSize-md)" />
       </Button>
       <Dialog open={settingsOpen} onClose={handleSettingsClose}>
         <DialogTitle>{t("Order Settings")}</DialogTitle>
