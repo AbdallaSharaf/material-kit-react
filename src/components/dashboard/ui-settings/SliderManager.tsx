@@ -7,7 +7,6 @@ import {
   Grid,
   Button,
   IconButton,
-  TextField,
   Card,
   CardContent,
 } from '@mui/material';
@@ -18,6 +17,7 @@ import { useSettingHandlers } from '@/controllers/uiSettingsController';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/redux/store/store';
 import { convertFileToBase64 } from '@/utils/fileToString';
+import { useTranslations } from 'next-intl';
 
 interface ImageSliderManagerProps {
   sectionKey: 'homeSlider' | 'offersFirstSlider' | 'offersLastSlider';
@@ -27,7 +27,7 @@ interface ImageSliderManagerProps {
 export const ImageSliderManager = ({ sectionKey, title }: ImageSliderManagerProps) => {
   const dispatch = useDispatch();
   const { handleCreateSetting, handleDelete, fetchData } = useSettingHandlers();
-
+  const t = useTranslations("common");
   const images = useSelector((state: RootState) => state.uiSettings[sectionKey]);
   const refreshData = useSelector((state: RootState) => state.uiSettings.refreshData);
 
@@ -107,7 +107,7 @@ export const ImageSliderManager = ({ sectionKey, title }: ImageSliderManagerProp
                 variant="outlined"
                 onClick={() => fileInputRef.current?.click()}
                 >
-                {newImageFile ? newImageFile.name : 'Choose Image'}
+                {newImageFile ? newImageFile.name : t('Choose Image')}
                 </Button>
 
                 <Button
@@ -116,7 +116,7 @@ export const ImageSliderManager = ({ sectionKey, title }: ImageSliderManagerProp
                 startIcon={<AddIcon />}
                 disabled={!newImageFile}
                 >
-                Upload
+                {t("Upload")}
                 </Button>
           </Stack>
           {previewUrl && (
