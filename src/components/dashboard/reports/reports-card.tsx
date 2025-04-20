@@ -29,12 +29,12 @@ export const ReportsCard = ({ reportKey, title }: ReportsProps) => {
         try {
           const [from, to] = dateRange;
       
-          const response = await axios.get(`/order/${reportKey}`, {
-            params: {
+          const response = await axios.post(`/order/${reportKey}`,
+            {
               startDate: dayjs(from).format("YYYY-MM-DD"),
               endDate: dayjs(to).format("YYYY-MM-DD"),
-            },
-          });
+            }
+          );
       
           setData(response.data.data); // assuming the response shape is { data: [...] }
         } catch (error) {
