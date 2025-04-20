@@ -11,6 +11,7 @@ import { DeviceMobile as UIIcon } from '@phosphor-icons/react/dist/ssr/DeviceMob
 import { TagSimple as OffersIcon } from '@phosphor-icons/react/dist/ssr/TagSimple';
 import { Star as StarIcon } from '@phosphor-icons/react/dist/ssr/Star'; // Added Star icon
 import { SquaresFour as CategoriesIcon } from '@phosphor-icons/react/dist/ssr/SquaresFour';
+import { ChartBar as ReportsIcon } from '@phosphor-icons/react/dist/ssr/ChartBar';
 
 export const navIcons = {
   'chart-pie': ChartPieIcon,
@@ -20,6 +21,7 @@ export const navIcons = {
   user: UserIcon,
   users: UsersIcon,
   orders: OrdersIcon,
+  reports: ReportsIcon,
   categories: CategoriesIcon, // Added Categories icon
   products: ProductsIcon,
   ui: UIIcon,

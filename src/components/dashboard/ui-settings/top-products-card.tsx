@@ -22,11 +22,10 @@ import {
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 
 export function TopProductsCard(): React.JSX.Element {
-  const { topProducts, refreshData } = useSelector((state: RootState) => state.products);
+  const { topProducts, refreshData, loading} = useSelector((state: RootState) => state.products);
   const { fetchTopProductData, handleMarkTopProduct, handleUpdateProduct } = useProductHandlers();
 
   const [sku, setSku] = React.useState('');
-  const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
     fetchTopProductData();

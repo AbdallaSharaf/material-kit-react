@@ -5,6 +5,7 @@ import usersReducer from '../slices/userSlice';
 import authReducer from '../slices/authSlice';
 import couponsReducer from '../slices/couponSlice';
 import ordersReducer from '../slices/orderSlice';
+import uiSettingsReducer from '../slices/uiSettingsSlice';
 
 // import Cookies from 'js-cookie';
 import { User } from '../../types/user';
@@ -23,6 +24,7 @@ const store = configureStore({
     coupons: couponsReducer,
     categories: categoriesReducer,
     users: usersReducer,
+    uiSettings: uiSettingsReducer,
     auth: authReducer,
     orders: ordersReducer,
   },

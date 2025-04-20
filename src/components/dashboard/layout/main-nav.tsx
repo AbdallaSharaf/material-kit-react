@@ -70,7 +70,9 @@ export function MainNav(): React.JSX.Element {
           </Stack>
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
             <Tooltip title="UI Page">
-                <IconButton onClick={() => router.push("https://fruits-heaven.vercel.app/")}>
+                <IconButton 
+                  onClick={() => window.open("https://fruits-heaven.vercel.app/", "_blank")}
+                >
                   <EyeIcon />
                 </IconButton>
             </Tooltip>
