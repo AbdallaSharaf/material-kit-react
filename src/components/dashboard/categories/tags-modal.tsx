@@ -19,7 +19,7 @@ import { RootState } from "@/redux/store/store";
 import { CategoryIn } from "@/interfaces/categoryInterface";
 import { useCategoryHandlers } from "@/controllers/categoriesController";
 import { useLocale } from "next-intl";
-import { useTranslations } from "use-intl";
+import { useTranslations } from "next-intl";
 
 export default function CategoriesModal(): React.JSX.Element {
   const [categoriesOpen, setCategoriesOpen] = React.useState(false);
