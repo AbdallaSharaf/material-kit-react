@@ -10,7 +10,7 @@ export async function getNavItems(): Promise<NavItemConfig[]> {
   return [
     { key: 'overview', title: t('Overview'), href: paths.dashboard.overview, icon: 'chart-pie' },
     { key: 'account', title: t('Account'), href: paths.dashboard.account, icon: 'user' },
-    // { key: 'reports', title: t('Reports'), href: paths.dashboard.reports, icon: 'reports' },
+    { key: 'reports', title: t('Reports'), href: paths.dashboard.reports, icon: 'reports' },
     { key: 'orders', title: t('Orders'), href: paths.dashboard.orders, icon: 'orders' },
     { key: 'customers', title: t('Customers'), href: paths.dashboard.customers, icon: 'users' },
     { key: 'categories', title: t('Categories'), href: paths.dashboard.categories, icon: 'categories' },

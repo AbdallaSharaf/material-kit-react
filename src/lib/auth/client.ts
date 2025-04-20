@@ -75,7 +75,6 @@ class AuthClient {
     });
     
     const data = await res.json();
-    console.log(data)
     if (!res.ok) {
       return { error: data.message, data: null };
     }

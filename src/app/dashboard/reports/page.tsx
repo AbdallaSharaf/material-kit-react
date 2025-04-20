@@ -5,6 +5,8 @@ import Typography from '@mui/material/Typography';
 import { config } from '@/config';
 import { OrdersTable } from '@/components/dashboard/orders/orders-table';
 import { useTranslations } from 'next-intl';
+import { ReportsCard } from '@/components/dashboard/reports/reports-card';
+import { Grid } from '@mui/material';
 
 export const metadata = {
   title: `Reports | Dashboard | ${config.site.name}`,
@@ -41,8 +43,50 @@ export default function Page() {
         </div>
       </Stack>
 
-      <OrdersTable />
+   {/* Section 1 */}
+   <Stack spacing={2}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={4}>
+            <ReportsCard reportKey="salesReport" title={t("Sales Report")} />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <ReportsCard reportKey="topSellingByQty" title={t("topSellingByQty")} />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <ReportsCard reportKey="topSellingByRevenue" title={t("topSellingByRevenue")} />
+          </Grid>
+        </Grid>
+      </Stack>
 
+      {/* Section 2 */}
+      <Stack spacing={2}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={4}>
+            <ReportsCard reportKey="lowestSelling" title={t("lowestSelling")} />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <ReportsCard reportKey="repeatedCustomers" title={t("repeatedCustomers")} />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <ReportsCard reportKey="newCustomers" title={t("newCustomers")} />
+          </Grid>
+        </Grid>
+      </Stack>
+
+      {/* Section 3 */}
+      <Stack spacing={2}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={4}>
+            <ReportsCard reportKey="highValueCustomers" title={t("highValueCustomers")} />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <ReportsCard reportKey="ordersAndInvoices" title={t("ordersAndInvoices")} />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <ReportsCard reportKey="monthlyComparison" title={t("monthlyComparison")} />
+          </Grid>
+        </Grid>
+      </Stack>
     </Stack>
   );
 }
