@@ -142,7 +142,7 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
       Swal.fire({
         icon: "warning",
         title: "Incomplete Data",
-        text: "Please complete all required fields before submitting.",
+        text: "Please complete all required fields before submitting",
       });
     }
     formik.handleSubmit();

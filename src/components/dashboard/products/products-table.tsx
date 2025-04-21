@@ -62,7 +62,7 @@ export function ProductsTable(): React.JSX.Element {
           enableSorting: false,
         },
         {
-          accessorKey: "images",
+          accessorKey: "imgCover",
           header: t("Image"),
           enableColumnActions: false,
           enableSorting: false,
@@ -70,7 +70,7 @@ export function ProductsTable(): React.JSX.Element {
           size: 60,
           Cell: ({ row }) => (
             <img
-              src={row.original.images?.[0]}
+              src={row.original.imgCover}
               alt="product image"
               style={{
                 width: "40px",

@@ -26,10 +26,12 @@ export type ProductIn = {
     minQty: number,
     trackQty: boolean,
     sold: number,
+    priceAfterExpiresAt?: number,
+    priceAfterDiscount?: number,
     deleted: boolean,
     SKU: number,
     order: number,
-    imgCover: string[],
+    imgCover: string,
     createdAt: string,
     updatedAt: string,
     __v: number,
@@ -43,7 +45,8 @@ export type ProductOut = {
             en?: string
         },
         metaTags?: string[],
-        images?: string,
+        images?: string[],
+        imgCover?: string,
         category?: 
             {
                 category?: string,
@@ -51,6 +54,8 @@ export type ProductOut = {
             }[],
         available?: boolean,
         price?: number,
+        priceAfterExpiresAt?: number,
+        priceAfterDiscount?: number,
         isTopProduct?: boolean,
         SKU?: number,
         order?: number,

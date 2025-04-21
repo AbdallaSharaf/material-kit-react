@@ -14,15 +14,17 @@ const getProductById = async (id: string) => {
     const res = await fetch(`https://fruits-heaven-api.vercel.app/api/v1/product/${id}`, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Content-Type": "application/json"
       },
-    });
+      cache: "no-store"
+    })
 
     if (!res.ok) throw new Error(`Failed to fetch product: ${res.status}`);
 
     const data = await res.json();
     const product = data.Product;
-    console.log("Fetched product data:", data);
+    console.log("Fetched product data:", product);
     return product;
   } catch (error) {
     console.error("Error fetching product:", error);
@@ -32,13 +34,14 @@ const getProductById = async (id: string) => {
 
 export default async function ProductPage({ params }: PageProps) {
   const { id } = params;
-  
+  console.log(id)
   if (!id) throw new Error("No product ID provided");
 
   const product = await getProductById(id);
+  // const product = await getProductById(id);
   const t = await getTranslations("common")
   const locale = await getLocale()
-
+  console.log(product);
   if (!product) {
     return (
       <Stack spacing={3}>
@@ -56,7 +59,7 @@ export default async function ProductPage({ params }: PageProps) {
           </Typography>
         </div>
       </Stack>
-
+      
       {product && <ProductForm product={product} />}
     </Stack>
   );

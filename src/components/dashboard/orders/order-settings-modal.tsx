@@ -67,7 +67,7 @@ export default function OrderSettingsModal(): React.JSX.Element {
             value={prepTime}
             onChange={(e) => setPrepTime(e.target.value)}
             sx={{ mt: 2 }}
-            helperText="Enter a number (e.g., 1, 2, 24 for a day)"
+            helperText="Enter a number (eg, 1, 2, 24 for a day)"
           />
           <FormControlLabel
             control={

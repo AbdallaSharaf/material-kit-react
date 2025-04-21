@@ -140,12 +140,40 @@ const handleChangeOrderInCategory = async ({id, newOrder, category}: {id: string
     });
   
     try {
-      let imageUrl = values.images && await uploadPhoto(values.images);
-  
-      if (values.images && !imageUrl) throw new Error("Image upload failed");
+      let imageUrls: string[] = [];
+
+      if (values.images && values.images.length > 0) {
+        imageUrls = await Promise.all(
+          values.images.map(async (image) => {
+            // If it's already uploaded (starts with Cloudinary URL), return it as is
+            if (typeof image === "string" && image.startsWith("https://res.cloudinary.com")) {
+              return image;
+            }
+            // Otherwise, upload
+            return await uploadPhoto(image);
+          })
+        );
+      }
+      
+      // Optional: Check if upload failed
+      if (values.images && values.images.length > 0 && imageUrls.includes(undefined as any)) {
+        throw new Error("One or more image uploads failed");
+      }
+      
+      // Handle imgCover similarly
+      let imageCoverUrl: string | undefined;
+      
+      if (values.imgCover) {
+        if (typeof values.imgCover === "string" && values.imgCover.startsWith("https://res.cloudinary.com")) {
+          imageCoverUrl = values.imgCover;
+        } else {
+          imageCoverUrl = await uploadPhoto(values.imgCover);
+          if (!imageCoverUrl) throw new Error("Image cover upload failed");
+        }
+      }      
   
       // Update values with the new image URL
-      const updatedValues = { ...values, images: imageUrl };
+      const updatedValues = { ...values, images: imageUrls, imgCover: imageCoverUrl };
   
       // Dispatch updated values to Redux
       const resultAction = await dispatch(updateProduct({ id, updatedData: updatedValues }));
@@ -303,12 +331,40 @@ const handleDelete = async (product: ProductIn) => {
         },
       });
       try {
-        let imageUrl = values.images && await uploadPhoto(values.images);
+        let imageUrls: string[] = [];
 
-        if (values.images && !imageUrl) throw new Error("Image upload failed");
+        if (values.images && values.images.length > 0) {
+          imageUrls = await Promise.all(
+            values.images.map(async (image) => {
+              // If it's already uploaded (starts with Cloudinary URL), return it as is
+              if (typeof image === "string" && image.startsWith("https://res.cloudinary.com")) {
+                return image;
+              }
+              // Otherwise, upload
+              return await uploadPhoto(image);
+            })
+          );
+        }
+        
+        // Optional: Check if upload failed
+        if (values.images && values.images.length > 0 && imageUrls.includes(undefined as any)) {
+          throw new Error("One or more image uploads failed");
+        }
+        
+        // Handle imgCover similarly
+        let imageCoverUrl: string | undefined;
+        
+        if (values.imgCover) {
+          if (typeof values.imgCover === "string" && values.imgCover.startsWith("https://res.cloudinary.com")) {
+            imageCoverUrl = values.imgCover;
+          } else {
+            imageCoverUrl = await uploadPhoto(values.imgCover);
+            if (!imageCoverUrl) throw new Error("Image cover upload failed");
+          }
+        }      
     
         // Update values with the new image URL
-        const updatedValues = { ...values, images: imageUrl };
+        const updatedValues = { ...values, images: imageUrls, imgCover: imageCoverUrl };
 
         const resultAction = await dispatch(addProduct(updatedValues));
         Swal.hideLoading()

@@ -94,7 +94,7 @@ const CategoryForm = ({ category }: CategoryFormProps) => {
       Swal.fire({
         icon: "warning",
         title: t("Incomplete Data"),
-        text: t("Please complete all required fields before submitting."),
+        text: t("Please complete all required fields before submitting"),
       });
     }
     formik.handleSubmit();
