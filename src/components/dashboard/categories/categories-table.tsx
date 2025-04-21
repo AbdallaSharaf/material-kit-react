@@ -55,7 +55,7 @@ export function CategoriesTable(): React.JSX.Element {
       },
       { 
         accessorKey: 'order',
-        header: t('Order'),
+        header: t('ORDER'),
         grow: true,
         size: 140,
         enableColumnActions: false,

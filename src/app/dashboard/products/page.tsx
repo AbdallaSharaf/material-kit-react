@@ -41,7 +41,7 @@ export default async function Page({ searchParams }: PageProps) {
       <Stack direction="row" spacing={3}>
         <div className="flex w-full justify-between items-center">
           <Typography variant="h4">
-            {categoryData ? `Products of ${categoryData.name[locale]}` : t("products")}
+            {categoryData ? `${t("Products of")} ${categoryData.name[locale]}` : t("products")}
           </Typography>
           {!categoryId && <TagsModal />}
         </div>

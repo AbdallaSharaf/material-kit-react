@@ -64,7 +64,14 @@ export default function CategoriesModal(): React.JSX.Element {
         <TagIcon fontSize="var(--icon-fontSize-md)" />
       </Button>
 
-      <Dialog open={categoriesOpen} onClose={handleCategoriesClose} fullWidth maxWidth="sm">
+      <Dialog open={categoriesOpen} onClose={handleCategoriesClose} fullWidth maxWidth="sm" 
+              disablePortal // Prevents rendering in a portal
+              sx={{
+                zIndex: 10, // Default MUI Dialog z-index (adjust if needed)
+                '& .swal-override': {
+                  zIndex: 1400, // Ensure Swal is above Dialog
+                },
+              }}>
         <DialogTitle>{t("Manage Categories")}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} mt={1}>

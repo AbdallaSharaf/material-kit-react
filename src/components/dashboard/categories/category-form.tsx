@@ -14,6 +14,7 @@ import { CategoryIn, CategoryOut } from "@/interfaces/categoryInterface";
 import Swal from "sweetalert2";
 import { useCategoryHandlers } from "@/controllers/categoriesController";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 interface CategoryFormProps {
   category?: CategoryIn;
@@ -27,10 +28,7 @@ const CategoryForm = ({ category }: CategoryFormProps) => {
     initialValues: {
       name_ar: category?.name?.ar || "",
       name_en: category?.name?.en || "",
-      description_ar: category?.description?.ar || "",
-      description_en: category?.description?.en || "",
       available: category?.available || true,
-      showInTopMenu: category?.showInTopMenu || true,
     },
     enableReinitialize: true,
     validationSchema: Yup.object({
@@ -42,37 +40,16 @@ const CategoryForm = ({ category }: CategoryFormProps) => {
         .trim()
         .required(t("English name is required"))
         .min(2, t("Too short category name")),
-      description_ar: Yup.string()
-        .trim()
-        .required(t("Arabic description is required"))
-        .min(5, t("Too short category description")),
-      description_en: Yup.string()
-        .trim()
-        .required(t("English description is required"))
-        .min(5, t("Too short category description")),
-      imgCover: Yup.string()
-        .url(t("Invalid image URL"))
-        .nullable(),
-      photos: Yup.array().of(Yup.string().url(t("Invalid image URL"))),
-      order: Yup.number()
-        .integer(t("Order must be an integer"))
-        .min(1, t("Order must be at least 1"))
-        .required(t("Order is required")),
       available: Yup.boolean().required(t("Availability status is required")),
-      showInTopMenu: Yup.boolean().required(t("Show in top menu status is required")),
     }),
     onSubmit: async (values) => {
-      const { name_ar, name_en, description_ar, description_en, ...rest } = values;
+      const { name_ar, name_en, ...rest } = values;
 
       const formattedData: CategoryOut = {
         ...rest,
         name: {
           ar: name_ar,
           en: name_en,
-        },
-        description: {
-          ar: description_ar,
-          en: description_en,
         },
       };
       let isSuccess = false;
@@ -137,30 +114,6 @@ const CategoryForm = ({ category }: CategoryFormProps) => {
           />
         </div>
 
-        <TextField
-          fullWidth
-          label={t("Arabic Description")}
-          name="description_ar"
-          multiline
-          rows={3}
-          value={formik.values.description_ar}
-          onChange={formik.handleChange}
-          error={formik.touched.description_ar && Boolean(formik.errors.description_ar)}
-          helperText={formik.touched.description_ar && formik.errors.description_ar}
-        />
-
-        <TextField
-          fullWidth
-          label={t("English Description")}
-          name="description_en"
-          multiline
-          rows={3}
-          value={formik.values.description_en}
-          onChange={formik.handleChange}
-          error={formik.touched.description_en && Boolean(formik.errors.description_en)}
-          helperText={formik.touched.description_en && formik.errors.description_en}
-        />
-
         <FormControlLabel
           control={
             <Switch
@@ -174,24 +127,18 @@ const CategoryForm = ({ category }: CategoryFormProps) => {
           labelPlacement="start"
         />
 
-        <FormControlLabel
-          control={
-            <Switch
-              checked={formik.values.showInTopMenu}
-              onChange={formik.handleChange}
-              name="showInTopMenu"
-              color="primary"
-            />
-          }
-          label={t("Show in Top Menu")}
-          labelPlacement="start"
-        />
-
-        <div className="flex justify-end">
-          <Button type="submit" variant="contained" color="primary" className="w-1/4 ml-auto">
-            {t("Submit")}
-          </Button>
-        </div>
+        <div className='grid grid-cols-2'>
+            <Box sx={{ mt: 4 }} className='w-1/2 me-auto'>
+              <Button type="button" variant='outlined' className="ml-auto w-full">
+                <Link href="/dashboard/categories">{t("Cancel")}</Link>
+              </Button>
+            </Box>
+            <Box sx={{ mt: 4 }} className='col-start-2 w-1/2 ms-auto'>
+              <Button type="submit" variant="contained" color="primary" className="ml-auto w-full">
+                {t("Submit")}
+              </Button>
+            </Box>
+            </div>
       </div>
     </Box>
   );
