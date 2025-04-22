@@ -145,6 +145,8 @@
         "ORDER": "Order",
         "disableFractionalQuantity": "Disable Fractional Quantity",
         "Search": "Search",
+        "Sold": "Sold",
+        "Stock": "Stock",
         "expiresAt": "Expires At",
         "activeFromHour": "Active From Hour",
         "activeToHour": "Active To Hour",

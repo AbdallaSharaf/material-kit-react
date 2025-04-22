@@ -82,12 +82,12 @@ export function ProductsTable(): React.JSX.Element {
           ),
         },
         {
-          accessorKey: "name",
+          accessorKey: "keyword",
           header: t("Name"),
           grow: true,
           size: 140,
           enableColumnActions: false,
-          enableColumnFilter: false,
+          enableColumnFilter: true,
           Cell: ({ row }) =>
             row.original.name?.[locale],
         },
@@ -106,12 +106,12 @@ export function ProductsTable(): React.JSX.Element {
                 style: "currency",
                 currency: "SAR",
               }),
+            },
+            enableColumnActions: false,
+            enableColumnFilter: false,
+            Cell: ({ row }) => <div>{row.original.price} SAR</div>,
           },
-          enableColumnActions: false,
-          enableColumnFilter: false,
-          Cell: ({ row }) => <div>{row.original.price} SAR</div>,
-        },
-        {
+          {
           accessorKey: "availability",
           header: t("Availability"),
           size: 90,
@@ -130,11 +130,27 @@ export function ProductsTable(): React.JSX.Element {
           },
           Cell: ({ row }) => (
             <Switch
-              checked={row.original.available}
-              onChange={() => handleChangeStatus(row.original)}
-              color="primary"
+            checked={row.original.available}
+            onChange={() => handleChangeStatus(row.original)}
+            color="primary"
             />
           ),
+        },
+        {
+          accessorKey: "sold",
+          header: t("Sold"),
+          grow: true,
+          size: 140,
+          enableColumnActions: false,
+          enableColumnFilter: false,
+        },
+        {
+          accessorKey: "stock",
+          header: t("Stock"),
+          grow: true,
+          size: 140,
+          enableColumnActions: false,
+          enableColumnFilter: false,
         },
       ];
     

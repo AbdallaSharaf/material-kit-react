@@ -15,6 +15,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useRouter } from 'next/navigation';
 import { ImageGalleryUploader } from './image-gallery-uploader';
 import Link from 'next/link';
+import dayjs from 'dayjs';
 
 // Validation Schema
 
@@ -45,9 +46,11 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
       available: product?.available ?? true,
       price: product?.price || 0,
       SKU: product?.SKU || 0,
+      stock: product?.stock || undefined,
       priceAfterExpiresAt: product?.priceAfterExpiresAt || undefined,
       priceAfterDiscount: product?.priceAfterDiscount || undefined,
-      trackQty: product?.trackQty ?? true,
+      trackQty: product?.trackQty ?? false,
+      lowStockQty: product?.lowStockQty || undefined,
       imgCover: product?.imgCover || undefined,  // Add image field
       images: product?.images || [] as string[],  // Add image field
     },
@@ -68,7 +71,15 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
         ),
       available: Yup.boolean(),
       price: Yup.number().positive('Price must be positive').required('Price is required'),
-      SKU: Yup.number().min(1, 'SKU must be positive'),
+      stock: Yup.number().positive('Stock must be positive'),
+      SKU: Yup.number().min(1, 'SKU must be positive').required("SKU is required"),
+      lowStockQty: Yup.number()
+      .min(1, 'Low Stock Quantity must be positive')
+      .when('trackQty', {
+        is: true,
+        then: schema => schema.required('Low Stock Quantity is required'),
+        otherwise: schema => schema.notRequired(),
+      }),
       // trackQty: Yup.boolean(),
       imgCover: Yup.mixed()
       .required("Image is required")
@@ -377,6 +388,36 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                 helperText={formik.touched.SKU && formik.errors.SKU}
               />
               </div>
+
+              <div className='grid md:grid-cols-2 gap-4 my-6'>
+              <TextField
+                fullWidth
+                margin="normal"
+                name="stock"
+                label="Stock"
+                type="number"
+                variant="outlined"
+                value={formik.values.stock}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={Boolean(formik.touched.stock && formik.errors.stock)}
+                helperText={formik.touched.stock && formik.errors.stock}
+              />
+
+              {(formik.values.trackQty) && <TextField
+                fullWidth
+                margin="normal"
+                name="lowStockQty"
+                label="Low Stock Quantity"
+                type="number"
+                variant="outlined"
+                value={formik.values.lowStockQty}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={Boolean(formik.touched.lowStockQty && formik.errors.lowStockQty)}
+                helperText={formik.touched.lowStockQty && formik.errors.lowStockQty}
+              />}
+              </div>
               
               <div className='grid md:grid-cols-2 gap-4 my-6'>
               <TextField
@@ -398,7 +439,11 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                 label="Price After Expires At"
                 type="datetime-local"
                 variant="outlined"
-                value={formik.values.priceAfterExpiresAt}
+                value={
+                  formik.values.priceAfterExpiresAt
+                    ? dayjs(formik.values.priceAfterExpiresAt).format("YYYY-MM-DDTHH:mm")
+                    : ''
+                }
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 InputLabelProps={{
@@ -501,7 +546,7 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                 label="Available"
                 />
 
-              {/* <FormControlLabel
+              <FormControlLabel
                 control={
                   <Checkbox
                   name="trackQty"
@@ -510,8 +555,7 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                   />
                 }
                 label="Track Quantity"
-              /> */}
-
+              />
               
             </div>
             </div>
