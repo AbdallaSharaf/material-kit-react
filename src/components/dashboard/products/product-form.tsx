@@ -403,20 +403,6 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                 error={Boolean(formik.touched.stock && formik.errors.stock)}
                 helperText={formik.touched.stock && formik.errors.stock}
               />
-
-              {(formik.values.trackQty) && <TextField
-                fullWidth
-                margin="normal"
-                name="lowStockQty"
-                label="Low Stock Quantity"
-                type="number"
-                variant="outlined"
-                value={formik.values.lowStockQty}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={Boolean(formik.touched.lowStockQty && formik.errors.lowStockQty)}
-                helperText={formik.touched.lowStockQty && formik.errors.lowStockQty}
-              />}
               </div>
               
               <div className='grid md:grid-cols-2 gap-4 my-6'>
@@ -538,17 +524,6 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
               <FormControlLabel
                 control={
                   <Checkbox
-                  name="available"
-                  checked={formik.values.available}
-                  onChange={formik.handleChange}
-                  />
-                }
-                label="Available"
-                />
-
-              <FormControlLabel
-                control={
-                  <Checkbox
                   name="trackQty"
                   checked={formik.values.trackQty}
                     onChange={formik.handleChange}
@@ -556,6 +531,33 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                 }
                 label="Track Quantity"
               />
+
+              {(formik.values.trackQty) && <TextField
+                fullWidth
+                margin="normal"
+                name="lowStockQty"
+                label="Low Stock Quantity"
+                type="number"
+                variant="outlined"
+                value={formik.values.lowStockQty}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={Boolean(formik.touched.lowStockQty && formik.errors.lowStockQty)}
+                helperText={formik.touched.lowStockQty && formik.errors.lowStockQty}
+                />}
+  
+              </div>
+              <div className='grid md:grid-cols-2 gap-4'>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                  name="available"
+                  checked={formik.values.available}
+                  onChange={formik.handleChange}
+                  />
+                }
+                label="Available"
+                />
               
             </div>
             </div>
