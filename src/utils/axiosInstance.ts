@@ -13,8 +13,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     // const token = Cookies.get('token'); // Get token from cookies
-    const token = localStorage.getItem('token'); // ⬅️ Use localStorage instead of Cookies    if (token) {
-
+    const token = localStorage.getItem('custom-auth-token'); // ⬅️ Use localStorage instead of Cookies    if (token) {
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

@@ -90,7 +90,6 @@ export const updateOrder = createAsyncThunk<
   async ({ id, updatedData }, { rejectWithValue }) => {    
     try {
       const response = await axios.patch<OrderOut, AxiosResponse<{message: string, Order: OrderIn}, any>>(`${API_URL}/${id}`, updatedData);
-      console.log(response.data.Order)
       return response.data.Order;
     } catch (error: any) {
       return rejectWithValue(
@@ -151,10 +150,10 @@ const ordersSlice = createSlice({
         })
         .addCase(updateOrder.fulfilled, (state, action: PayloadAction<OrderIn>) => {
           state.loading = false;
-          const index = state.orders.findIndex((order) => order._id === action.payload._id);
-          if (index !== -1) {
-            state.orders[index] = action.payload;
-          }
+          // const index = state.orders.findIndex((order) => order._id === action.payload._id);
+          // if (index !== -1) {
+          //   state.orders[index] = action.payload;
+          // }
         })
         .addCase(updateOrder.rejected, (state, action) => {
           state.loading = false;

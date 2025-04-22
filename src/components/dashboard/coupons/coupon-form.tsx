@@ -89,6 +89,8 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
       expiresAt: Yup.string().required("Expiry date is required"),
       minAmount: Yup.string(),
       maxAmount: Yup.string(),
+      activeFromHour: Yup.number().min(0, "Choose an hour between 0 and 23").max(23, "Choose an hour between 0 and 23"),
+      activeToHour: Yup.number().min(0, "Choose an hour between 0 and 23").max(23, "Choose an hour between 0 and 23"),
       userLimit: Yup.object({
         mode: Yup.string().oneOf(["unlimited", "limited"]).required(),
         value: Yup.string().when("mode", {
@@ -266,6 +268,8 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
             name="minAmount"
             value={formik.values.minAmount}
             onChange={formik.handleChange}
+            error={formik.touched.minAmount && Boolean(formik.errors.minAmount)}
+            helperText={formik.touched.minAmount && formik.errors.minAmount}
           />
           <TextField
             fullWidth
@@ -273,26 +277,32 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
             name="maxAmount"
             value={formik.values.maxAmount}
             onChange={formik.handleChange}
+            error={formik.touched.maxAmount && Boolean(formik.errors.maxAmount)}
+            helperText={formik.touched.maxAmount && formik.errors.maxAmount}
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextField
           fullWidth
-          type="time" // 👈 makes it a time picker
+          type="number" // 👈 makes it a number picker
           label={t("activeFromHour")}
           name="activeFromHour"
           value={formik.values.activeFromHour}
           onChange={formik.handleChange}
+          error={formik.touched.activeFromHour && Boolean(formik.errors.activeFromHour)}
+          helperText={formik.touched.activeFromHour && formik.errors.activeFromHour}
         />
 
         <TextField
           fullWidth
-          type="time" // 👈 makes it a time picker
+          type="number" // 👈 makes it a number picker
           label={t("activeToHour")}
           name="activeToHour"
           value={formik.values.activeToHour}
           onChange={formik.handleChange}
+          error={formik.touched.activeToHour && Boolean(formik.errors.activeToHour)}
+          helperText={formik.touched.activeToHour && formik.errors.activeToHour}
         />
 
         </div>

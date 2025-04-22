@@ -9,10 +9,9 @@ export interface CouponOut {
     validFor?: "category" | "product" | "shipping" | "all";
     appliedOn?: string[]; // e.g., array of service or category IDs
     minAmount?: string; // minimum order amount
-    activeFromHour?: string; // minimum order amount
-    activeToHour?: string; // minimum order amount
+    activeFromHour?: number; // minimum order amount
+    activeToHour?: number; // minimum order amount
     maxAmount?: string; // maximum order amount
-
     }
   
   export interface CouponIn {
@@ -29,8 +28,8 @@ export interface CouponOut {
     appliedOn: string[],
     isActive: boolean,
     deleted: boolean,
-    activeFromHour: string,
-    activeToHour: string,
+    activeFromHour: number,
+    activeToHour: number,
     count: number,
     disableFractionalQuantity: boolean,
     createdAt: string,

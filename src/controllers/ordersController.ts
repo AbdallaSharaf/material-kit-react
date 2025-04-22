@@ -18,12 +18,12 @@ const dispatch = useDispatch<AppDispatch>()
 
 const handleChangeStatus = async (order: OrderOut) => {
   try {
-      const resultAction = await dispatch(updateOrder({id: order._id!, updatedData: {status: order.status}}));
+      const resultAction = await dispatch(updateOrder({id: order._id, updatedData: {status: order.status}}));
       if (updateOrder.fulfilled.match(resultAction)) {
         // Update the existing Swal instead of reopening it
         dispatch(setRefreshData(refreshData + 1));
       }
-      else {  
+      else {
         // Update the Swal alert with an error
         Swal.fire({
           title: 'Error Updating Order',

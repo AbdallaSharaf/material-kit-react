@@ -17,7 +17,7 @@ import {
 import { Box } from '@mui/system';
 import { MaterialReactTable, MRT_ColumnDef, MRT_TableOptions } from 'material-react-table';
 
-import CustomToolbar from './custom-toolbar';
+import CustomToolbar from '../products/custom-toolbar';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
@@ -31,6 +31,7 @@ import {useLocale, useTranslations } from 'next-intl';
 import axios from 'axios';
 import { MRT_Localization_AR } from 'material-react-table/locales/ar';
 import { MRT_Localization_EN } from 'material-react-table/locales/en';
+import Image from 'next/image';
 // Define columns outside the component to avoid defining them during render
 export function OrdersTable(): React.JSX.Element {
 
@@ -146,15 +147,15 @@ export function OrdersTable(): React.JSX.Element {
         const status = cell.getValue<string>();
         const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
         const open = Boolean(anchorEl);
-
+    
         const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
           setAnchorEl(event.currentTarget);
         };
-
+    
         const handleCloseMenu = () => {
           setAnchorEl(null);
         };
-
+    
         const handleStatusChange = async (newStatus: string) => {
           handleCloseMenu();
           try {
@@ -163,20 +164,24 @@ export function OrdersTable(): React.JSX.Element {
             console.error('Failed to update status:', error);
           }
         };
-
+    
         const color: ChipProps['color'] =
           status === 'newOrder'
             ? 'default'
             : status === 'accepted'
               ? 'primary'
-              : status === 'shipped'
-                ? 'info'
-                : status === 'delivered'
-                  ? 'success'
-                  : status === 'cancelled'
-                    ? 'error'
-                    : 'warning';
-
+              : status === 'processing'
+                ? 'secondary'
+                : status === 'onDelivery'
+                  ? 'info'
+                  : status === 'delivered'
+                    ? 'success'
+                    : status === 'canceled'
+                      ? 'error'
+                      : status === 'returned'
+                        ? 'warning'
+                        : 'default';
+    
         return (
           <>
             <Chip
@@ -187,7 +192,15 @@ export function OrdersTable(): React.JSX.Element {
               sx={{ cursor: 'pointer' }}
             />
             <Menu anchorEl={anchorEl} open={open} onClose={handleCloseMenu}>
-              {['newOrder', 'accepted', 'shipped', 'delivered', 'cancelled', 'returned'].map((option) => (
+              {[
+                'newOrder',
+                'accepted',
+                'processing',
+                'onDelivery',
+                'delivered',
+                'canceled',
+                'returned',
+              ].map((option) => (
                 <MenuItem
                   key={option}
                   selected={option === status}
@@ -200,7 +213,7 @@ export function OrdersTable(): React.JSX.Element {
           </>
         );
       },
-    },
+    },    
     {
       accessorKey: 'paymentMethod',
       header: t('Payment Method'),
@@ -342,31 +355,50 @@ export function OrdersTable(): React.JSX.Element {
         renderDetailPanel={({ row }) =>
           row.original.items.length > 0 ? (
             <Box className="flex flex-col gap-3">
-              {row.original.items.map((item) => {
-                return (
-                  <Box key={item._id} className="grid grid-cols-2 items-center">
-                    <Box className="flex flex-col gap-1">
-                      <Typography>
-                        <strong>{t('Name')}:</strong> {item.name?.['en'] || item.name?.['ar']}
-                      </Typography>
-                      <Typography>
-                        <strong>{t("Quantity")}:</strong> {item.quantity}
-                      </Typography>
-                    </Box>
-                    <Box className="flex flex-col gap-1">
-                      <Typography>
-                        <strong>{t("Item price")}:</strong> {item.itemPrice}
-                      </Typography>
-                      <Typography>
-                        <strong>{t("Total Price")}:</strong> {item.totalPrice}
-                      </Typography>
-                    </Box>
+              {row.original.items.map((item) => (
+                <Box
+                  key={item._id}
+                  className="flex items-center justify-between gap-20 bg-gray-50 p-3 rounded-lg shadow-sm"
+                >
+                  {/* Image */}
+                  <div className='flex items-center'>
+
+                  <Box className="w-16 h-16 flex-shrink-0 rounded overflow-hidden border border-gray-200">
+                  <Image
+                    src={
+                      Array.isArray(item?.imgCover)
+                      ? item.imgCover[0] || "/placeholder.png"
+                      : item?.imgCover || "/placeholder.png"
+                    }
+                    alt={item.name?.['en'] || item.name?.['ar']}
+                    width={64}
+                    height={64}
+                    className="w-16 h-16 object-cover rounded"
+                    unoptimized // optional if you're using external URLs
+                    />
                   </Box>
-                );
-              })}
+        
+                  {/* Name & Quantity */}
+                  <Box className="flex flex-col flex-grow px-4">
+                    <Typography fontWeight="bold">
+                      {item.name?.['en'] || item.name?.['ar']} × {item.quantity}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('Item price')}: {item.itemPrice}
+                    </Typography>
+                  </Box>
+                  </div>
+        
+                  {/* Total Price */}
+                  <Typography fontWeight="bold" className="text-right text-green-600 min-w-[100px]">
+                    {t('Total Price')}: {item.totalPrice}
+                  </Typography>
+                </Box>
+              ))}
             </Box>
           ) : null
         }
+        
         layoutMode="grid"
         renderTopToolbarCustomActions={({ table }) => <CustomToolbar table={table} data={orders} />}
         muiTableHeadRowProps={{
