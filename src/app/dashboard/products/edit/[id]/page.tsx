@@ -19,12 +19,12 @@ const getProductById = async (id: string) => {
       },
       cache: "no-store"
     })
-
     if (!res.ok) throw new Error(`Failed to fetch product: ${res.status}`);
-
+    
     const data = await res.json();
     const product = data.Product;
-    console.log("Fetched product data:", product);
+    // console.log(product)
+    // console.log("Fetched product data:", product);
     return product;
   } catch (error) {
     console.error("Error fetching product:", error);
