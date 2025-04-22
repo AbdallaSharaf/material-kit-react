@@ -50,7 +50,7 @@ export function ProductsTable(): React.JSX.Element {
       searchQuery,
       loading
     } = useSelector((state: RootState) => state.products);
-
+    
     const getColumns = (hasCategoryId: boolean): MRT_ColumnDef<ProductIn>[] => {    
       const baseColumns: MRT_ColumnDef<ProductIn>[] = [
         {

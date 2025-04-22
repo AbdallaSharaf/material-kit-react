@@ -16,6 +16,7 @@ import {
   Chip,
   Checkbox,
   CircularProgress,
+  Autocomplete,
 } from "@mui/material";
 import Swal from "sweetalert2";
 // import your handler
@@ -26,6 +27,9 @@ import { useSelector } from "react-redux";
 import { useCategoryHandlers } from "@/controllers/categoriesController";
 import { useProductHandlers } from "@/controllers/productsController";
 import { useLocale, useTranslations } from "next-intl";
+import { CategoryIn } from "@/interfaces/categoryInterface";
+import { ProductIn } from "@/interfaces/productInterface";
+import Link from "next/link";
 
 interface CouponFormProps {
   coupon?: CouponIn;
@@ -52,6 +56,7 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
       discount: coupon?.discount || 0,
       expiresAt: coupon?.expiresAt || new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
       minAmount: coupon?.minAmount || "0",
+      disableFractionalQuantity: coupon?.disableFractionalQuantity || true,
       maxAmount: coupon?.maxAmount || "100000",
       userLimit: coupon
         ? coupon.userLimit === "unlimited"
@@ -63,7 +68,7 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
           ? { mode: "unlimited", value: "" }
           : { mode: "limited", value: coupon.limit || "" }
         : { mode: "unlimited", value: "" },
-      validFor: coupon?.validFor || "all",
+      validFor: coupon?.validFor || undefined,
       appliedOn: coupon?.appliedOn || [],
       isActive: coupon?.isActive ?? true,
     },
@@ -134,6 +139,25 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
       }
     },    
   });
+
+    // Determine options and labels
+  const isCategory = formik.values.validFor === "category";
+  const options = isCategory ? categories : products;
+
+  const getOptionLabel = (option: any) => {
+    if (typeof option === "string") return option;
+    if (isCategory) return option.name[locale];
+    return `${option.name[locale]} (${option.SKU})`;
+  };
+
+  const handleAutocompleteChange = (_: any, values: any) => {
+    formik.setFieldValue(
+      "appliedOn",
+      values.map((item: any) => item._id)
+    );
+  };
+
+  const selectedValues = options.filter((item) => formik.values.appliedOn.includes(item._id));
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -219,7 +243,7 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
 
           <TextField
             fullWidth
-            type="date"
+            type="datetime-local"
             label={t("expiresAt")}
             name="expiresAt"
             InputLabelProps={{ shrink: true }}
@@ -228,7 +252,7 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
             error={formik.touched.expiresAt && Boolean(formik.errors.expiresAt)}
             helperText={formik.touched.expiresAt && formik.errors.expiresAt}
             inputProps={{
-              min: new Date(new Date().setHours(0, 0, 0, 0)).toISOString().split("T")[0],
+              min: new Date().toISOString().slice(0, 16), // Format: YYYY-MM-DDTHH:MM
             }}
           />
         </div>
@@ -345,43 +369,44 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
 
       {(formik.values.validFor === "category" || formik.values.validFor === "product") && (
         <FormControl fullWidth error={formik.touched.appliedOn && Boolean(formik.errors.appliedOn)}>
-          <InputLabel>
-            {formik.values.validFor === "category" ? t("categories") : t("products")}
-          </InputLabel>
-
-          <Select
-            multiple
-            label={formik.values.validFor === "category" ? t("categories") : t("products")}
-            name="appliedOn"
-            value={formik.values.appliedOn}
-            onChange={formik.handleChange}
-            renderValue={(selected) => (
-              <div>
-                {selected.map((value) => {
-                  const item = (formik.values.validFor === "category" ? categories : products).find(
-                    (item) => item._id === value
-                  );
-                  return item ? (
-                    <Chip key={value} label={item.name[locale]} />
-                  ) : null;
-                })}
-              </div>
-            )}
-          >
-            {(categoriesLoading || productsLoading) ? (
-              <MenuItem disabled>
-                <CircularProgress size={24} />
-              </MenuItem>
-            ) : (
-              (formik.values.validFor === "category" ? categories : products).map((item) => (
-                <MenuItem key={item._id} value={item._id}>
-                  <Checkbox checked={formik.values.appliedOn.indexOf(item._id) > -1} />
-                  {item.name[locale]}
-                </MenuItem>
-              ))
-            )}
-          </Select>
-        </FormControl>
+  <Autocomplete
+    multiple
+    options={options}
+    loading={categoriesLoading || productsLoading}
+    value={selectedValues}
+    onChange={handleAutocompleteChange}
+    getOptionLabel={getOptionLabel}
+    isOptionEqualToValue={(option, value) => option._id === value._id}
+    filterSelectedOptions
+    renderTags={(value, getTagProps) =>
+      value.map((option, index) => (
+        <Chip
+          variant="outlined"
+          label={getOptionLabel(option)}
+          {...getTagProps({ index })}
+        />
+      ))
+    }
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        label={isCategory ? t("categories") : t("products")}
+        placeholder={t("Search")}
+        error={formik.touched.appliedOn && Boolean(formik.errors.appliedOn)}
+        helperText={formik.touched.appliedOn && formik.errors.appliedOn}
+        InputProps={{
+          ...params.InputProps,
+          endAdornment: (
+            <>
+              {(categoriesLoading || productsLoading) && <CircularProgress size={20} />}
+              {params.InputProps.endAdornment}
+            </>
+          ),
+        }}
+      />
+    )}
+  />
+</FormControl>
       )}
 
       <div className="w-full flex justify-end">
@@ -400,12 +425,36 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
         />
       </div>
 
+      <div className="w-full flex justify-end">
+        <FormControlLabel
+          className="w-fit"
+          control={
+            <Switch
+              checked={formik.values.disableFractionalQuantity}
+              onChange={formik.handleChange}
+              name="disableFractionalQuantity"
+              color="primary"
+            />
+          }
+          label={t("disableFractionalQuantity")}
+          labelPlacement="start"
+        />
+      </div>
 
-        <div className="flex justify-end">
-          <Button type="submit" variant="contained" color="primary" className="w-1/4 ml-auto">
-            {t("Submit")}
-          </Button>
-        </div>
+
+
+      <div className='grid grid-cols-2'>
+            <Box sx={{ mt: 4 }} className='w-1/2 me-auto'>
+              <Button type="button" variant='outlined' className="ml-auto w-full">
+                <Link href="/dashboard/coupons">{t("Cancel")}</Link>
+              </Button>
+            </Box>
+            <Box sx={{ mt: 4 }} className='col-start-2 w-1/2 ms-auto'>
+              <Button type="submit" variant="contained" color="primary" className="ml-auto w-full">
+                {t("Submit")}
+              </Button>
+            </Box>
+            </div>
       </div>
     </Box>
   );

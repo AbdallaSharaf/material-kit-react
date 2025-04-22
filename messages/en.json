@@ -142,6 +142,8 @@
         "shipping": "Shipping",
         "active": "Active",
         "ORDER": "Order",
+        "disableFractionalQuantity": "Disable Fractional Quantity",
+        "Search": "Search",
         "expiresAt": "Expires At",
         "minAmount": "Minimum Amount",
         "Products of": "Products of",
