@@ -89,7 +89,7 @@
         "Incomplete Data": "بيانات غير مكتملة",
         "Please complete all required fields before submitting": "يرجى تعبئة جميع الحقول المطلوبة قبل الإرسال.",
         "newOrder": "جديد",
-        "Order": "الطلب",
+        "Order": "الترتيب",
         "Availability": "التوصيل",
         "Active": "نشط",
         "Inactive": "غير نشط",
@@ -158,7 +158,8 @@
         "Inactive Coupons": "القسائم غير النشطة",
         "Delete": "حذف",
         "Up to": "إلى",
-        "N/A": "غير متاح"
+        "N/A": "غير متاح",
+        "Invoice Id":"رقم الفاتورة"
 
     }
     }

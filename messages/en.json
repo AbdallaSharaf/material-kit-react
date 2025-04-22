@@ -162,6 +162,7 @@
         "Delivered":"Delivered",
         "Pending":"Pending",
         "cod":"cod",
-        "credit_card":"credit_card"
+        "credit_card":"credit_card",
+        "Invoice Id":"Invoice Id"
     }
 }
