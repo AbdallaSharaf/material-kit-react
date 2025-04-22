@@ -49,17 +49,39 @@ export function OrdersTable(): React.JSX.Element {
 
   const handleDownload = async (rowData: any) => {
     try {
-      const response = await axios.post('/api/download-invoice', rowData, {
-        responseType: 'blob',
-      });
+
+      fetch(`https://sge-commerce.onrender.com/api/v1/order/invoice/${rowData._id}`)
+  .then(res => res.json())
+  .then(({ data, contentType }) => {
+    const byteCharacters = atob(data); // decode base64
+    const byteNumbers = new Array(byteCharacters.length).fill(0).map((_, i) => byteCharacters.charCodeAt(i));
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: contentType });
+
+    const blobUrl = URL.createObjectURL(blob);
+    window.open(blobUrl); // Opens in a new tab
+  })
+  .catch(err => console.error('Failed to load PDF preview', err));
+      // const response = await axios.get(`https://sge-commerce.onrender.com/api/v1/order/invoice/${rowData._id}`);
   
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `order_${rowData._id}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      // const url = window.URL.createObjectURL(new Blob([response.data]));
+      // const link = document.createElement('a');
+      // link.href = url;
+      // link.setAttribute('download', `order_${rowData._id}.pdf`);
+      // document.body.appendChild(link);
+      // link.click();
+      // link.remove();
+
+      // const downloadBase64PDF = (base64Data, filename) => {
+      //   const link = document.createElement('a');
+      //   link.href = `data:application/pdf;base64,${base64Data}`;
+      //   link.download = filename;
+      //   document.body.appendChild(link);
+      //   link.click();
+      //   document.body.removeChild(link);
+      // };
+  
+      // downloadBase64PDF(response.data, 'order.pdf');
     } catch (error) {
       console.error('Error downloading PDF:', error);
     }
@@ -74,6 +96,14 @@ export function OrdersTable(): React.JSX.Element {
   );
 
   const orderColumns: MRT_ColumnDef<OrderIn>[] = [
+    {
+      accessorKey: 'invoiceId',
+      header: t('Invoice Id'),
+      size: 100,
+      enableColumnFilter: false,
+      enableSorting: false,
+      enableColumnActions: false,
+    },
     {
       accessorKey: 'name',
       header: t('Name'),
