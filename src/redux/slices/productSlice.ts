@@ -124,7 +124,6 @@ export const fetchProductsByCategory = createAsyncThunk<
   async (params, { rejectWithValue }) => {
     try {
       const { page } = params;
-
       const url = new URL(`${API_URL}/category/${params.id}`);
       url.searchParams.set('deleted', 'false');
       url.searchParams.set('PageCount', params.pageSize);

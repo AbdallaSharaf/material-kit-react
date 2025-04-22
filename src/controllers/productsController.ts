@@ -46,23 +46,22 @@ const handleChangeStatus = async (product: ProductIn) => {
     }
   };
 
-const handleMarkTopProduct = async (SKU: string) => {
+const handleMarkTopProduct = async (product: ProductIn) => {
   try {
-      // const resultAction = await dispatch(updateProduct({SKU:SKU}));
-      // if (updateProduct.fulfilled.match(resultAction)) {
-      //   // Update the existing Swal instead of reopening it
-      //   dispatch(setRefreshData(refreshData + 1));
-      // }
-      // else {  
-      //   // Update the Swal alert with an error
-      //   Swal.fire({
-      //     title: 'Error Updating Product',
-      //     text: resultAction.payload ? String(resultAction.payload) : 'Unknown error',
-      //     icon: 'error',
-      //     showConfirmButton: true,
-      //   });
-      // }
-      console.log(SKU)
+      const resultAction = await dispatch(updateProduct({id: product._id!, updatedData: {isTopProduct: true}}));
+      if (updateProduct.fulfilled.match(resultAction)) {
+        // Update the existing Swal instead of reopening it
+        dispatch(setRefreshData(refreshData + 1));
+      }
+      else {  
+        // Update the Swal alert with an error
+        Swal.fire({
+          title: 'Error Updating Product',
+          text: resultAction.payload ? String(resultAction.payload) : 'Unknown error',
+          icon: 'error',
+          showConfirmButton: true,
+        });
+      }
     } catch (error: any) {
       // Fire the Swal alert for unexpected errors
       Swal.fire({

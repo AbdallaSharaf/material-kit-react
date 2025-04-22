@@ -29,7 +29,7 @@ const initialState: UiSettingsState = {
   
 
 // Define the base URL for your API endpoint (adjust as needed)
-const API_URL = `https://fruits-heaven-api.vercel.app/api/v1/setting`;
+const API_URL = `https://fruits-heaven-api.vercel.app/api/v1/siteSettings/slider`;
 // const API_URL = `${process.env.NEXT_PUBLIC_API_URL}setting`;
 // Fetch all uiSettings
 export const fetchUiSettings = createAsyncThunk<
@@ -44,8 +44,7 @@ export const fetchUiSettings = createAsyncThunk<
 
       url.searchParams.set('deleted', 'false');
       const response = await axios.get(url.href);
-      const { data } = response.data;
-      return data;
+      return response.data;
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || error.message || 'Failed to fetch uiSettings'
@@ -64,9 +63,8 @@ SettingIn,
   async (params, { rejectWithValue }) => {
       try {
         let imageUrl = params.settingData.url && await uploadPhoto(params.settingData.url);
-
         if (params.settingData.url && !imageUrl) throw new Error("Image upload failed");
-    const response = await axios.post<SettingOut, AxiosResponse<{message: string, setting: SettingIn}, any>>(`${API_URL}/${params.key}`, {url: imageUrl});
+    const response = await axios.post<SettingOut, AxiosResponse<{message: string, setting: SettingIn}, any>>(`${API_URL}/${params.key}`, {url: imageUrl, redirectUrl: params.settingData.redirectUrl});
       return response.data.setting;
     } catch (error: any) {
       return rejectWithValue(
@@ -103,15 +101,15 @@ export const updateSetting = createAsyncThunk<
 
 // Delete a caSetting
 export const deleteSetting = createAsyncThunk<
-  string, // Return type: the id of the deleted caSetting
-  {key: string, id: string}, // Argument type: caSetting id
+  {idx: number, key: string}, // Return type: the id of the deleted caSetting
+  {key: string, idx: number}, // Argument type: caSetting id
   { rejectValue: string }
 >(
   'uiSettings/deleteSetting',
-  async ({key, id}, { rejectWithValue }) => {
+  async ({key, idx}, { rejectWithValue }) => {
     try {
-      await axios.delete(`${API_URL}//${key}/${id}`);
-      return id;
+      await axios.delete(`${API_URL}/${key}/${idx}`);
+      return {idx, key};
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || error.message || 'Failed to delete caSetting'
@@ -202,17 +200,22 @@ const uiSettingsSlice = createSlice({
           state.loading = true;
           state.error = null;
         })
-        .addCase(deleteSetting.fulfilled, (state, action: PayloadAction<string>) => {
-            state.loading = false;
-
-            // Remove the item from all arrays just in case
-            state.homeSlider = state.homeSlider.filter((z) => z._id !== action.payload);
-            state.offersFirstSlider = state.offersFirstSlider.filter((z) => z._id !== action.payload);
-            state.offersLastSlider = state.offersLastSlider.filter((z) => z._id !== action.payload);
+        .addCase(deleteSetting.fulfilled, (state, action: PayloadAction<{ idx: number, key: string }>) => {
+          state.loading = false;
+      
+          // Remove the item by index from the corresponding array
+          if (action.payload.key === 'homeSlider') {
+            state.homeSlider.splice(action.payload.idx, 1);
+          } else if (action.payload.key === 'offersFirstSlider') {
+            state.offersFirstSlider.splice(action.payload.idx, 1);
+          } else if (action.payload.key === 'offersLastSlider') {
+            state.offersLastSlider.splice(action.payload.idx, 1);
+          }
         })
         .addCase(deleteSetting.rejected, (state, action) => {
           state.loading = false;
           state.error = action.payload || 'Failed to delete caSetting';
+          console.log(state.error)
         });
     },
     

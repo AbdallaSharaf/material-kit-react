@@ -117,7 +117,7 @@ const dispatch = useDispatch<AppDispatch>()
       }
     };
 
-const handleDelete = async (key: string, setting: SettingIn) => {
+const handleDelete = async (key: string, idx: number) => {
     // Show confirmation dialog and await the user's response.
     const result = await Swal.fire({
       title: `Are you sure you want to delete this photo?`,
@@ -142,7 +142,7 @@ const handleDelete = async (key: string, setting: SettingIn) => {
         allowOutsideClick: false,
       });
       try {
-        const resultAction = await dispatch(deleteSetting({id: setting._id, key}));
+        const resultAction = await dispatch(deleteSetting({idx, key}));
         Swal.hideLoading();
         if (deleteSetting.fulfilled.match(resultAction)) {
           Swal.update({

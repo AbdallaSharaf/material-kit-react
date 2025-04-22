@@ -18,25 +18,56 @@ import {
   Paper,
   Divider,
   Box,
+  Autocomplete,
+  CircularProgress,
 } from '@mui/material';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import { useLocale, useTranslations } from 'next-intl';
+import { ProductIn } from '@/interfaces/productInterface';
+import axios from '@/utils/axiosInstance';
 
 export function TopProductsCard(): React.JSX.Element {
   const { topProducts, refreshData, loading} = useSelector((state: RootState) => state.products);
   const { fetchTopProductData, handleMarkTopProduct, handleUpdateProduct } = useProductHandlers();
   const locale = useLocale() as "en" | "ar";
   const t = useTranslations("common");
-  const [sku, setSku] = React.useState('');
+  const [selectedProduct, setSelectedProduct] = React.useState<ProductIn | null>(null);
+  
+  
+  const [options, setOptions] = React.useState([] as ProductIn[]);
+  const [inputValue, setInputValue] = React.useState('');
+  const [loadingOptions, setLoadingOptions] = React.useState(false);
+  
+  React.useEffect(() => {
+    const fetchOptions = async () => {
+      if (!inputValue.trim()) return;
+      setLoadingOptions(true);
+      try {
+        const url = `https://fruits-heaven-api.vercel.app/api/v1/product?keyword=${inputValue}`;
+        const res = await axios.get(url);
+        const data = res.data;
+        setOptions(data.data || []);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+    } finally {
+      setLoadingOptions(false);
+    }
+  };
+
+  const delayDebounce = setTimeout(fetchOptions, 400); // debounce input
+  return () => clearTimeout(delayDebounce);
+}, [inputValue]);
 
   React.useEffect(() => {
     fetchTopProductData();
   }, [refreshData]);
 
   const handleAddTopProduct = async () => {
-    if (!sku.trim()) return;
-    handleMarkTopProduct(sku);
-    setSku('');
+    if (!selectedProduct?.SKU) return;
+    handleMarkTopProduct(selectedProduct);
+    setInputValue('');
+    setSelectedProduct(null);
+    setOptions([]);
   };
 
   const handleRemoveTopProduct = async (productId: string) => {
@@ -51,14 +82,33 @@ export function TopProductsCard(): React.JSX.Element {
         </Typography>
 
         <Stack direction="row" spacing={2}>
-          <TextField
-            label={t("Enter Product SKU")}
-            variant="outlined"
-            size="small"
-            fullWidth
-            value={sku}
-            onChange={(e) => setSku(e.target.value)}
-          />
+        <Autocomplete
+          fullWidth
+          options={options}
+          getOptionLabel={(option) => `${option.name?.[locale] ?? ''} (${option.SKU ?? ''})`}
+          loading={loadingOptions}
+          inputValue={inputValue}
+          onInputChange={(_, value) => setInputValue(value)}
+          onChange={(_, value) => setSelectedProduct(value)}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={t("Enter Product SKU")}
+              variant="outlined"
+              size="small"
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    {loadingOptions && <CircularProgress color="inherit" size={20} />}
+                    {params.InputProps.endAdornment}
+                  </>
+                ),
+              }}
+            />
+          )}
+        />
+
           <Button variant="contained" onClick={handleAddTopProduct} disabled={loading}>
             {t("Add")}
           </Button>

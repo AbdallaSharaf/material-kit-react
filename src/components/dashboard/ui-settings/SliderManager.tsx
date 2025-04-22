@@ -1,5 +1,4 @@
-'use client';
-
+"use client"
 import { useEffect, useRef, useState } from 'react';
 import {
   Stack,
@@ -9,6 +8,7 @@ import {
   IconButton,
   Card,
   CardContent,
+  TextField,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -30,8 +30,8 @@ export const ImageSliderManager = ({ sectionKey, title }: ImageSliderManagerProp
   const t = useTranslations("common");
   const images = useSelector((state: RootState) => state.uiSettings[sectionKey]);
   const refreshData = useSelector((state: RootState) => state.uiSettings.refreshData);
-
   const [newImageFile, setNewImageFile] = useState<File | null>(null);
+  const [redirectUrl, setRedirectUrl] = useState<string>(''); // New state for redirectUrl
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState('');
 
@@ -44,30 +44,33 @@ export const ImageSliderManager = ({ sectionKey, title }: ImageSliderManagerProp
     }
   };
 
-    const handleAdd = async () => {
-        if (!newImageFile) return;
-    
-        const base64Url = await convertFileToBase64(newImageFile);
-        const success = await handleCreateSetting({
-        key: sectionKey,
-        values: { url: base64Url },
-        });
-    
-        if (success) {
-        setNewImageFile(null);
-        setPreviewUrl('');
-        if (fileInputRef.current) fileInputRef.current.value = '';
-        }
-    };
-  
+  const handleAdd = async () => {
+    if (!newImageFile || !redirectUrl) return; // Ensure redirectUrl is provided
+
+    const base64Url = await convertFileToBase64(newImageFile);
+    const success = await handleCreateSetting({
+      key: sectionKey,
+      values: { url: base64Url, redirectUrl: redirectUrl }, // Include redirectUrl
+    });
+
+    if (success) {
+      setNewImageFile(null);
+      setRedirectUrl(''); // Reset the redirectUrl input after image upload
+      setPreviewUrl('');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   useEffect(() => {
     fetchData(sectionKey);
   }, [sectionKey, dispatch, refreshData]);
 
+  const handleRemove = async (idx: number) => {
+    handleDelete(sectionKey, idx);
+  };
 
-  const handleRemove = async (image: SettingIn) => {
-    handleDelete(sectionKey, image);
+  const handleRedirectUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRedirectUrl(e.target.value);
   };
 
   return (
@@ -76,8 +79,8 @@ export const ImageSliderManager = ({ sectionKey, title }: ImageSliderManagerProp
         <Stack spacing={2}>
           <Typography variant="h6">{title}</Typography>
           <Grid container spacing={2}>
-            {images.map((image) => (
-              <Grid item key={image._id} xs={12} sm={6} md={4}>
+            {images?.map((image, idx) => (
+              <Grid item key={idx} xs={12} sm={6} md={4}>
                 <div style={{ position: 'relative' }}>
                   <img
                     src={image.url}
@@ -85,47 +88,59 @@ export const ImageSliderManager = ({ sectionKey, title }: ImageSliderManagerProp
                     style={{ width: '100%', borderRadius: 8 }}
                   />
                   <IconButton
-                    onClick={() => handleRemove(image)}
+                    onClick={() => handleRemove(idx)}
                     style={{ position: 'absolute', top: 4, right: 4 }}
                   >
                     <DeleteIcon />
                   </IconButton>
+                  <Typography variant="body2" style={{ marginTop: 8 }}>
+                    {image.redirectUrl}
+                  </Typography>
                 </div>
               </Grid>
             ))}
           </Grid>
-          <Stack direction="row" spacing={1}>
-          <input
-                type="file"
-                accept="image/*"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                style={{ display: 'none' }}
-                />
 
-                <Button
-                variant="outlined"
-                onClick={() => fileInputRef.current?.click()}
-                >
-                {newImageFile ? newImageFile.name : t('Choose Image')}
-                </Button>
+          {/* Input for Redirect URL when adding a new image */}
+          <Stack direction="row" spacing={1} alignItems="center">
+            <TextField
+              label={t('redirect URL')}
+              value={redirectUrl}
+              onChange={handleRedirectUrlChange}
+              
+              required
+            />
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
 
-                <Button
-                onClick={handleAdd}
-                variant="contained"
-                startIcon={<AddIcon />}
-                disabled={!newImageFile}
-                >
-                {t("Upload")}
-                </Button>
+            <Button
+              variant="outlined"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {newImageFile ? newImageFile.name : t('Choose Image')}
+            </Button>
+
+            <Button
+              onClick={handleAdd}
+              variant="contained"
+              startIcon={<AddIcon />}
+              disabled={!newImageFile || !redirectUrl}
+            >
+              {t("Upload")}
+            </Button>
           </Stack>
           {previewUrl && (
             <img
-                src={previewUrl}
-                alt="Preview"
-                style={{ maxWidth: '200px', borderRadius: 8, marginTop: 10 }}
+              src={previewUrl}
+              alt="Preview"
+              style={{ maxWidth: '200px', borderRadius: 8, marginTop: 10 }}
             />
-            )}
+          )}
         </Stack>
       </CardContent>
     </Card>
