@@ -46,13 +46,13 @@ export default function Page() {
    {/* Section 1 */}
    <Stack spacing={2}>
         <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} sm={12} md={6} lg={4}>
             <ReportsCard reportKey="salesReport" title={t("Sales Report")} />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} sm={12} md={6} lg={4}>
             <ReportsCard reportKey="topSellingByQty" title={t("topSellingByQty")} />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} sm={12} md={6} lg={4}>
             <ReportsCard reportKey="topSellingByRevenue" title={t("topSellingByRevenue")} />
           </Grid>
         </Grid>
@@ -61,13 +61,13 @@ export default function Page() {
       {/* Section 2 */}
       <Stack spacing={2}>
         <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} sm={12} md={6} lg={4}>
             <ReportsCard reportKey="lowestSelling" title={t("lowestSelling")} />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} sm={12} md={6} lg={4}>
             <ReportsCard reportKey="repeatedCustomers" title={t("repeatedCustomers")} />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} sm={12} md={6} lg={4}>
             <ReportsCard reportKey="newCustomers" title={t("newCustomers")} />
           </Grid>
         </Grid>
@@ -76,13 +76,13 @@ export default function Page() {
       {/* Section 3 */}
       <Stack spacing={2}>
         <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} sm={12} md={6} lg={4}>
             <ReportsCard reportKey="highValueCustomers" title={t("highValueCustomers")} />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} sm={12} md={6} lg={4}>
             <ReportsCard reportKey="ordersAndInvoices" title={t("ordersAndInvoices")} />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} sm={12} md={6} lg={4}>
             <ReportsCard reportKey="monthlyComparison" title={t("monthlyComparison")} />
           </Grid>
         </Grid>

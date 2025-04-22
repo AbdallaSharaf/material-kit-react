@@ -67,9 +67,9 @@ export const ImageGalleryUploader = ({
         >
           <input {...getInputProps()} />
           <Typography sx={{ mb: images.length ? 2 : 0 }}>
-            {isDragActive ? t('Drop images here') : t('Drag & drop up to 5 images (min 1 required)')}
+            {isDragActive ? t('Drop images here') : t('Drag & drop up to 5 images')}
           </Typography>
-  
+          
           {/* 👇 Preview inside the dropzone */}
           {images.length > 0 && (
             <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 2 }}>

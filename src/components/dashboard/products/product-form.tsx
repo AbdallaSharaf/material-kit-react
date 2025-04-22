@@ -71,11 +71,23 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
       SKU: Yup.number().min(1, 'SKU must be positive'),
       // trackQty: Yup.boolean(),
       imgCover: Yup.mixed()
-        .required("Image is required"),
-      images: Yup.array()
-      .min(1, 'At least 1 image is required')
-      .max(5, 'Maximum 5 images allowed')
-      .required('Product gallery is required'),
+      .required("Image is required")
+      .test("fileSize", "Image must be less than 10MB", (value) => {
+        if (!value) return true; // skip validation if empty (required will catch it)
+        return (value as File).size <= 10485760;
+      }),
+    
+    images: Yup.array()
+      .max(5, "Maximum 5 images allowed")
+      .required("Product gallery is required")
+      .test(
+        "fileSize",
+        "Each image must be less than 10MB",
+        (files) => {
+          if (!files) return true;
+          return files.every((file: File) => file.size <= 10485760);
+        }
+      )
     }),
     onSubmit: async (values) => {
       const { name_ar, name_en, description_ar, description_en, shortDesc_ar, shortDesc_en, ...rest } = values;
@@ -438,7 +450,7 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                   />
 
                 <p className="font-light text-center text-sm mt-2">
-                  Set the product thumbnail image. Only *.png, *.jpg, and *.jpeg image files are accepted.
+                  Maximum file size is 10MB. Only *.png, *.jpg, and *.jpeg image files are accepted.
                 </p>
               </div>
               <div className='col-span-3'>

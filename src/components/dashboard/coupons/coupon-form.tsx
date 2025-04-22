@@ -57,6 +57,8 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
       expiresAt: coupon?.expiresAt || new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
       minAmount: coupon?.minAmount || "0",
       disableFractionalQuantity: coupon?.disableFractionalQuantity || true,
+      activeFromHour: coupon?.activeFromHour || undefined,
+      activeToHour: coupon?.activeToHour || undefined,
       maxAmount: coupon?.maxAmount || "100000",
       userLimit: coupon
         ? coupon.userLimit === "unlimited"
@@ -276,6 +278,27 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextField
+          fullWidth
+          type="time" // 👈 makes it a time picker
+          label={t("activeFromHour")}
+          name="activeFromHour"
+          value={formik.values.activeFromHour}
+          onChange={formik.handleChange}
+        />
+
+        <TextField
+          fullWidth
+          type="time" // 👈 makes it a time picker
+          label={t("activeToHour")}
+          name="activeToHour"
+          value={formik.values.activeToHour}
+          onChange={formik.handleChange}
+        />
+
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <TextField
           select
           fullWidth
           label={t("userLimit")}
@@ -440,8 +463,6 @@ const CouponForm = ({ coupon }: CouponFormProps) => {
           labelPlacement="start"
         />
       </div>
-
-
 
       <div className='grid grid-cols-2'>
             <Box sx={{ mt: 4 }} className='w-1/2 me-auto'>
