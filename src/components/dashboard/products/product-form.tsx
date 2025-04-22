@@ -45,8 +45,8 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
       available: product?.available ?? true,
       price: product?.price || 0,
       SKU: product?.SKU || 0,
-      priceAfterExpiresAt: product?.price || undefined,
-      priceAfterDiscount: product?.price || undefined,
+      priceAfterExpiresAt: product?.priceAfterExpiresAt || undefined,
+      priceAfterDiscount: product?.priceAfterDiscount || undefined,
       trackQty: product?.trackQty ?? true,
       imgCover: product?.imgCover || undefined,  // Add image field
       images: product?.images || [] as string[],  // Add image field
@@ -384,11 +384,14 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                 margin="normal"
                 name="priceAfterExpiresAt"
                 label="Price After Expires At"
-                type="number"
+                type="datetime-local"
                 variant="outlined"
                 value={formik.values.priceAfterExpiresAt}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
+                InputLabelProps={{
+                  shrink: true, // Ensures the label stays above the input
+                }}
               />
               </div>
               <div className='grid md:grid-cols-4 gap-4 my-7'>
