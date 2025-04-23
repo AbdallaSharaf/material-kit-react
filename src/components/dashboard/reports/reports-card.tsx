@@ -1,14 +1,27 @@
-'use client';
-
+"use client"
 import React, { useEffect, useState } from 'react';
-import { Stack, Typography, Paper } from '@mui/material';
+import {
+  Stack,
+  Typography,
+  Paper,
+  CircularProgress,
+  TextField,
+  MenuItem,
+} from '@mui/material';
 import { DateRangePicker } from 'rsuite';
 import 'rsuite/dist/rsuite.min.css';
 import dayjs from 'dayjs';
-import { useTranslations } from 'next-intl';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { Button } from '@mui/material';
 import axios from '@/utils/axiosInstance';
+
+import SalesReportView from './salesReportView';
+import TopSellingProductsReportView from './topSellingByQty';
+import RepeatedCustomersReportView from './repeatedCustomers';
+import NewCustomersReportView from './newCustomers';
+import HighValueCustomersReportView from './highValueCustomers';
+import OrdersReportView from './ordersReportView';
+import MonthlyComparisonReportView from './monthlyComparison';
 
 interface ReportsProps {
   reportKey: string;
@@ -16,73 +29,132 @@ interface ReportsProps {
 }
 
 export const ReportsCard = ({ reportKey, title }: ReportsProps) => {
-  const t = useTranslations("common");
-
+  const currentYear = new Date().getFullYear();
   const [dateRange, setDateRange] = useState<[Date, Date]>(() => {
     const end = new Date();
     const start = dayjs(end).subtract(1, 'month').toDate();
     return [start, end];
   });
 
+  const [year, setYear] = useState<number>(currentYear);
   const [data, setData] = useState<any[]>([]);
-
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleDownloadPDF = () => {
     const content = JSON.stringify(data, null, 2);
-    const blob = new Blob([content], { type: 'application/pdf' }); // content is still plain text
+    const blob = new Blob([content], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
-  
+
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${reportKey}-report.pdf`; // name it however you like
+    a.download = `${reportKey}-report.pdf`;
     a.click();
-  
+
     URL.revokeObjectURL(url);
   };
 
   useEffect(() => {
     const fetchReportData = async () => {
-        try {
+      setLoading(true);
+      try {
+        let payload;
+
+        if (reportKey === 'monthlyComparison') {
+          payload = { year };
+        } else {
           const [from, to] = dateRange;
-      
-          const response = await axios.post(`https://fruits-heaven-api.vercel.app/api/v1/order/${reportKey}`,
-            {
-              startDate: dayjs(from).format("YYYY-MM-DD"),
-              endDate: dayjs(to).format("YYYY-MM-DD"),
-            }
-          );
-          console.log(response.data)
-          setData(response.data.data); // assuming the response shape is { data: [...] }
-        } catch (error) {
-          console.error('Error fetching report:', error);
+          payload = {
+            startDate: dayjs(from).format('YYYY-MM-DD'),
+            endDate: dayjs(to).format('YYYY-MM-DD'),
+          };
         }
-      };
+
+        const response = await axios.post(
+          `https://fruits-heaven-api.vercel.app/api/v1/order/${reportKey}`,
+          payload
+        );
+        setData(response.data.data);
+      } catch (error) {
+        console.error('Error fetching report:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
     fetchReportData();
-  }, [reportKey, dateRange]);
+  }, [reportKey, dateRange, year]);
+
+  const renderReportContent = () => {
+    if (loading) {
+      return (
+        <Stack alignItems="center" py={4}>
+          <CircularProgress />
+        </Stack>
+      );
+    }
+
+    switch (reportKey) {
+      case 'salesReport':
+        return <SalesReportView data={data} />;
+      case 'topSellingByQty':
+      case 'topSellingByRevenue':
+        return <TopSellingProductsReportView data={data} type={reportKey} />;
+      case 'repeatedCustomers':
+        return <RepeatedCustomersReportView data={data} />;
+      case 'newCustomers':
+        return <NewCustomersReportView data={data} />;
+      case 'highValueCustomers':
+        return <HighValueCustomersReportView data={data} />;
+      case 'ordersAndInvoices':
+        return <OrdersReportView data={data} />;
+      case 'monthlyComparison':
+        return <MonthlyComparisonReportView data={data} />;
+      default:
+        return <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(data, null, 2)}</pre>;
+    }
+  };
+
+  const renderPicker = () => {
+    if (reportKey === 'monthlyComparison') {
+      return (
+        <TextField
+          select
+          label="Select Year"
+          value={year}
+          size='small'
+          onChange={(e) => setYear(Number(e.target.value))}
+          sx={{ minWidth: 150 }}
+        >
+          {Array.from({ length: 10 }, (_, i) => currentYear - i).map((y) => (
+            <MenuItem key={y} value={y}>
+              {y}
+            </MenuItem>
+          ))}
+        </TextField>
+      );
+    }
+
+    return (
+      <DateRangePicker
+        value={dateRange}
+        onChange={(range) => setDateRange(range as [Date, Date])}
+        cleanable={false}
+        format="yyyy-MM-dd"
+      />
+    );
+  };
 
   return (
     <Paper sx={{ p: 3, borderRadius: 3 }}>
       <Stack spacing={2}>
         <Typography variant="h6">{title}</Typography>
-        <div className='flex justify-between'>
-        <DateRangePicker
-          value={dateRange}
-          onChange={(range) => setDateRange(range as [Date, Date])}
-          cleanable={false}
-          format="yyyy-MM-dd"
-          />
-        <Button
-          variant="contained"
-          onClick={handleDownloadPDF}
-          >
+        <div className="flex justify-between items-center gap-4">
+          {renderPicker()}
+          <Button variant="contained" onClick={handleDownloadPDF}>
             <FileDownloadIcon />
-          {/* {t('Download as PDF')} */}
-        </Button>
+          </Button>
         </div>
-
-        {/* Render result */}
-        <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(data, null, 2)}</pre>
+        {renderReportContent()}
       </Stack>
     </Paper>
   );

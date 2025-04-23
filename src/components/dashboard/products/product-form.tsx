@@ -84,7 +84,7 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
       imgCover: Yup.mixed()
       .required("Image is required")
       .test("fileSize", "Image must be less than 10MB", (value) => {
-        if (!value) return true; // skip validation if empty (required will catch it)
+        if (!value || typeof value === "string") return true; // skip validation if empty (required will catch it)
         return (value as File).size <= 10485760;
       }),
     
@@ -96,7 +96,11 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
         "Each image must be less than 10MB",
         (files) => {
           if (!files) return true;
-          return files.every((file: File) => file.size <= 10485760);
+          return files.every((file: File) => {
+            if (typeof file === "string") return true;
+            return file.size <= 10485760
+          }
+          );
         }
       )
     }),

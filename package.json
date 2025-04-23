@@ -56,6 +56,7 @@
     "react-hook-form": "7.52.0",
     "react-redux": "^9.2.0",
     "react-world-flags": "^1.6.0",
+    "recharts": "^2.15.3",
     "rsuite": "^5.80.0",
     "sweetalert2": "^11.16.0",
     "tailwindcss": "^4.0.6",
