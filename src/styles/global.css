@@ -21,3 +21,8 @@ html {
 body {
   height: 100%;
 }
+
+[dir="rtl"] .MuiBox-root.mui-192dx0w{
+  display: flex;
+  flex-direction: row-reverse;
+}
