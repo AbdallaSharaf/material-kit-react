@@ -18,6 +18,7 @@ import { Box } from '@mui/system';
 import { MaterialReactTable, MRT_ColumnDef, MRT_TableOptions } from 'material-react-table';
 
 import CustomToolbar from '../products/custom-toolbar';
+import Swal from 'sweetalert2';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
@@ -32,6 +33,7 @@ import axios from 'axios';
 import { MRT_Localization_AR } from 'material-react-table/locales/ar';
 import { MRT_Localization_EN } from 'material-react-table/locales/en';
 import Image from 'next/image';
+import TablePaginationActions, { TablePaginationActionsProps } from '@mui/material/TablePagination/TablePaginationActions';
 // Define columns outside the component to avoid defining them during render
 export function OrdersTable(): React.JSX.Element {
 
@@ -48,46 +50,99 @@ export function OrdersTable(): React.JSX.Element {
   //   link.click();
   // };
 
+  // const handleDownload = async (rowData: any) => {
+  //   try {
+
+  //     fetch(`https://sge-commerce.onrender.com/api/v1/order/invoice/${rowData._id}`)
+  // .then(res => res.json())
+  // .then(({ data, contentType }) => {
+  //   const byteCharacters = atob(data); // decode base64
+  //   const byteNumbers = new Array(byteCharacters.length).fill(0).map((_, i) => byteCharacters.charCodeAt(i));
+  //   const byteArray = new Uint8Array(byteNumbers);
+  //   const blob = new Blob([byteArray], { type: contentType });
+
+  //   const blobUrl = URL.createObjectURL(blob);
+  //   window.open(blobUrl); // Opens in a new tab
+  // })
+  // .catch(err => console.error('Failed to load PDF preview', err));
+  //     // const response = await axios.get(`https://sge-commerce.onrender.com/api/v1/order/invoice/${rowData._id}`);
+  
+  //     // const url = window.URL.createObjectURL(new Blob([response.data]));
+  //     // const link = document.createElement('a');
+  //     // link.href = url;
+  //     // link.setAttribute('download', `order_${rowData._id}.pdf`);
+  //     // document.body.appendChild(link);
+  //     // link.click();
+  //     // link.remove();
+
+  //     // const downloadBase64PDF = (base64Data, filename) => {
+  //     //   const link = document.createElement('a');
+  //     //   link.href = `data:application/pdf;base64,${base64Data}`;
+  //     //   link.download = filename;
+  //     //   document.body.appendChild(link);
+  //     //   link.click();
+  //     //   document.body.removeChild(link);
+  //     // };
+  
+  //     // downloadBase64PDF(response.data, 'order.pdf');
+  //   } catch (error) {
+  //     console.error('Error downloading PDF:', error);
+  //   }
+  // };
+
   const handleDownload = async (rowData: any) => {
     try {
-
-      fetch(`https://sge-commerce.onrender.com/api/v1/order/invoice/${rowData._id}`)
-  .then(res => res.json())
-  .then(({ data, contentType }) => {
-    const byteCharacters = atob(data); // decode base64
-    const byteNumbers = new Array(byteCharacters.length).fill(0).map((_, i) => byteCharacters.charCodeAt(i));
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: contentType });
-
-    const blobUrl = URL.createObjectURL(blob);
-    window.open(blobUrl); // Opens in a new tab
-  })
-  .catch(err => console.error('Failed to load PDF preview', err));
-      // const response = await axios.get(`https://sge-commerce.onrender.com/api/v1/order/invoice/${rowData._id}`);
+      // Show loading alert
+      Swal.fire({
+        title: 'Generating Invoice...',
+        text: 'Please wait while we prepare your PDF.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
   
-      // const url = window.URL.createObjectURL(new Blob([response.data]));
-      // const link = document.createElement('a');
-      // link.href = url;
-      // link.setAttribute('download', `order_${rowData._id}.pdf`);
-      // document.body.appendChild(link);
-      // link.click();
-      // link.remove();
-
-      // const downloadBase64PDF = (base64Data, filename) => {
-      //   const link = document.createElement('a');
-      //   link.href = `data:application/pdf;base64,${base64Data}`;
-      //   link.download = filename;
-      //   document.body.appendChild(link);
-      //   link.click();
-      //   document.body.removeChild(link);
-      // };
+      const response = await fetch(`https://sge-commerce.onrender.com/api/v1/order/invoice/${rowData._id}`);
+      const { data, contentType } = await response.json();
   
-      // downloadBase64PDF(response.data, 'order.pdf');
+      // Decode base64 to byte array
+      const byteCharacters = atob(data);
+      const byteNumbers = new Array(byteCharacters.length)
+        .fill(0)
+        .map((_, i) => byteCharacters.charCodeAt(i));
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: contentType });
+  
+      // Create download link
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `order_${rowData._id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+  
+      // Show success alert
+      Swal.fire({
+        icon: 'success',
+        title: 'Download Complete',
+        text: 'Your invoice has been successfully downloaded.',
+        timer: 2000,
+        showConfirmButton: false,
+      });
     } catch (error) {
       console.error('Error downloading PDF:', error);
+  
+      // Show error alert
+      Swal.fire({
+        icon: 'error',
+        title: 'Download Failed',
+        text: 'Something went wrong while downloading the invoice.',
+      });
     }
   };
-
+  
   const t = useTranslations("common")
   const { fetchData, handleChangeStatus } = useOrderHandlers();
   const dispatch = useDispatch<AppDispatch>();
@@ -420,7 +475,7 @@ export function OrdersTable(): React.JSX.Element {
             },
           },
         }}
-      
+
       />
     </Paper>
   );
