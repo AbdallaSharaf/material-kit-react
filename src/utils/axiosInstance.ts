@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 // import Cookies from 'js-cookie';
-
+// console.log("NEXT_PUBLIC_BACKEND_URL",process.env.NEXT_PUBLIC_BACKEND_URL)
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BASE_URL, // Set your API base URL
+  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL, // Set your API base URL
   headers: {
     'Content-Type': 'application/json',
   },

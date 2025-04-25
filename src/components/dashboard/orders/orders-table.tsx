@@ -34,6 +34,7 @@ import { MRT_Localization_AR } from 'material-react-table/locales/ar';
 import { MRT_Localization_EN } from 'material-react-table/locales/en';
 import Image from 'next/image';
 import TablePaginationActions, { TablePaginationActionsProps } from '@mui/material/TablePagination/TablePaginationActions';
+import axiosInstance from '@/utils/axiosInstance';
 // Define columns outside the component to avoid defining them during render
 export function OrdersTable(): React.JSX.Element {
 
@@ -90,59 +91,113 @@ export function OrdersTable(): React.JSX.Element {
   //   }
   // };
 
-  const handleDownload = async (rowData: any) => {
-    try {
-      // Show loading alert
-      Swal.fire({
-        title: 'Generating Invoice...',
-        text: 'Please wait while we prepare your PDF.',
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
+  // const handleDownload = async (rowData: any) => {
+  //   try {
+  //     // Show loading alert
+  //     Swal.fire({
+  //       title: 'Generating Invoice...',
+  //       text: 'Please wait while we prepare your PDF.',
+  //       allowOutsideClick: false,
+  //       didOpen: () => {
+  //         Swal.showLoading();
+  //       },
+  //     });
   
-      const response = await fetch(`https://sge-commerce.onrender.com/api/v1/order/invoice/${rowData._id}`);
-      const { data, contentType } = await response.json();
+  //     const response = await axiosInstance.get(`order/invoice/${rowData._id}`);
+  //     const { data } = response;
+  //     const contentType = response.headers['content-type'];
   
-      // Decode base64 to byte array
-      const byteCharacters = atob(data);
-      const byteNumbers = new Array(byteCharacters.length)
-        .fill(0)
-        .map((_, i) => byteCharacters.charCodeAt(i));
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: contentType });
+  //     // Decode base64 to byte array
+  //     const byteCharacters = atob(data);
+  //     const byteNumbers = new Array(byteCharacters.length)
+  //       .fill(0)
+  //       .map((_, i) => byteCharacters.charCodeAt(i));
+  //     const byteArray = new Uint8Array(byteNumbers);
+  //     const blob = new Blob([byteArray], { type: contentType });
   
-      // Create download link
-      const blobUrl = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = `order_${rowData._id}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(blobUrl);
+  //     // Create download link
+  //     const blobUrl = URL.createObjectURL(blob);
+  //     const link = document.createElement('a');
+  //     link.href = blobUrl;
+  //     link.download = `order_${rowData._id}.pdf`;
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     document.body.removeChild(link);
+  //     URL.revokeObjectURL(blobUrl);
   
-      // Show success alert
-      Swal.fire({
-        icon: 'success',
-        title: 'Download Complete',
-        text: 'Your invoice has been successfully downloaded.',
-        timer: 2000,
-        showConfirmButton: false,
-      });
-    } catch (error) {
-      console.error('Error downloading PDF:', error);
+  //     // Show success alert
+  //     Swal.fire({
+  //       icon: 'success',
+  //       title: 'Download Complete',
+  //       text: 'Your invoice has been successfully downloaded.',
+  //       timer: 2000,
+  //       showConfirmButton: false,
+  //     });
+  //   } catch (error) {
+  //     console.error('Error downloading PDF:', error);
   
-      // Show error alert
-      Swal.fire({
-        icon: 'error',
-        title: 'Download Failed',
-        text: 'Something went wrong while downloading the invoice.',
-      });
-    }
-  };
-  
+  //     // Show error alert
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Download Failed',
+  //       text: 'Something went wrong while downloading the invoice.',
+  //     });
+  //   }
+  // };
+
+
+const handleDownload = async (rowData: any) => {
+  try {
+    Swal.fire({
+      title: 'Generating Invoice...',
+      text: 'Please wait while we prepare your PDF.',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+    
+    const res = await fetch(`https://sge-commerce.onrender.com/api/v1/order/invoice/${rowData._id}`);
+    const { data, contentType, filename } = await res.json();
+
+    if (!data) throw new Error('Missing PDF data');
+
+    // Decode base64 to byte array
+    const byteCharacters = atob(data); // make sure data is clean base64
+    const byteNumbers = new Array(byteCharacters.length)
+      .fill(0)
+      .map((_, i) => byteCharacters.charCodeAt(i));
+    const byteArray = new Uint8Array(byteNumbers);
+
+    const blob = new Blob([byteArray], { type: contentType });
+    const blobUrl = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = filename || `order_${rowData._id}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(blobUrl);
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Invoice Downloaded',
+      text: 'The invoice has been successfully downloaded.',
+      timer: 2000,
+      showConfirmButton: false,
+    });
+
+  } catch (error) {
+    console.error('Error downloading PDF:', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Download Failed',
+      text: 'An error occurred while downloading the invoice.',
+    });
+  }
+};
+
   const t = useTranslations("common")
   const { fetchData, handleChangeStatus } = useOrderHandlers();
   const dispatch = useDispatch<AppDispatch>();
