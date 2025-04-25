@@ -329,7 +329,7 @@ const handleDownload = async (rowData: any) => {
       header: t('Payment Method'),
       size: 166,
       filterVariant: 'select',
-      filterSelectOptions: [t('cod'), t('credit_card')],
+      filterSelectOptions: [t('COD'), t('CC')],
       Cell: ({ cell }) => {
         const value = cell.getValue<string>();
         const label = value === 'cod' ? t('COD') : t('CC');
