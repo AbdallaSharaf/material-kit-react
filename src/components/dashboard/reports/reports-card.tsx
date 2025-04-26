@@ -26,6 +26,7 @@ import OrdersReportView from './ordersReportView';
 import MonthlyComparisonReportView from './monthlyComparison';
 import Swal from 'sweetalert2';
 import { handleDownloadExcel } from '@/utils/generateExcel';
+import LowestSellingReportView from './LowestSellingReportView';
 
 interface ReportsProps {
   reportKey: string;
@@ -100,6 +101,8 @@ export const ReportsCard = ({ reportKey, title }: ReportsProps) => {
         return <OrdersReportView data={data} />;
       case 'monthlyComparison':
         return <MonthlyComparisonReportView data={data} />;
+      case 'lowestSelling':
+        return <LowestSellingReportView data={data} />;
       default:
         return <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(data, null, 2)}</pre>;
     }

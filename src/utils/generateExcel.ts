@@ -91,7 +91,7 @@ export const handleDownloadExcel = (data: any, reportKey: string, title: string)
     // Create one row per product with order info
     return order.products.map((product: any) => ({
       ...baseFields,
-      'Product Name': product.name?.["ar"] || product.name?.["en"] || 'Unknown Product',
+      'Product Name': product.name?.ar || product.name?.en|| 'Unknown Product',
       'Product ID': product._id || 'N/A',
       'Quantity': product.quantity || 0,
       'Unit Price': product.price?.toFixed(2) || '0.00',
@@ -111,7 +111,7 @@ export const handleDownloadExcel = (data: any, reportKey: string, title: string)
   case 'topSellingByQty':
 case 'topSellingByRevenue':
   return data.map((product: any) => ({
-    'Product Name': product.name?.["ar"] || 'Unknown Product',
+    'Product Name': product.name?.ar || product.name?.en || 'Unknown Product',
     'Product ID': product._id || 'N/A',
     'SKU': product.sku || 'N/A',
     [reportKey === 'topSellingByQty' ? 'Quantity Sold' : 'Total Revenue']: 
@@ -128,7 +128,7 @@ case 'topSellingByRevenue':
       z: '"$"#,##0.00'
     },
     // Additional useful metrics if available:
-    'Category': product.category?.["ar"] || 'N/A',
+    'Category': product.category?.ar || 'N/A',
     'Stock Level': product.stockLevel || 'N/A'
   }));
 
@@ -152,6 +152,19 @@ case 'topSellingByRevenue':
       : 'N/A',
     'Last Order Date': customer.lastOrderDate 
       ? dayjs(customer.lastOrderDate).format('YYYY-MM-DD')
+      : 'N/A'
+  }));
+
+  case 'lowestSelling':
+  return data.map((product: any) => ({
+    'Product Name': product.name?.ar || product.name?.en || 'Unknown Product',
+    'Product ID': product._id,
+    'Quantity Sold': product.totalQuantitySold || 0,
+    'Status': product.totalQuantitySold <= 3 ? 'Low Stock Alert' : 'Normal',
+    // Add more fields if available:
+    'Category': product.category?.ar || 'N/A',
+    'Last Sold Date': product.lastSoldDate 
+      ? dayjs(product.lastSoldDate).format('YYYY-MM-DD')
       : 'N/A'
   }));
         // We'll add other cases here as we get the components
