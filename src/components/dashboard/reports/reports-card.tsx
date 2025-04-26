@@ -8,6 +8,8 @@ import {
   TextField,
   MenuItem,
 } from '@mui/material';
+import * as XLSX from 'xlsx';
+
 import { DateRangePicker } from 'rsuite';
 import 'rsuite/dist/rsuite.min.css';
 import dayjs from 'dayjs';
@@ -22,6 +24,8 @@ import NewCustomersReportView from './newCustomers';
 import HighValueCustomersReportView from './highValueCustomers';
 import OrdersReportView from './ordersReportView';
 import MonthlyComparisonReportView from './monthlyComparison';
+import Swal from 'sweetalert2';
+import { handleDownloadExcel } from '@/utils/generateExcel';
 
 interface ReportsProps {
   reportKey: string;
@@ -39,19 +43,6 @@ export const ReportsCard = ({ reportKey, title }: ReportsProps) => {
   const [year, setYear] = useState<number>(currentYear);
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const handleDownloadPDF = () => {
-    const content = JSON.stringify(data, null, 2);
-    const blob = new Blob([content], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${reportKey}-report.pdf`;
-    a.click();
-
-    URL.revokeObjectURL(url);
-  };
 
   useEffect(() => {
     const fetchReportData = async () => {
@@ -150,7 +141,7 @@ export const ReportsCard = ({ reportKey, title }: ReportsProps) => {
         <Typography variant="h6">{title}</Typography>
         <div className="flex justify-between items-center gap-4">
           {renderPicker()}
-          <Button variant="contained" onClick={handleDownloadPDF}>
+          <Button variant="contained" onClick={() => handleDownloadExcel(data, reportKey, title)}>
             <FileDownloadIcon />
           </Button>
         </div>
