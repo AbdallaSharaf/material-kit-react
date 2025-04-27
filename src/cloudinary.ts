@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Set your Cloudinary upload preset and cloud name here
-const cloudName = 'dhrk71pn9';
+const cloudName = 'devvtoxcr';
 const uploadPreset = 'fruits-heaven'; // set this in your Cloudinary settings
 
 /**
