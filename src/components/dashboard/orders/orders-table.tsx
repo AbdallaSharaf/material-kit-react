@@ -17,7 +17,7 @@ import {
 import { Box } from '@mui/system';
 import { MaterialReactTable, MRT_ColumnDef, MRT_TableOptions } from 'material-react-table';
 
-import CustomToolbar from '../products/custom-toolbar';
+import CustomToolbar from './custom-toolbar';
 import Swal from 'sweetalert2';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -426,6 +426,7 @@ const handleDownload = async (rowData: any) => {
         enableColumnResizing
         enableGlobalFilter={true}
         enableSorting={true}
+        enableColumnActions={false}
         localization={locale === 'ar' ? MRT_Localization_AR : MRT_Localization_EN}
         initialState={{
           columnVisibility: {
