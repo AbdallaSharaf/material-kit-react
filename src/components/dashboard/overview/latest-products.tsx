@@ -1,3 +1,4 @@
+"use client"
 import React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -14,26 +15,62 @@ import type { SxProps } from '@mui/material/styles';
 import { ArrowRight as ArrowRightIcon } from '@phosphor-icons/react/dist/ssr/ArrowRight';
 import { DotsThreeVertical as DotsThreeVerticalIcon } from '@phosphor-icons/react/dist/ssr/DotsThreeVertical';
 import dayjs from 'dayjs';
-import { Product } from '@/app/dashboard/page';
+import { useLocale, useTranslations } from 'next-intl';
+import axiosInstance from '@/utils/axiosInstance';
+import { Stack } from '@mui/system';
+import { CircularProgress } from '@mui/material';
+import { ProductIn } from '@/interfaces/productInterface';
+import { useRouter } from 'next/navigation';
 
 
 
 export interface LatestProductsProps {
-  products?: Product[];
   sx?: SxProps;
 }
 
-export function LatestProducts({ products = [], sx }: LatestProductsProps): React.JSX.Element {
+export function LatestProducts({ sx }: LatestProductsProps): React.JSX.Element {
+    const locale = useLocale() as "en" | "ar";
+    const t = useTranslations('common');
+    const router = useRouter();
+    const [data, setData] = React.useState<ProductIn[]>([]);
+    const [loading, setLoading] = React.useState<boolean>(false);
+
+     React.useEffect(() => {
+        const fetchReportData = async () => {
+          setLoading(true);
+          try {
+            const url = new URL("https://fruits-heaven-api.vercel.app/api/v1/product");
+            url.searchParams.set('deleted', 'false');
+            url.searchParams.set('PageCount', "6");
+            url.searchParams.set('sort', "-createdAt");
+            url.searchParams.set('page', "1");
+            const response = await axiosInstance.get(url.href);
+            setData(response.data.data);
+          } catch (error) {
+            console.error('Error fetching report:', error);
+          } finally {
+            setLoading(false);
+          }
+        };
+        fetchReportData();
+      }, []);
+    if (loading) {
+      return (
+        <Stack alignItems="center" py={4}>
+          <CircularProgress />
+        </Stack>
+      );
+    }
   return (
     <Card sx={sx}>
-      <CardHeader title="Latest products" />
+      <CardHeader title={t("Latest products")} />
       <Divider />
       <List>
-        {products.map((product, index) => (
-          <ListItem divider={index < products.length - 1} key={product._id}>
+        {data.map((product, index) => (
+          <ListItem divider={index < data.length - 1} key={product._id}>
             <ListItemAvatar>
-              {product.image ? (
-                <Box component="img" src={product.image} sx={{ borderRadius: 1, height: '48px', width: '48px' }} />
+              {product.imgCover ? (
+                <Box component="img" src={product.imgCover} sx={{ borderRadius: 1, height: '48px', width: '48px' }} />
               ) : (
                 <Box
                   sx={{
@@ -46,14 +83,11 @@ export function LatestProducts({ products = [], sx }: LatestProductsProps): Reac
               )}
             </ListItemAvatar>
             <ListItemText
-              primary={product.name}
+              primary={product.name[locale]}
               primaryTypographyProps={{ variant: 'subtitle1' }}
               secondary={`Updated ${dayjs(product.updatedAt).format('MMM D, YYYY')}`}
               secondaryTypographyProps={{ variant: 'body2' }}
             />
-            <IconButton edge="end">
-              <DotsThreeVerticalIcon weight="bold" />
-            </IconButton>
           </ListItem>
         ))}
       </List>
@@ -61,11 +95,13 @@ export function LatestProducts({ products = [], sx }: LatestProductsProps): Reac
       <CardActions sx={{ justifyContent: 'flex-end' }}>
         <Button
           color="inherit"
-          endIcon={<ArrowRightIcon fontSize="var(--icon-fontSize-md)" />}
           size="small"
           variant="text"
+          onClick={() => {
+            router.push('/dashboard/products');
+          }}
         >
-          View all
+          {t("View all")}
         </Button>
       </CardActions>
     </Card>

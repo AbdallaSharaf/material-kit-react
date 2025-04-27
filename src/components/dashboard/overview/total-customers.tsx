@@ -1,3 +1,4 @@
+"use client"
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Card from '@mui/material/Card';
@@ -5,21 +6,50 @@ import CardContent from '@mui/material/CardContent';
 import Stack from '@mui/material/Stack';
 import type { SxProps } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import { ArrowDown as ArrowDownIcon } from '@phosphor-icons/react/dist/ssr/ArrowDown';
-import { ArrowUp as ArrowUpIcon } from '@phosphor-icons/react/dist/ssr/ArrowUp';
 import { Users as UsersIcon } from '@phosphor-icons/react/dist/ssr/Users';
+import { CircularProgress } from '@mui/material';
+import { useTranslations } from 'next-intl';
+import axiosInstance from '@/utils/axiosInstance';
+import dayjs from 'dayjs';
 
 export interface TotalCustomersProps {
-  diff?: number;
-  trend: 'up' | 'down';
   sx?: SxProps;
-  value: string;
 }
 
-export function TotalCustomers({ diff, trend, sx, value }: TotalCustomersProps): React.JSX.Element {
-  const TrendIcon = trend === 'up' ? ArrowUpIcon : ArrowDownIcon;
-  const trendColor = trend === 'up' ? 'var(--mui-palette-success-main)' : 'var(--mui-palette-error-main)';
-
+export function TotalCustomers({ sx }: TotalCustomersProps): React.JSX.Element {
+  const t = useTranslations('common');
+  const [data, setData] = React.useState<any>();
+  const [loading, setLoading] = React.useState<boolean>(false);
+   React.useEffect(() => {
+      const fetchReportData = async () => {
+        setLoading(true);
+        try {
+          const today = dayjs();
+          const tomorrow = today.add(1, 'day');
+      
+          const response = await axiosInstance.post(
+            `https://fruits-heaven-api.vercel.app/api/v1/order/newCustomers`,
+            {
+              startDate: today.format('YYYY-MM-DD'),
+              endDate: tomorrow.format('YYYY-MM-DD'),
+            }
+          );
+          setData(response.data.data);
+        } catch (error) {
+          console.error('Error fetching report:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchReportData();
+    }, []);
+  if (loading) {
+    return (
+      <Stack alignItems="center" py={4}>
+        <CircularProgress />
+      </Stack>
+    );
+  }
   return (
     <Card sx={sx}>
       <CardContent>
@@ -27,27 +57,14 @@ export function TotalCustomers({ diff, trend, sx, value }: TotalCustomersProps):
           <Stack direction="row" sx={{ alignItems: 'flex-start', justifyContent: 'space-between' }} spacing={3}>
             <Stack spacing={1}>
               <Typography color="text.secondary" variant="overline">
-                Total Customers
+                {t("New Customers")}
               </Typography>
-              <Typography variant="h4">{value}</Typography>
+              <Typography variant="h4">{data?.length}</Typography>
             </Stack>
             <Avatar sx={{ backgroundColor: 'var(--mui-palette-success-main)', height: '56px', width: '56px' }}>
               <UsersIcon fontSize="var(--icon-fontSize-lg)" />
             </Avatar>
           </Stack>
-          {diff ? (
-            <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
-              <Stack sx={{ alignItems: 'center' }} direction="row" spacing={0.5}>
-                <TrendIcon color={trendColor} fontSize="var(--icon-fontSize-md)" />
-                <Typography color={trendColor} variant="body2">
-                  {diff}%
-                </Typography>
-              </Stack>
-              <Typography color="text.secondary" variant="caption">
-                Since last month
-              </Typography>
-            </Stack>
-          ) : null}
         </Stack>
       </CardContent>
     </Card>

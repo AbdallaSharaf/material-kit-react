@@ -4,7 +4,6 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { config } from '@/config';
 import { OrdersTable } from '@/components/dashboard/orders/orders-table';
-import OrderSettingsModal from '@/components/dashboard/orders/order-settings-modal';
 import { useTranslations } from 'next-intl';
 
 export const metadata = {
