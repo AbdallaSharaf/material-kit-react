@@ -45,8 +45,7 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
       metaTags: product?.metaTags || [] as string[],
       category: product?.category?.map(cat => ({
         category: cat.category._id || '', // Mapping `_id` to `category`
-        order: cat.order || 1// Keeping order as is
-      })) || (categoryId ? [{ category: categoryId, order: 1 }] : []),
+      })) || (categoryId ? [{ category: categoryId }] : []),
       available: product?.available ?? true,
       price: product?.price || 0,
       SKU: product?.SKU || 0,
@@ -336,17 +335,6 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                             </MenuItem>
                           ))}
                         </Select>
-
-                        <TextField
-                          type="number"
-                          name={`category.${index}.order`}
-                          label="Order"
-                          value={cat.order}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          error={Boolean(formik.touched.category?.[index]?.order && (formik.errors.category?.[index] as any)?.order)}
-                          helperText={formik.touched.category?.[index]?.order && (formik.errors.category?.[index] as any)?.order}
-                          />
                           <IconButton onClick={() => remove(index)} color="error">
                             <CloseIcon />
                           </IconButton>                      

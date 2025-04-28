@@ -127,7 +127,7 @@ export const fetchProductsByCategory = createAsyncThunk<
       const url = new URL(`${API_URL}/category/${params.id}`);
       url.searchParams.set('deleted', 'false');
       url.searchParams.set('PageCount', params.pageSize);
-      url.searchParams.set('sort', "order");
+      // url.searchParams.set('sort', "order");
       url.searchParams.set('page', page+1);
       if (params.columnFilters && params.columnFilters.length > 0) {
         params.columnFilters.forEach((filter: any) => {
