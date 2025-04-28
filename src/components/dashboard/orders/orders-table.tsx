@@ -511,7 +511,7 @@ const handleDownload = async (rowData: any) => {
         }
         
         layoutMode="grid"
-        renderTopToolbarCustomActions={({ table }) => <CustomToolbar table={table} data={orders} />}
+        renderTopToolbarCustomActions={({ table }) => <CustomToolbar table={table} />}
         muiTableHeadRowProps={{
           sx: {
             height: '50px', // increase header row height
