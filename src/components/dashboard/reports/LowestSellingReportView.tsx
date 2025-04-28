@@ -19,9 +19,6 @@ const LowestSellingReportView = ({ data }: any) => {
           <Typography>
             <strong>{t('quantitySold')}:</strong> {product.totalQuantitySold}
           </Typography>
-          <Typography>
-            <strong>{t('productId')}:</strong> {product._id}
-          </Typography>
           <Divider />
         </Stack>
       ))}

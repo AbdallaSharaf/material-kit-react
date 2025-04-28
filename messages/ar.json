@@ -163,6 +163,8 @@
         "product": "منتج",
         "shipping": "الشحن",
         "active": "نشط",
+        "lowestSellingProducts": "المنتجات الأقل مبيعًا",
+        "quantitySold": "الكمية المباعة",
         "Offers Paragraph": "فقرة العروض",
         "Paragraph (English)": "الفقرة (بالإنجليزية)",
         "Paragraph (Arabic)": "الفقرة (بالعربية)",

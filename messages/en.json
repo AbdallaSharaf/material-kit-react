@@ -18,6 +18,8 @@
     },
     "common":{
         "products": "Products",
+        "lowestSellingProducts": "Lowest Selling Products",
+        "quantitySold": "Quantity Sold",
         "Overview": "Overview",
         "Account": "Account",
         "Orders": "Orders",
