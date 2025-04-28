@@ -179,7 +179,7 @@ export const updateProduct = createAsyncThunk<
   async ({ id, updatedData }, { rejectWithValue }) => {    
     try {
       const response = await axios.put<ProductOut, AxiosResponse<{message: string, Product: ProductIn}, any>>(`${API_URL}/${id}`, updatedData);
-      console.log(response.data.Product)
+      // console.log(response.data.Product)
       return response.data.Product;
     } catch (error: any) {
       return rejectWithValue(

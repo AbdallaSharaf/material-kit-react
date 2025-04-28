@@ -300,24 +300,29 @@ export function ProductsTable(): React.JSX.Element {
       }}
         layoutMode='grid'
         renderTopToolbarCustomActions = {({ table }) => (<CustomToolbar table={table} data={products}/>)}
-        renderRowActions= {({ row }) => (
-          <Box sx={{ display: 'flex', gap: '4px'}}>
+        renderRowActions={({ row }) => (
+          <Box sx={{ display: 'flex', gap: '4px' }}>
             <Tooltip title={t("Edit")}>
-              <IconButton onClick={() => router.push(`products/edit/${row.original._id}`)}>
-                <i
-                  className="fa fa-pencil !text-sm text-yellow-500 hover:text-yellow-600 cursor-pointer"
-                ></i>
+              <IconButton
+                onClick={() => {
+                  let url = `products/edit/${row.original._id}`;
+                  if (categoryId) {
+                    url += `?category=${categoryId}`;
+                  }
+                  router.push(url);
+                }}
+              >
+                <i className="fa fa-pencil !text-sm text-yellow-500 hover:text-yellow-600 cursor-pointer"></i>
               </IconButton>
             </Tooltip>
+        
             <Tooltip title={t("Delete")}>
               <IconButton color="error" onClick={() => handleDelete(row.original)}>
-                <i
-                  className="fa fa-trash !text-sm text-red-500 hover:text-red-600 cursor-pointer"
-                ></i>
+                <i className="fa fa-trash !text-sm text-red-500 hover:text-red-600 cursor-pointer"></i>
               </IconButton>
             </Tooltip>
           </Box>
-        )}
+        )}        
         muiTableHeadCellProps={{
           sx: {
             '& .Mui-TableHeadCell-Content-Wrapper': {

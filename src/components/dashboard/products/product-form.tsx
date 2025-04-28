@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import { ImageGalleryUploader } from './image-gallery-uploader';
 import Link from 'next/link';
 import dayjs from 'dayjs';
+import { useSearchParams } from 'next/navigation';
 
 // Validation Schema
 
@@ -26,11 +27,13 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
   const { categories, refreshData } = useSelector((state: RootState) => state.categories);
   const [thumbnail, setThumbnail] = useState<string>(product?.imgCover || "");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const searchParams = useSearchParams();
+  const categoryId = searchParams.get("category"); // Get category ID from params
   React.useEffect(() => {
     fetchData();
   }, [refreshData]);
   // console.log(product)
-  console.log(product?.priceAfterDiscount)
+  // console.log(product?.priceAfterDiscount)
   const formik = useFormik({
     initialValues: {
       name_ar: product?.name?.ar ||"",
@@ -43,7 +46,7 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
       category: product?.category?.map(cat => ({
         category: cat.category._id || '', // Mapping `_id` to `category`
         order: cat.order || 1// Keeping order as is
-      })) || [],
+      })) || (categoryId ? [{ category: categoryId, order: 1 }] : []),
       available: product?.available ?? true,
       price: product?.price || 0,
       SKU: product?.SKU || 0,
@@ -107,7 +110,10 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
     }),
     onSubmit: async (values) => {
       const { name_ar, name_en, description_ar, description_en, shortDesc_ar, shortDesc_en, ...rest } = values;
-    
+      let url = '/dashboard/products';
+      if (categoryId) {
+        url += `?category=${categoryId}`;
+      }
       const formattedData: ProductOut = {
         ...rest,
         name: {
@@ -174,7 +180,7 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
         });
     
         if (isSuccess) {
-          router.push("/dashboard/products");
+          router.push(url);
           formik.resetForm();
         }
     
@@ -182,7 +188,7 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
         // Creating new product
         const isSuccess = await handleCreateProduct(formattedData);
         if (isSuccess) {
-          router.push("/dashboard/products");
+          router.push(url);
           formik.resetForm();
         }
       }

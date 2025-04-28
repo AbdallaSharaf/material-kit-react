@@ -6,7 +6,7 @@ import { mkConfig, generateCsv, download } from 'export-to-csv'; //or use your l
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { MRT_Row } from 'material-react-table';
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ProductIn } from '@/interfaces/productInterface';
 import { useTranslations } from 'next-intl';
 
@@ -19,7 +19,8 @@ const csvConfig = mkConfig({
 
 export default function CustomToolbar({table, data}: any) {
   const t = useTranslations("common");
-
+  const searchParams = useSearchParams();
+  const categoryId = searchParams.get("category"); // Get category ID from params
     const router = useRouter()
 
   const handleExportRows = (rows: MRT_Row<ProductIn>[]) => {
@@ -53,7 +54,15 @@ export default function CustomToolbar({table, data}: any) {
         flexWrap: 'wrap',
         }}
     >
-        <Button variant="contained" onClick={()=>router.push(`products/add`)}
+        <Button
+            variant="contained"
+            onClick={() => {
+              let url = 'products/add';
+              if (categoryId) {
+                url += `?category=${categoryId}`;
+              }
+              router.push(url);
+            }}
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <span>{t("Add")}</span>
           <PlusIcon style={{ fontSize: 'var(--icon-fontSize-md)'}} />
