@@ -223,10 +223,6 @@ const couponsSlice = createSlice({
         })
         .addCase(updateCoupon.fulfilled, (state, action: PayloadAction<CouponIn>) => {
           state.loading = false;
-          const index = state.activeCoupons.findIndex((z) => z._id === action.payload._id);
-          if (index !== -1) {
-            state.activeCoupons[index] = action.payload;
-          }
         })
         .addCase(updateCoupon.rejected, (state, action) => {
           state.loading = false;

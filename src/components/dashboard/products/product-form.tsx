@@ -30,6 +30,7 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
     fetchData();
   }, [refreshData]);
   // console.log(product)
+  console.log(product?.priceAfterDiscount)
   const formik = useFormik({
     initialValues: {
       name_ar: product?.name?.ar ||"",
