@@ -19,6 +19,12 @@
     "common":{
         "products": "المنتجات",
         "Overview": "نظرة عامة",
+        "name": "الاسم",
+        "phone": "الهاتف",
+        "date": "التاريخ",
+        "visible": "مرئي",
+        "rating": "التقييم",
+        "comment": "التعليق",
         "Account": "الحساب",
         "disableFractionalQuantity": "تعطيل الكمية المقطعة",
         "Orders": "الطلبات",
