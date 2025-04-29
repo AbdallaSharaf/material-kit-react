@@ -1,32 +1,27 @@
-"use client"
+'use client';
+
 import React, { useEffect, useState } from 'react';
-import {
-  Stack,
-  Typography,
-  Paper,
-  CircularProgress,
-  TextField,
-  MenuItem,
-} from '@mui/material';
+import { CircularProgress, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material';
+import { DateRangePicker } from 'rsuite';
 import * as XLSX from 'xlsx';
 
-import { DateRangePicker } from 'rsuite';
 import 'rsuite/dist/rsuite.min.css';
-import dayjs from 'dayjs';
+
+import axios from '@/utils/axiosInstance';
+import { handleDownloadExcel } from '@/utils/generateExcel';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { Button } from '@mui/material';
-import axios from '@/utils/axiosInstance';
+import dayjs from 'dayjs';
+import Swal from 'sweetalert2';
 
+import HighValueCustomersReportView from './highValueCustomers';
+import LowestSellingReportView from './LowestSellingReportView';
+import MonthlyComparisonReportView from './monthlyComparison';
+import NewCustomersReportView from './newCustomers';
+import OrdersReportView from './ordersReportView';
+import RepeatedCustomersReportView from './repeatedCustomers';
 import SalesReportView from './salesReportView';
 import TopSellingProductsReportView from './topSellingByQty';
-import RepeatedCustomersReportView from './repeatedCustomers';
-import NewCustomersReportView from './newCustomers';
-import HighValueCustomersReportView from './highValueCustomers';
-import OrdersReportView from './ordersReportView';
-import MonthlyComparisonReportView from './monthlyComparison';
-import Swal from 'sweetalert2';
-import { handleDownloadExcel } from '@/utils/generateExcel';
-import LowestSellingReportView from './LowestSellingReportView';
 
 interface ReportsProps {
   reportKey: string;
@@ -61,10 +56,7 @@ export const ReportsCard = ({ reportKey, title }: ReportsProps) => {
           };
         }
 
-        const response = await axios.post(
-          `https://fruits-heaven-api.vercel.app/api/v1/order/${reportKey}`,
-          payload
-        );
+        const response = await axios.post(`https://fruits-heaven-api.onrender.com/api/v1/order/${reportKey}`, payload);
         setData(response.data.data);
       } catch (error) {
         console.error('Error fetching report:', error);
@@ -115,7 +107,7 @@ export const ReportsCard = ({ reportKey, title }: ReportsProps) => {
           select
           label="Select Year"
           value={year}
-          size='small'
+          size="small"
           onChange={(e) => setYear(Number(e.target.value))}
           sx={{ minWidth: 150 }}
         >

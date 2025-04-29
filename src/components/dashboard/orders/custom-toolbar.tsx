@@ -1,6 +1,8 @@
-"use client";
-import React, { useState, useEffect } from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import { OrderIn } from '@/interfaces/orderInterface';
+import axiosInstance from '@/utils/axiosInstance';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { Button } from '@mui/material';
 import { Box } from '@mui/system';
@@ -8,7 +10,6 @@ import dayjs from 'dayjs';
 import { download, generateCsv, mkConfig } from 'export-to-csv';
 import { MRT_Row } from 'material-react-table';
 import { useTranslations } from 'next-intl';
-import axiosInstance from '@/utils/axiosInstance';
 
 const csvConfig = mkConfig({
   fieldSeparator: ',',
@@ -63,9 +64,9 @@ export default function CustomToolbar({ table }: { table: any }) {
       setIsLoading(true);
       try {
         // Fetch all orders from your API
-        const response = await axiosInstance.get('https://fruits-heaven-api.vercel.app/api/v1/order?PageCount=all');
+        const response = await axiosInstance.get('https://fruits-heaven-api.onrender.com/api/v1/order?PageCount=all');
         const data = response.data;
-        console.log(data.data)
+        console.log(data.data);
         if (!data || !data.data || data.data.length === 0) {
           throw new Error('No data available');
         }
@@ -83,9 +84,7 @@ export default function CustomToolbar({ table }: { table: any }) {
           PaymentMethod: order?.paymentMethod,
           PaymentStatus: order?.isPaid ? t('Paid') : t('Unpaid'),
           DeliveryStatus: order?.isDelivered ? t('Delivered') : t('Pending'),
-          Items: order?.items
-            .map((item) => `${item?.quantity} x ${item?.name?.en || item?.name?.ar || ''}`)
-            .join('; '),
+          Items: order?.items.map((item) => `${item?.quantity} x ${item?.name?.en || item?.name?.ar || ''}`).join('; '),
           Subtotal: order?.subTotal.toFixed(2),
           ShippingFee: order?.shippingFee.toFixed(2),
           Total: order?.totalPrice.toFixed(2),
@@ -95,7 +94,6 @@ export default function CustomToolbar({ table }: { table: any }) {
         // Generate and download CSV
         const csv = generateCsv(csvConfig)(rowData);
         download(csvConfig)(csv);
-
       } catch (error) {
         console.error('Error exporting all data:', error);
         // Optionally show error to user
@@ -122,21 +120,15 @@ export default function CustomToolbar({ table }: { table: any }) {
         style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
         disabled={isLoading}
       >
-        <span>
-          {isLoading ? t('Loading') : t('Export All Data')}
-        </span>
+        <span>{isLoading ? t('Loading') : t('Export All Data')}</span>
         <FileDownloadIcon style={{ fontSize: 'var(--icon-fontSize-md)' }} />
       </Button>
       <Button
-        disabled={
-          !table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()
-        }
+        disabled={!table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()}
         onClick={() => handleExportRows(table.getSelectedRowModel().rows)}
         style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
       >
-        <span>
-          {t('Export Selected Rows')}
-        </span>
+        <span>{t('Export Selected Rows')}</span>
         <FileDownloadIcon style={{ fontSize: 'var(--icon-fontSize-md)' }} />
       </Button>
     </Box>

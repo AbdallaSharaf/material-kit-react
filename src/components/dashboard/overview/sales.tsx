@@ -1,6 +1,8 @@
 'use client';
 
 import * as React from 'react';
+import axiosInstance from '@/utils/axiosInstance';
+import { CircularProgress } from '@mui/material';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -9,15 +11,13 @@ import CardHeader from '@mui/material/CardHeader';
 import Divider from '@mui/material/Divider';
 import { alpha, useTheme } from '@mui/material/styles';
 import type { SxProps } from '@mui/material/styles';
+import { Stack } from '@mui/system';
 import { ArrowClockwise as ArrowClockwiseIcon } from '@phosphor-icons/react/dist/ssr/ArrowClockwise';
 import { ArrowRight as ArrowRightIcon } from '@phosphor-icons/react/dist/ssr/ArrowRight';
 import type { ApexOptions } from 'apexcharts';
+import { useTranslations } from 'next-intl';
 
 import { Chart } from '@/components/core/chart';
-import { useTranslations } from 'next-intl';
-import axiosInstance from '@/utils/axiosInstance';
-import { CircularProgress } from '@mui/material';
-import { Stack } from '@mui/system';
 
 export interface SalesProps {
   sx?: SxProps;
@@ -34,7 +34,7 @@ export function Sales({ sx }: SalesProps): React.JSX.Element {
     setLoading(true);
     try {
       const response = await axiosInstance.post(
-        `https://fruits-heaven-api.vercel.app/api/v1/order/monthlyComparison`,
+        `https://fruits-heaven-api.onrender.com/api/v1/order/monthlyComparison`,
         { year: currentYear }
       );
       setData(response.data.data);
@@ -49,12 +49,12 @@ export function Sales({ sx }: SalesProps): React.JSX.Element {
     fetchReportData();
   }, []);
 
-  console.log(data)
+  console.log(data);
   // Transform API data to chart series format
   const chartSeries = React.useMemo(() => {
     // Initialize an array with 12 months (0-11) and default sales of 0
     const monthlySales = Array(12).fill(0);
-  
+
     if (Array.isArray(data)) {
       data.forEach((item) => {
         if (item?.month != null && item?.totalSales != null) {
@@ -63,7 +63,7 @@ export function Sales({ sx }: SalesProps): React.JSX.Element {
         }
       });
     }
-  
+
     return [
       {
         name: 'Sales',
@@ -84,9 +84,9 @@ export function Sales({ sx }: SalesProps): React.JSX.Element {
     <Card sx={sx}>
       <CardHeader
         action={
-          <Button 
-            color="inherit" 
-            size="small" 
+          <Button
+            color="inherit"
+            size="small"
             startIcon={<ArrowClockwiseIcon fontSize="var(--icon-fontSize-md)" />}
             onClick={fetchReportData}
             disabled={loading}

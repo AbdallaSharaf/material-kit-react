@@ -1,8 +1,9 @@
-import { Typography } from "@mui/material";
-import { Stack } from "@mui/system";
-import React from "react";
-import CouponForm from "@/components/dashboard/coupons/coupon-form";
-import { getTranslations } from "next-intl/server";
+import React from 'react';
+import { Typography } from '@mui/material';
+import { Stack } from '@mui/system';
+import { getTranslations } from 'next-intl/server';
+
+import CouponForm from '@/components/dashboard/coupons/coupon-form';
 
 interface PageProps {
   params: { id: string };
@@ -10,10 +11,10 @@ interface PageProps {
 
 const getCouponById = async (id: string) => {
   try {
-    const res = await fetch(`https://fruits-heaven-api.vercel.app/api/v1/coupon/${id}`, {
-      method: "GET",
+    const res = await fetch(`https://fruits-heaven-api.onrender.com/api/v1/coupon/${id}`, {
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
 
@@ -22,23 +23,23 @@ const getCouponById = async (id: string) => {
     const data = await res.json();
     return data.coupon;
   } catch (error) {
-    console.error("Error fetching coupon:", error);
+    console.error('Error fetching coupon:', error);
     return null;
   }
 };
 
 const CouponPage = async ({ params }: PageProps) => {
   const { id } = params;
-  const t = await getTranslations("common");
+  const t = await getTranslations('common');
 
-  if (!id) throw new Error("No coupon ID provided");
+  if (!id) throw new Error('No coupon ID provided');
 
   const coupon = await getCouponById(id);
 
   if (!coupon) {
     return (
       <Stack spacing={3}>
-        <Typography variant="h4">{t("CouponNotFound")}</Typography>
+        <Typography variant="h4">{t('CouponNotFound')}</Typography>
       </Stack>
     );
   }
@@ -48,7 +49,7 @@ const CouponPage = async ({ params }: PageProps) => {
       <Stack direction="row" spacing={3}>
         <div className="flex w-full justify-between items-center">
           <Typography variant="h4">
-            {t("Edit")} {coupon.code}
+            {t('Edit')} {coupon.code}
           </Typography>
         </div>
       </Stack>

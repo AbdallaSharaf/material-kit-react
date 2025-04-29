@@ -1,6 +1,8 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from '../../utils/axiosInstance';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+
 import { User } from '@/types/user';
+
+import axios from '../../utils/axiosInstance';
 
 interface AuthState {
   user: User | null;
@@ -21,40 +23,31 @@ const initialState: AuthState = {
 const API_URL = `${process.env.VITE_BASE_URL}auth`;
 
 // ✅ Fetch User Data
-export const fetchUserData = createAsyncThunk<
-  User,
-  void,
-  { rejectValue: string }
->('auth/fetchUserData', async (_, { rejectWithValue }) => {
-  try {
-    const response = await axios.get('https://fruits-heaven-api.vercel.app/api/v1/user/myData');
-    return response.data.user;
-  } catch (error: any) {
-    return rejectWithValue(error.response?.data?.error || 'Failed to fetch user data');
-  }
-});
-
-export const changePassword = createAsyncThunk<
-  any,        // ✅ Return type on success
-  any,        // ✅ Argument type (account data to update)
-  { rejectValue: string }
->(
-  'account/changePassword',
-  async (accountData, { rejectWithValue }) => {
+export const fetchUserData = createAsyncThunk<User, void, { rejectValue: string }>(
+  'auth/fetchUserData',
+  async (_, { rejectWithValue }) => {
     try {
-
-      // Call your update API (adjust endpoint if needed)
-      const response = await axios.put(`${API_URL}/changeMyPassword`, accountData);
-      return response.data;
+      const response = await axios.get('https://fruits-heaven-api.onrender.com/api/v1/user/myData');
+      return response.data.user;
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message ||
-        error.message ||
-        'Failed to update account'
-      );
+      return rejectWithValue(error.response?.data?.error || 'Failed to fetch user data');
     }
   }
 );
+
+export const changePassword = createAsyncThunk<
+  any, // ✅ Return type on success
+  any, // ✅ Argument type (account data to update)
+  { rejectValue: string }
+>('account/changePassword', async (accountData, { rejectWithValue }) => {
+  try {
+    // Call your update API (adjust endpoint if needed)
+    const response = await axios.put(`${API_URL}/changeMyPassword`, accountData);
+    return response.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || error.message || 'Failed to update account');
+  }
+});
 
 // ✅ Login action
 export const loginUser = createAsyncThunk<
@@ -78,22 +71,19 @@ export const loginUser = createAsyncThunk<
 });
 
 // ✅ Restore session
-export const restoreSession = createAsyncThunk(
-  'auth/restoreSession',
-  async (_, { rejectWithValue, dispatch }) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('No token found');
+export const restoreSession = createAsyncThunk('auth/restoreSession', async (_, { rejectWithValue, dispatch }) => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('No token found');
 
-      // ✅ Fetch user data if token exists
-      await dispatch(fetchUserData());
+    // ✅ Fetch user data if token exists
+    await dispatch(fetchUserData());
 
-      return { token };
-    } catch (error) {
-      return rejectWithValue('Invalid token');
-    }
+    return { token };
+  } catch (error) {
+    return rejectWithValue('Invalid token');
   }
-);
+});
 
 // ✅ Logout action
 export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {
@@ -121,7 +111,7 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Login failed';
-      })
+      });
 
     builder
       // ✅ Login
@@ -131,14 +121,14 @@ const authSlice = createSlice({
       })
       .addCase(changePassword.fulfilled, (state, action) => {
         state.loading = false;
-        console.log(action)
+        console.log(action);
         // state.token = action.payload.token;
       })
       .addCase(changePassword.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Password change failed';
       })
-      
+
       // ✅ Fetch User Data
       .addCase(fetchUserData.fulfilled, (state, action) => {
         state.user = action.payload;
@@ -148,7 +138,7 @@ const authSlice = createSlice({
         state.user = null;
         state.isAuthenticated = false;
       })
-      
+
       // ✅ Restore session
       .addCase(restoreSession.fulfilled, (state, action) => {
         state.token = action.payload.token;

@@ -1,9 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { Stack, Typography, TextField, Button, Paper, CircularProgress } from '@mui/material';
-import { useTranslations } from 'next-intl';
 import axios from '@/utils/axiosInstance';
+import { Button, CircularProgress, Paper, Stack, TextField, Typography } from '@mui/material';
+import { useTranslations } from 'next-intl';
 
 export function OffersParagraphCard(): React.JSX.Element {
   const t = useTranslations('common');
@@ -19,9 +19,9 @@ export function OffersParagraphCard(): React.JSX.Element {
     const fetchSettings = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`https://fruits-heaven-api.vercel.app/api/v1/siteSettings/${id}`);
+        const res = await axios.get(`https://fruits-heaven-api.onrender.com/api/v1/siteSettings/${id}`);
         const data = res.data.SiteSettings.offersParagraph;
-        console.log(data)
+        console.log(data);
         setEnglishParagraph(data.en ?? '');
         setArabicParagraph(data.ar ?? '');
       } catch (error) {
@@ -37,11 +37,11 @@ export function OffersParagraphCard(): React.JSX.Element {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await axios.put(`https://fruits-heaven-api.vercel.app/api/v1/siteSettings/${id}`, {
-        offersParagraph:{
-            en: englishParagraph,
-            ar: arabicParagraph,
-        }
+      await axios.put(`https://fruits-heaven-api.onrender.com/api/v1/siteSettings/${id}`, {
+        offersParagraph: {
+          en: englishParagraph,
+          ar: arabicParagraph,
+        },
       });
       // You can show success feedback here if you want
     } catch (error) {

@@ -36,14 +36,14 @@ class AuthClient {
 
     // Make API request
 
-    const res = await fetch(`https://fruits-heaven-api.vercel.app/api/v1/auth/SignIn`, {
+    const res = await fetch(`https://fruits-heaven-api.onrender.com/api/v1/auth/SignIn`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
-    
+
     const data = await res.json();
-    
+
     if (!res.ok) {
       return { error: data.message || 'Invalid credentials' };
     }
@@ -68,17 +68,17 @@ class AuthClient {
     if (!token) {
       return { data: null }; // No token is not an error — just unauthenticated
     }
-    const res = await fetch(`https://fruits-heaven-api.vercel.app/api/v1/user/myData`, {
+    const res = await fetch(`https://fruits-heaven-api.onrender.com/api/v1/user/myData`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    
+
     const data = await res.json();
     if (!res.ok) {
       return { error: data.message, data: null };
     }
-    
+
     return { data };
   }
 
