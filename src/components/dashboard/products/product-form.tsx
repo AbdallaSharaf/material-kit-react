@@ -347,7 +347,7 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
                           </div>
                     ))}
                     </div>
-                    <Button onClick={() => push({ category: '', order: 1 })} color="primary">+ Add Category</Button>
+                    <Button onClick={() => push({ category: ''})} color="primary">+ Add Category</Button>
                   </>
                 )}
               </FieldArray>

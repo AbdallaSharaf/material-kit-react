@@ -65,9 +65,15 @@ export const fetchOrders = createAsyncThunk<
           url.searchParams.append(filter.id, filter.value);
         });
       }
-      { params.sorting && params.sorting.length > 0 && params.sorting.forEach((sort:any) => {
-        url.searchParams.append('sort', sort.desc ? `-${sort.id}` : sort.id);
-      });}
+      if (params.sorting && params.sorting.length > 0) {
+        params.sorting.forEach((sort: any) => {
+          url.searchParams.append('sort', sort.desc ? `-${sort.id}` : sort.id);
+        });
+      } else {
+        // Default sorting by createdAt descending
+        url.searchParams.append('sort', '-createdAt');
+        // url.searchParams.append('sort', 'status');
+      }
       const response = await axios.get(url.href);
       const { data, TotalCount } = response.data;
       return { orders: data, totalCount: TotalCount };

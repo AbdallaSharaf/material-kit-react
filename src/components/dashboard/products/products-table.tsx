@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from 'react';
-import { MaterialReactTable, MRT_ColumnDef, MRT_TableOptions } from 'material-react-table';
+import { MaterialReactTable, MRT_Cell, MRT_ColumnDef, MRT_Row, MRT_TableOptions } from 'material-react-table';
 import { IconButton, Paper, Switch, Tooltip } from '@mui/material';
 import CustomToolbar from './custom-toolbar';
 import { Box } from '@mui/system';
@@ -60,6 +60,7 @@ export function ProductsTable(): React.JSX.Element {
           size: 70,
           enableColumnActions: false,
           enableSorting: false,
+          enableEditing: false,
         },
         {
           accessorKey: "imgCover",
@@ -67,6 +68,7 @@ export function ProductsTable(): React.JSX.Element {
           enableColumnActions: false,
           enableSorting: false,
           enableColumnFilter: false,
+          enableEditing: false,
           size: 60,
           Cell: ({ row }) => (
             <img
@@ -86,6 +88,7 @@ export function ProductsTable(): React.JSX.Element {
           header: t("Name"),
           grow: true,
           size: 140,
+          enableEditing: false,
           enableColumnActions: false,
           enableColumnFilter: true,
           Cell: ({ row }) =>
@@ -95,6 +98,7 @@ export function ProductsTable(): React.JSX.Element {
           accessorKey: "price",
           header: t("Price"),
           size: 100,
+          enableEditing: false,
           filterVariant: "range-slider",
           muiFilterSliderProps: {
             marks: true,
@@ -117,6 +121,7 @@ export function ProductsTable(): React.JSX.Element {
           size: 90,
           enableSorting: false,
           enableColumnFilter: false,
+          enableEditing: false,
           enableColumnActions: false,
           filterVariant: "select",
           filterSelectOptions: [
@@ -141,6 +146,7 @@ export function ProductsTable(): React.JSX.Element {
           header: t("Sold"),
           grow: true,
           size: 140,
+          enableEditing: false,
           enableColumnActions: false,
           enableColumnFilter: false,
         },
@@ -150,6 +156,7 @@ export function ProductsTable(): React.JSX.Element {
           grow: true,
           size: 140,
           enableColumnActions: false,
+          enableEditing: false,
           enableColumnFilter: false,
         },
       ];
@@ -159,6 +166,7 @@ export function ProductsTable(): React.JSX.Element {
         header: t("Categories"),
         size: 140,
         filterVariant: "select",
+        enableEditing: false,
         filterSelectOptions: categories?.map((category) => ({
           label: category.name?.[locale],
           value: category?._id,
@@ -187,6 +195,7 @@ export function ProductsTable(): React.JSX.Element {
       const orderInCatColumn: MRT_ColumnDef<ProductIn> = {
         accessorFn: (row) => row.category?.map((category) => category.order),
         header: t("Order in Category"),
+        id: "orderInCategory",
         enableColumnFilter: false,
         size: 140,
       };
@@ -239,7 +248,64 @@ export function ProductsTable(): React.JSX.Element {
         enableRowActions
         enableColumnResizing
         enableGlobalFilter={false}
-        onEditingRowSave={handleSaveRow} 
+        editDisplayMode="cell" 
+        enableEditing
+        onEditingRowSave={({ values, row }: { values: any; row: MRT_Row<ProductIn> }) => {
+          // Check which columns were actually edited with type safety
+          const changedColumns = (Object.keys(row._valuesCache) as Array<keyof ProductIn>).filter(
+            (key) => row.original[key] !== values[key]
+          );
+        
+          if (changedColumns.includes('order')) {
+            handleChangeOrder({ 
+              id: row.original._id, 
+              newOrder: Number(values.order) 
+            });
+          }
+          
+          if ((changedColumns as any).includes('orderInCategory')) {
+            if (!categoryId) {
+              console.error('Category ID is required for orderInCategory update');
+              return;
+            }
+            handleChangeOrderInCategory({ 
+              id: row.original._id, 
+              newOrder: Number(values.orderInCategory), 
+              category: categoryId 
+            });
+          }
+        }}
+        
+        muiEditTextFieldProps={({ cell }: { cell: MRT_Cell<ProductIn> }) => ({
+          onBlur: (event: React.FocusEvent<HTMLInputElement>) => {
+            // Only handle these specific columns with type guards
+            if (cell.column.id === 'order' || cell.column.id === 'orderInCategory') {
+              const newValue = Number(event.target.value);
+              
+              if (isNaN(newValue)) {
+                console.error('Invalid number value entered');
+                return;
+              }
+        
+              if (cell.column.id === 'order') {
+                handleChangeOrder({ 
+                  id: cell.row.original._id, 
+                  newOrder: newValue 
+                });
+              } else if (cell.column.id === 'orderInCategory') {
+                if (!categoryId) {
+                  console.error('Category ID is required for orderInCategory update');
+                  return;
+                }
+                handleChangeOrderInCategory({ 
+                  id: cell.row.original._id, 
+                  newOrder: newValue, 
+                  category: categoryId 
+                });
+              }
+            }
+          }
+        })}
         enableRowOrdering= {true}
         localization={locale === 'ar' ? MRT_Localization_AR : MRT_Localization_EN}
         columnFilterDisplayMode = 'popover'

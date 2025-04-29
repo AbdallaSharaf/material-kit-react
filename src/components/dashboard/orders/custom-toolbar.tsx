@@ -72,6 +72,7 @@ export default function CustomToolbar({ table }: { table: any }) {
         // Format the data for CSV
         const rowData = data.data.map((order: OrderIn) => ({
           OrderID: order?._id,
+          InvoiceID: order?.invoiceId,
           Customer: order?.shippingAddress?.name,
           Email: order?.shippingAddress?.email,
           Phone: order?.shippingAddress?.phone,

@@ -31,6 +31,7 @@ export interface OrderIn {
     }>;
     totalQuantity: number;
     totalPrice: number;
+    invoiceId: string;
     subTotal: number;
     notes: string;
     shippingFee: number;
