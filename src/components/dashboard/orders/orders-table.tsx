@@ -146,58 +146,65 @@ export function OrdersTable(): React.JSX.Element {
   // };
 
 
-const handleDownload = async (rowData: any) => {
-  try {
-    Swal.fire({
-      title: 'Generating Invoice...',
-      text: 'Please wait while we prepare your PDF.',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
-    
-    const res = await fetch(`https://sge-commerce.onrender.com/api/v1/order/invoice/${rowData._id}`);
-    const { data, contentType, filename } = await res.json();
-
-    if (!data) throw new Error('Missing PDF data');
-
-    // Decode base64 to byte array
-    const byteCharacters = atob(data); // make sure data is clean base64
-    const byteNumbers = new Array(byteCharacters.length)
-      .fill(0)
-      .map((_, i) => byteCharacters.charCodeAt(i));
-    const byteArray = new Uint8Array(byteNumbers);
-
-    const blob = new Blob([byteArray], { type: contentType });
-    const blobUrl = URL.createObjectURL(blob);
-
-    const link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = filename || `order_${rowData._id}.pdf`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(blobUrl);
-
-    Swal.fire({
-      icon: 'success',
-      title: 'Invoice Downloaded',
-      text: 'The invoice has been successfully downloaded.',
-      timer: 2000,
-      showConfirmButton: false,
-    });
-
-  } catch (error) {
-    console.error('Error downloading PDF:', error);
-    Swal.fire({
-      icon: 'error',
-      title: 'Download Failed',
-      text: 'An error occurred while downloading the invoice.',
-    });
-  }
-};
-
+  const handleDownload = async (rowData: { _id: string }) => {
+    try {
+      Swal.fire({
+        title: 'Generating Invoice...',
+        text: 'Please wait while we prepare your PDF.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+  
+   
+      const response = await axios.get(`https://fruits-heaven-api.onrender.com/api/v1/order/invoice/${rowData._id}`);
+  
+      const { data } = response;
+  
+      // Validate response format
+      if (!data || !data.data || !data.contentType || !data.filename) {
+        throw new Error('Invalid response from server');
+      }
+  
+      const { data: base64String, contentType, filename } = data;
+  
+      // Convert base64 to binary
+      const byteCharacters = atob(base64String); // decode base64
+      const byteNumbers = new Array(byteCharacters.length)
+        .fill(0)
+        .map((_, i) => byteCharacters.charCodeAt(i));
+      const byteArray = new Uint8Array(byteNumbers);
+  
+      // Create blob and download link
+      const blob = new Blob([byteArray], { type: contentType });
+      const blobUrl = URL.createObjectURL(blob);
+  
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = filename || `order_${rowData._id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(blobUrl); // clean up memory
+  
+      Swal.fire({
+        icon: 'success',
+        title: 'Invoice Downloaded',
+        text: 'The invoice has been successfully downloaded.',
+        timer: 2000,
+        showConfirmButton: false,
+      });
+  
+    } catch (error: any) {
+      console.error('Error downloading PDF:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Download Failed',
+        text: error?.message || 'An unexpected error occurred while downloading the invoice.',
+      });
+    }
+  };
   const t = useTranslations("common")
   const { fetchData, handleChangeStatus } = useOrderHandlers();
   const dispatch = useDispatch<AppDispatch>();
