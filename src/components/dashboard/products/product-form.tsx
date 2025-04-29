@@ -69,7 +69,6 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
         .of(
           Yup.object().shape({
             category: Yup.string().required('Please select a category'),
-            order: Yup.number().min(1, 'Order must be at least 1').required('Order is required'),
           })
         ),
       available: Yup.boolean(),

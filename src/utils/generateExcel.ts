@@ -86,6 +86,7 @@ export const handleDownloadExcel = (data: any, reportKey: string, title: string)
               : 'N/A',
             // 'Order Status': order.status || 'N/A'
           };
+          return baseFields
         });
 
         // Add summary row
