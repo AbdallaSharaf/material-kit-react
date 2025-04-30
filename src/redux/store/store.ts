@@ -7,6 +7,7 @@ import couponsReducer from '../slices/couponSlice';
 import ordersReducer from '../slices/orderSlice';
 import uiSettingsReducer from '../slices/uiSettingsSlice';
 import reviewsReducer from '../slices/reviewSlice';
+import customersReducer from '../slices/customerSlice';
 
 // import Cookies from 'js-cookie';
 import { User } from '../../types/user';
@@ -29,6 +30,7 @@ const store = configureStore({
     uiSettings: uiSettingsReducer,
     auth: authReducer,
     orders: ordersReducer,
+    customers: customersReducer,
   },
   preloadedState: {
     auth: {

@@ -4,12 +4,14 @@ import * as React from 'react';
 import axios from '@/utils/axiosInstance';
 import { Button, CircularProgress, Paper, Stack, TextField, Typography } from '@mui/material';
 import { useTranslations } from 'next-intl';
+import dayjs from 'dayjs';
 
 export function OffersParagraphCard(): React.JSX.Element {
   const t = useTranslations('common');
 
   const [englishParagraph, setEnglishParagraph] = React.useState('');
   const [arabicParagraph, setArabicParagraph] = React.useState('');
+  const [offersTime, setOffersTime] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
 
@@ -20,12 +22,13 @@ export function OffersParagraphCard(): React.JSX.Element {
       setLoading(true);
       try {
         const res = await axios.get(`https://fruits-heaven-api.onrender.com/api/v1/siteSettings/${id}`);
-        const data = res.data.SiteSettings.offersParagraph;
+        const data = res.data.SiteSettings;
         console.log(data);
-        setEnglishParagraph(data.en ?? '');
-        setArabicParagraph(data.ar ?? '');
+        setEnglishParagraph(data.offersParagraph?.en ?? '');
+        setArabicParagraph(data.offersParagraph?.ar ?? '');
+        setOffersTime(data.offersTime ?? '');
       } catch (error) {
-        console.error('Error fetching offer paragraphs:', error);
+        console.error('Error fetching offer settings:', error);
       } finally {
         setLoading(false);
       }
@@ -42,10 +45,11 @@ export function OffersParagraphCard(): React.JSX.Element {
           en: englishParagraph,
           ar: arabicParagraph,
         },
+        offersTime: offersTime,
       });
       // You can show success feedback here if you want
     } catch (error) {
-      console.error('Error updating offer paragraphs:', error);
+      console.error('Error updating offer settings:', error);
     } finally {
       setSaving(false);
     }
@@ -79,6 +83,19 @@ export function OffersParagraphCard(): React.JSX.Element {
               onChange={(e) => setArabicParagraph(e.target.value)}
               multiline
               rows={4}
+            />
+            <TextField
+              fullWidth
+              label={t('Offers End Time')}
+              type="datetime-local"
+              value={offersTime ? dayjs(offersTime).format('YYYY-MM-DDTHH:mm') : ''}
+              onChange={(e) => {
+                const newValue = e.target.value;
+                setOffersTime(newValue ? dayjs(newValue).toISOString() : '');
+              }}
+              InputLabelProps={{
+                shrink: true,
+              }}
             />
             <Button variant="contained" onClick={handleSave} disabled={saving}>
               {saving ? t('Saving') : t('Save')}

@@ -1,163 +1,153 @@
 'use client';
 
 import * as React from 'react';
-import { MaterialReactTable, MRT_ColumnDef, MRT_EditActionButtons, MRT_TableOptions } from 'material-react-table';
-import Avatar from '@mui/material/Avatar';
-import { DialogActions, DialogContent, DialogTitle, IconButton, Paper, Tooltip } from '@mui/material';
+import { MaterialReactTable, MRT_ColumnDef } from 'material-react-table';
+import { Paper } from '@mui/material';
 import CustomToolbar from './custom-toolbar';
-import { Box } from '@mui/system';
-import Swal from 'sweetalert2';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-
-
-export interface Customer {
-  id: string;
-  avatar: string;
-  name: string;
-  email: string;
-  ordersCount: number;
-  totalSpent: number;
-  phone: string;
-}
-
-interface CustomersTableProps {
-  data?: Customer[];
-}
-
-const handleSaveRow: MRT_TableOptions<Customer>['onEditingRowSave'] = ({
-  exitEditingMode,
-}) => {
-  exitEditingMode();
-};
+import { CustomerIn } from '@/interfaces/customerInterface';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/redux/store/store';
+import { useCustomerHandlers } from '@/controllers/customersController';
+import { useLocale, useTranslations } from 'next-intl';
+import { MRT_Localization_AR } from 'material-react-table/locales/ar';
+import { MRT_Localization_EN } from 'material-react-table/locales/en';
+import { setColumnFilters, setPagination, setSearchQuery, setSorting } from '@/redux/slices/customerSlice';
+import dayjs from 'dayjs';
 
 // Define columns outside the component to avoid defining them during render
-const columns: MRT_ColumnDef<Customer>[] = [
-  {
-    accessorKey: 'name',
-    header: 'Name',
-    Cell: ({ row }) => (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <Avatar src={row.original.avatar} />
-        {row.original.name}
-      </div>
-    ),
-  },
-  { accessorKey: 'phone', header: 'Phone' },
-  { accessorKey: 'email', header: 'Email' },
-  {
-    accessorKey: 'ordersCount',
-    header: 'NO. of orders',
-    enableEditing: false,
-  },
-  {
-    accessorKey: 'totalSpent',
-    header: 'Total Spent',
-    enableEditing: false,
-    filterVariant: 'range-slider',
-    muiFilterSliderProps: {
-      marks: true,
-      max: 10000, //custom max (as opposed to faceted max)
-      min: 100, //custom min (as opposed to faceted min)
-      step: 100,
-      valueLabelFormat: (value) =>
-        value.toLocaleString('en-US', {
-          style: 'currency',
-          currency: 'SAR',
-        }),
+
+
+
+export function CustomersTable(): React.JSX.Element {
+  const t = useTranslations("common");
+
+  const columns: MRT_ColumnDef<CustomerIn>[] = [
+    {
+      accessorKey: 'name',
+      header: t('name'),
+      enableSorting: false,
     },
-    Cell: ({ cell }) => <div>{cell.getValue<number>()} SAR</div>,
-  },
-];
-
-const handleDelete = async (id: string) => {
-  const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: 'This user will be deleted!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
-  });
-  console.log(id)
-  if (result.isConfirmed) {
-      try {
-          Swal.fire('Deleted!', 'The user has been deleted.', 'success');
-      } catch (error) {
-          console.error('Error deleting user:', error);
-          Swal.fire('Error!', 'There was a problem deleting the user.', 'error');
-      }
-  }
-};
-
-export function CustomersTable({
-  data = [],
-}: CustomersTableProps): React.JSX.Element {
-
-
+    {
+      accessorKey: 'phone',
+      header: t('phone'),
+      enableSorting: false,
+    },
+    {
+      accessorKey: 'email',
+      header: t('email'),
+      enableSorting: false,
+    },
+    {
+      accessorKey: 'createdAt',
+      header: t('registrationDate'),
+      Cell: ({ cell }) => dayjs(cell.getValue<string>()).format('YYYY-MM-DD HH:mm'),
+      enableColumnFilter: false,
+    },
+    {
+      accessorKey: 'lastLogin',
+      header: t('lastLogin'),
+      Cell: ({ cell }) => dayjs(cell.getValue<string>()).format('YYYY-MM-DD HH:mm'),
+      enableColumnFilter: false,
+    },
+    {
+      accessorKey: 'numberOfOrders',
+      header: t('numberOfOrders'),
+      enableColumnFilter: false,
+    },
+    {
+      accessorKey: 'ordersSum',
+      header: t('totalSpent'),
+      enableColumnFilter: false,
+      Cell: ({ cell }) => `${cell.getValue<number>().toFixed(2)} SAR`,
+    },
+  ];
+  
+  const { customers, searchQuery, columnFilters, pagination, rowCount, loading, sorting } = useSelector((state: RootState) => state.customers);
+  const { fetchData } = useCustomerHandlers();
+  const dispatch = useDispatch<AppDispatch>();
+  const locale = useLocale() as "ar" | "en";
+  React.useEffect(() => {
+    fetchData(); // Fetch products by category
+    }, [searchQuery, columnFilters, pagination, sorting]);
   return (
     <Paper>
       <MaterialReactTable 
         columns={columns} 
-        data={data} 
+        data={customers} 
         enableRowSelection
-        createDisplayMode= 'modal' //default ('row', and 'custom' are also available)
-        editDisplayMode= 'modal' //default ('row', 'cell', 'table', and 'custom' are also available)
-        enableEditing = {true}
-        enableRowActions
-        onEditingRowSave={handleSaveRow} 
+        enableGlobalFilter= {false}
         columnFilterDisplayMode = 'popover'
         positionToolbarAlertBanner= 'bottom'
-        getRowId = {(row) => row.id}
-        initialState= {{
-          columnPinning: {
-            right: ['mrt-row-actions'],
+        getRowId = {(row) => row._id}
+        localization={locale === 'ar' ? MRT_Localization_AR : MRT_Localization_EN}
+
+        columnResizeDirection= {locale ==='ar' ? 'rtl' : 'ltr'}
+
+        manualFiltering={true}
+        manualPagination={true}
+        manualSorting={true}
+        onSortingChange={(updaterOrValue) => {
+          const newSorting =
+          typeof updaterOrValue === "function"
+              ? updaterOrValue(sorting)
+              : updaterOrValue;
+          console.log(newSorting);
+          dispatch(setSorting(newSorting));
+      }}
+        onColumnFiltersChange={(updaterOrValue) => {
+            const newColumnFilters =
+            typeof updaterOrValue === "function"
+                ? updaterOrValue(columnFilters)
+                : updaterOrValue;
+            dispatch(setColumnFilters(newColumnFilters));
+        }}
+        // onGlobalFilterChange={(newGlobalFilter: string) => dispatch(setSearchQuery(newGlobalFilter))}        
+        muiDetailPanelProps= {() => ({
+          sx: (theme) => ({
+            backgroundColor:
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,210,244,0.1)'
+                : 'rgba(0,0,0,0.1)',
+          }),
+        })}
+        onPaginationChange={(updaterOrValue) => {
+          const newPagination =
+          typeof updaterOrValue === "function"
+              ? updaterOrValue(pagination)
+              : updaterOrValue;
+          dispatch(setPagination(newPagination));
+      }}
+      rowCount={rowCount}
+      state={{
+          globalFilter: searchQuery,
+          isLoading: loading,
+          pagination,
+          columnFilters,
+          sorting
+      }}
+        layoutMode='grid'
+
+        muiTableHeadCellProps={{
+          sx: {
+            '& .Mui-TableHeadCell-Content-Wrapper': {
+              height: 18,
+            },
+            '& .Mui-TableHeadCell-Content-Labels': {
+              height: 18,
+            },
           },
         }}
-        renderCreateRowDialogContent={ ({ table, row, internalEditComponents }) => (
-          <>
-            <DialogTitle variant="h3">Create New User</DialogTitle>
-            <DialogContent
-              sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
-            >
-              {internalEditComponents} {/* or render custom edit components here */}
-            </DialogContent>
-            <DialogActions>
-              <MRT_EditActionButtons variant="text" table={table} row={row} />
-            </DialogActions>
-          </>
-        )}
-        //optionally customize modal content
-        renderEditRowDialogContent = {({ table, row, internalEditComponents }) => (
-          <>
-            <DialogTitle variant="h3">Edit User</DialogTitle>
-            <DialogContent
-              sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
-            >
-              {internalEditComponents} {/* or render custom edit components here */}
-            </DialogContent>
-            <DialogActions>
-              <MRT_EditActionButtons variant="text" table={table} row={row} />
-            </DialogActions>
-          </>
-        )}
-        renderTopToolbarCustomActions = {({ table }) => (<CustomToolbar table={table} data={data}/>)}
-        renderRowActions= {({ row, table }) => (
-          <Box sx={{ display: 'flex', gap: '1rem' }}>
-            <Tooltip title="Edit">
-              <IconButton onClick={() => table.setEditingRow(row)}>
-                <i
-                  className="fa fa-pencil !text-sm text-yellow-500 hover:text-yellow-600 cursor-pointer"
-                ></i>
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Delete">
-              <IconButton color="error" onClick={() => handleDelete(row.original.id)}>
-                <i
-                  className="fa fa-trash !text-sm text-red-500 hover:text-red-600 cursor-pointer"
-                ></i>
-              </IconButton>
-            </Tooltip>
-          </Box>
-        )}
+        initialState= {{
+          columnVisibility: {
+            email: false,
+            street: false,
+
+          },
+        }}
+        enableColumnResizing
+        enableColumnActions={false}
+        renderTopToolbarCustomActions = {({ table }) => (<CustomToolbar table={table}/>)}
       />
     </Paper>
   );

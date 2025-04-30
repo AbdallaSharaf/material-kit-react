@@ -128,7 +128,7 @@ export const fetchProductsByCategory = createAsyncThunk<
       });
     }
     {
-      params.globalFilter && url.searchParams.set('_id', params.globalFilter ?? '');
+      params.globalFilter && url.searchParams.set('search', params.globalFilter ?? '');
     }
     {
       params.sorting &&

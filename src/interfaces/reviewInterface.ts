@@ -15,10 +15,3 @@ export type ReviewIn = {
     createdAt: string,
     productName: string
   }
-    
-  
-export type ReviewsModalProps = {
-  isOpen: boolean;
-  review: ReviewIn | null;
-  onClose: () => void;
-};
