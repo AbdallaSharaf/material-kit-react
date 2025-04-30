@@ -467,52 +467,81 @@ export function OrdersTable(): React.JSX.Element {
         muiDetailPanelProps={() => ({
           sx: (theme) => ({
             backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,210,244,0.1)' : 'rgba(0,0,0,0.1)',
+            "& .MuiCollapse-root": {
+              width: "60%"
+            }
           }),
         })}
         //conditionally render detail panel
         renderDetailPanel={({ row }) =>
           row.original.items.length > 0 ? (
-            <Box className="flex flex-col gap-3">
-              {row.original.items.map((item) => (
-                <Box
-                  key={item._id}
-                  className="flex items-center justify-between gap-20 bg-gray-50 p-3 rounded-lg shadow-sm"
-                >
-                  {/* Image */}
-                  <div className='flex items-center'>
-
-                  <Box className="w-16 h-16 flex-shrink-0 rounded overflow-hidden border border-gray-200">
-                  <Image
-                    src={
-                      Array.isArray(item?.imgCover)
-                      ? item.imgCover[0] || "/placeholder.png"
-                      : item?.imgCover || "/placeholder.png"
-                    }
-                    alt={item.name?.['en'] || item.name?.['ar']}
-                    width={64}
-                    height={64}
-                    className="w-16 h-16 object-cover rounded"
-                    unoptimized // optional if you're using external URLs
-                    />
-                  </Box>
-        
-                  {/* Name & Quantity */}
-                  <Box className="flex flex-col flex-grow px-4">
-                    <Typography fontWeight="bold">
-                      {item.name?.['en'] || item.name?.['ar']} × {item.quantity}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('Item price')}: {item.itemPrice}
-                    </Typography>
-                  </Box>
-                  </div>
-        
-                  {/* Total Price */}
-                  <Typography fontWeight="bold" className="text-right text-green-600 min-w-[100px]">
-                    {t('Total Price')}: {item.totalPrice}
-                  </Typography>
-                </Box>
-              ))}
+            <Box className="w-full overflow-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('Item')}
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('Quantity')}
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('Unit Price')}
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('Total Price')}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {row.original.items.map((item) => (
+                    <tr key={item._id}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex gap-5 items-center">
+                          <div className="flex-shrink-0 h-16 w-16">
+                            <Image
+                              src={
+                                Array.isArray(item?.imgCover)
+                                  ? item.imgCover[0] || "/placeholder.png"
+                                  : item?.imgCover || "/placeholder.png"
+                              }
+                              alt={item.name?.[locale]}
+                              width={64}
+                              height={64}
+                              className="h-16 w-16 object-cover rounded border border-gray-200"
+                              unoptimized
+                            />
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {item.name?.[locale]}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{item.quantity}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{item.itemPrice}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-semibold text-green-600">
+                          {item.totalPrice}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  <tr className="bg-gray-50">
+                    <td colSpan={3} className="px-6 py-4 text-start text-sm font-medium text-gray-900">
+                      {t('Order Total')}:
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">
+                      {row.original.totalPrice}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </Box>
           ) : null
         }
