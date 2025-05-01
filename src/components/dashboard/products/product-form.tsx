@@ -16,6 +16,8 @@ import { useRouter } from 'next/navigation';
 import { ImageGalleryUploader } from './image-gallery-uploader';
 import Link from 'next/link';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 import { useSearchParams } from 'next/navigation';
 
 // Validation Schema
@@ -50,7 +52,9 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
       price: product?.price || 0,
       SKU: product?.SKU || 0,
       stock: product?.stock || undefined,
-      priceAfterExpiresAt: product?.priceAfterExpiresAt || undefined,
+      priceAfterExpiresAt: product?.priceAfterExpiresAt
+        ? dayjs.utc(product.priceAfterExpiresAt).format("YYYY-MM-DDTHH:mm")
+        : undefined,
       priceAfterDiscount: product?.priceAfterDiscount || undefined,
       trackQty: product?.trackQty ?? false,
       lowStockQty: product?.lowStockQty || undefined,
@@ -126,6 +130,9 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
           ar: shortDesc_ar,
           en: shortDesc_en,
         },
+        priceAfterExpiresAt: values.priceAfterExpiresAt
+          ? dayjs.utc(values.priceAfterExpiresAt).toISOString()
+          : undefined
       };
     
       if (product) {
@@ -193,6 +200,7 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
     }    
   });
 
+  console.log(formik.values?.priceAfterExpiresAt)
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -417,23 +425,26 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
               />
 
               <TextField
-                fullWidth
-                margin="normal"
-                name="priceAfterExpiresAt"
-                label="Price After Expires At"
-                type="datetime-local"
-                variant="outlined"
-                value={
-                  formik.values.priceAfterExpiresAt
-                    ? dayjs(formik.values.priceAfterExpiresAt).format("YYYY-MM-DDTHH:mm")
-                    : ''
-                }
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                InputLabelProps={{
-                  shrink: true, // Ensures the label stays above the input
-                }}
-              />
+                    fullWidth
+                    margin="normal"
+                    name="priceAfterExpiresAt"
+                    label="Price After Expires At (UTC)"
+                    type="datetime-local"
+                    variant="outlined"
+                    value={formik.values.priceAfterExpiresAt}
+                    onChange={(e) => {
+                      // When user selects a time, treat it as UTC
+                      const utcDate = e.target.value ? dayjs.utc(e.target.value) : null;
+                      formik.setFieldValue(
+                        'priceAfterExpiresAt',
+                        utcDate ? utcDate.format("YYYY-MM-DDTHH:mm") : ''
+                      );
+                    }}
+                    onBlur={formik.handleBlur}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
               </div>
               <div className='grid md:grid-cols-4 gap-4 my-7'>
                 <div className="">

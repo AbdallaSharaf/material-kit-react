@@ -2,47 +2,51 @@ import React from 'react';
 import { Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { getLocale, getTranslations } from 'next-intl/server';
-
 import ProductForm from '@/components/dashboard/products/product-form';
+import axios from 'axios';
+import { ProductIn } from '@/interfaces/productInterface';
+
+// Configure axios instance
+const api = axios.create({
+  baseURL: process.env.API_BASE_URL || 'https://fruits-heaven-api.onrender.com/api/v1',
+  timeout: 5000, // Set a timeout
+});
+
+
+interface ApiResponse {
+  Product: ProductIn;
+}
 
 interface PageProps {
   params: { id: string };
 }
 
-const getProductById = async (id: string) => {
+const getProductById = async (id: string): Promise<ProductIn | null> => {
   try {
-    console.log('Fetching product with ID:', id);
-    const res = await fetch(`https://fruits-heaven-api.onrender.com/api/v1/product/${id}`, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
-    });
-    if (!res.ok) throw new Error(`Failed to fetch product: ${res.status}`);
-
-    const data = await res.json();
-    const product = data.Product;
-    // console.log(product)
-    // console.log("Fetched product data:", product);
-    return product;
+    const response = await api.get<ApiResponse>(`/product/${id}`);
+    console.log(response.data.Product)
+    return response.data.Product;
   } catch (error) {
-    console.error('Error fetching product:', error);
+    if (axios.isAxiosError(error)) {
+      console.error('Axios error fetching product:', error.message);
+      if (error.response?.status === 404) {
+        console.log('Product not found');
+      }
+    } else {
+      console.error('Unexpected error fetching product:', error);
+    }
     return null;
   }
 };
 
 export default async function ProductPage({ params }: PageProps) {
   const { id } = params;
-  console.log(id);
   if (!id) throw new Error('No product ID provided');
 
   const product = await getProductById(id);
-  // const product = await getProductById(id);
   const t = await getTranslations('common');
-  const locale = await getLocale();
-  console.log(product);
+  const locale = await getLocale() as "ar" | "en";
+
   if (!product) {
     return (
       <Stack spacing={3}>
@@ -55,7 +59,9 @@ export default async function ProductPage({ params }: PageProps) {
     <Stack spacing={3}>
       <Stack direction="row" spacing={3}>
         <div className="flex w-full justify-between items-center">
-          <Typography variant="h4">{product && t('Edit') + ' ' + product.name[locale]}</Typography>
+          <Typography variant="h4">
+            {product && `${t('Edit')} ${product.name[locale]}`}
+          </Typography>
         </div>
       </Stack>
 
