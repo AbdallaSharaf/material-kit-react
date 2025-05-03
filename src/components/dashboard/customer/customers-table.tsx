@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { MaterialReactTable, MRT_ColumnDef } from 'material-react-table';
-import { Paper } from '@mui/material';
+import { Paper, Switch } from '@mui/material';
 import CustomToolbar from './custom-toolbar';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { CustomerIn } from '@/interfaces/customerInterface';
@@ -21,7 +21,7 @@ import dayjs from 'dayjs';
 
 export function CustomersTable(): React.JSX.Element {
   const t = useTranslations("common");
-
+  const { fetchData, handleVerifyUserCustomer } = useCustomerHandlers();
   const columns: MRT_ColumnDef<CustomerIn>[] = [
     {
       accessorKey: 'name',
@@ -61,10 +61,25 @@ export function CustomersTable(): React.JSX.Element {
       enableColumnFilter: false,
       Cell: ({ cell }) => `${cell.getValue<number>().toFixed(2)} SAR`,
     },
+    {
+    accessorKey: "verified",
+    header: t("Verified"),
+    size: 90,
+    enableSorting: false,
+    enableColumnFilter: false,
+    enableEditing: false,
+    enableColumnActions: false,
+    Cell: ({ row }) => (
+      <Switch
+      checked={row.original.verified}
+      onChange={() => handleVerifyUserCustomer(row.original)}
+      color="primary"
+      />
+    ),
+  },
   ];
   
   const { customers, searchQuery, columnFilters, pagination, rowCount, loading, sorting } = useSelector((state: RootState) => state.customers);
-  const { fetchData } = useCustomerHandlers();
   const dispatch = useDispatch<AppDispatch>();
   const locale = useLocale() as "ar" | "en";
   React.useEffect(() => {

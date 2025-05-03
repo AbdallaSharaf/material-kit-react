@@ -4,6 +4,7 @@ export type CustomerIn = {
     phone: string,
     _id: string,
     createdAt: string,
+    verified: boolean,
     lastLogin: string,
     numberOfOrders: number,
     ordersSum: number,

@@ -20,6 +20,7 @@ interface CustomersState {
   pagination: MRT_PaginationState;
   columnFilters: MRT_ColumnFiltersState;
   rowCount: number;
+  refreshData: number;
 }
 
 // Define the initial state
@@ -28,6 +29,7 @@ const initialState: CustomersState = {
   loading: false,
   error: null,
   totalCount: 0, // Total number of customers
+  refreshData: 0,
   // Initialize your UI state variables
   searchQuery: '',
   sorting: [],
@@ -79,10 +81,34 @@ export const fetchCustomers = createAsyncThunk<
   }
 });
 
+// Add a new compUser
+export const verifyUser = createAsyncThunk<
+  CustomerIn,         // Return type on success
+  { id: string; updatedData: {verified: boolean};},             // Argument type (new user data)
+  { rejectValue: string }
+>(
+  'customers/verifyUser',
+  async ({id, updatedData}, { rejectWithValue}) => {
+    try {
+      const response = await axios.put<CustomerIn>(`${API_URL}/${id}`, updatedData);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+        error.message ||
+        'Failed to add user'
+      );
+    }
+  }
+);
+
 const customersSlice = createSlice({
   name: 'customers',
   initialState,
   reducers: {
+    setRefreshData: (state, action: PayloadAction<number>) => {
+      state.refreshData = action.payload;
+    },
     setSearchQuery: (state, action: PayloadAction<string>) => {
       state.searchQuery = action.payload;
     },
@@ -116,11 +142,23 @@ const customersSlice = createSlice({
         state.loading = false;
         state.error = action.payload || 'Failed to fetch customers';
       });
+      builder
+        .addCase(verifyUser.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(verifyUser.fulfilled, (state, action: PayloadAction<CustomerIn>) => {
+          state.loading = false;
+        })
+        .addCase(verifyUser.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload || 'Failed to add compUser';
+        });
   },
 });
 
 // Export the UI actions so that you can dispatch them from your components
-export const { setSearchQuery, setSorting, setPagination, setRowCount, setColumnFilters } =
+export const { setSearchQuery, setSorting, setPagination, setRowCount, setColumnFilters, setRefreshData } =
   customersSlice.actions;
 
 // Export the reducer to be used in the store

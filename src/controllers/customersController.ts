@@ -1,6 +1,8 @@
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store/store";
-import { fetchCustomers, setRowCount} from "../redux/slices/customerSlice";   
+import { fetchCustomers, setRefreshData, setRowCount, verifyUser} from "../redux/slices/customerSlice";   
+import Swal from "sweetalert2";
+import { CustomerIn } from "@/interfaces/customerInterface";
 export const useCustomerHandlers = () => {
 
 const dispatch = useDispatch<AppDispatch>()
@@ -10,6 +12,7 @@ const dispatch = useDispatch<AppDispatch>()
     columnFilters,
     searchQuery,
     sorting,
+    refreshData
 } = useSelector((state: RootState) => state.customers);
 
   const fetchData = async () => {
@@ -33,7 +36,35 @@ const dispatch = useDispatch<AppDispatch>()
         }
       };
 
+      const handleVerifyUserCustomer = async (customer: CustomerIn) => {
+        try {
+            const resultAction = await dispatch(verifyUser({id: customer._id!, updatedData: {verified: !customer.verified}}));
+            if (verifyUser.fulfilled.match(resultAction)) {
+              // Update the existing Swal instead of reopening it
+              dispatch(setRefreshData(refreshData + 1));
+            }
+            else {  
+              // Update the Swal alert with an error
+              Swal.fire({
+                title: 'Error Updating Customer',
+                text: resultAction.payload ? String(resultAction.payload) : 'Unknown error',
+                icon: 'error',
+                showConfirmButton: true,
+              });
+            }
+          } catch (error: any) {
+            // Fire the Swal alert for unexpected errors
+            Swal.fire({
+              title: 'Unexpected Error',
+              text: error.message,
+              icon: 'error',
+              showConfirmButton: true,
+            });
+          }
+        };
+
     return {
         fetchData,
+        handleVerifyUserCustomer
       };
 }
