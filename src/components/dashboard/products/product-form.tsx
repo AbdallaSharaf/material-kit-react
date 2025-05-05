@@ -45,9 +45,12 @@ const ProductForm = ({ product }: { product?: ProductIn }) => {
       shortDesc_ar: product?.shortDesc?.ar ||"",
       shortDesc_en: product?.shortDesc?.en || "",
       metaTags: product?.metaTags || [] as string[],
-      category: product?.category?.map(cat => ({
-        category: cat.category._id || '', // Mapping `_id` to `category`
-      })) || (categoryId ? [{ category: categoryId }] : []),
+      category: product?.category
+      ?.filter(cat => cat?.category?._id) // Only keep valid categories
+      ?.map(cat => ({
+        category: cat.category._id // Now safe to access
+      })) 
+      || (categoryId ? [{ category: categoryId }] : []),    
       available: product?.available ?? true,
       price: product?.price || 0,
       SKU: product?.SKU || 0,

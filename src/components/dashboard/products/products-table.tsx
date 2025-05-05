@@ -174,19 +174,21 @@ export function ProductsTable(): React.JSX.Element {
         Cell: ({ row }) => (
           <div>
             {row.original.category?.map((category, index: number) => (
-              <span
-                key={index}
-                style={{
-                  display: "inline-block",
-                  backgroundColor: "#e0e0e0",
-                  borderRadius: "4px",
-                  padding: "2px 6px",
-                  marginRight: "4px",
-                  fontSize: "12px",
-                }}
-              >
-                {category.category?.name?.[locale]}
-              </span>
+              category?.category?.name?.[locale] && (
+                <span
+                  key={index}
+                  style={{
+                    display: "inline-block",
+                    backgroundColor: "#e0e0e0",
+                    borderRadius: "4px",
+                    padding: "2px 6px",
+                    marginRight: "4px",
+                    fontSize: "12px",
+                  }}
+                >
+                  {category.category.name[locale]}
+                </span>
+              )
             ))}
           </div>
         ),
