@@ -34,13 +34,15 @@ export function MainNav(): React.JSX.Element {
 
   React.useEffect(() => {
     if (user) return;
-    dispatch(restoreSession())
-      .then(() => {
+    const restoreSessionData = async () => {
+      try {
+        await dispatch(restoreSession());
         setIsNavReady(true); // Ensure the nav is ready after async logic is complete
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error('Error restoring session:', error);
-      });
+      }
+    }
+    restoreSessionData();
   }, [user]);
   // console.log(user)
   return (
