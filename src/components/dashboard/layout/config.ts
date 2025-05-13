@@ -18,6 +18,6 @@ export async function getNavItems(): Promise<NavItemConfig[]> {
     { key: 'offers', title: t('Offers'), href: paths.dashboard.offers, icon: 'offers' },
     { key: 'ui', title: t('Ui'), href: paths.dashboard.ui, icon: 'ui' },
     { key: 'reviews', title: t('Reviews'), href: paths.dashboard.reviews, icon: 'star' },
-    { key: 'settings', title: t('Settings'), href: paths.dashboard.settings, icon: 'gear-six' },
+    // { key: 'settings', title: t('Settings'), href: paths.dashboard.settings, icon: 'gear-six' },
   ];
 }
