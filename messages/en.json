@@ -19,6 +19,7 @@
     "common":{
         "products": "Products",
         "Profile": "Profile",
+        "Location": "Location",
         "Sign Out": "Sign Out",
             "profile": "Profile",
         "editableInfo": "The information can be edited",

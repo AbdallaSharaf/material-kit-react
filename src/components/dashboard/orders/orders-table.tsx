@@ -238,6 +238,30 @@ export function OrdersTable(): React.JSX.Element {
       enableSorting: false,
     },
     {
+      accessorKey: 'shippingAddress.location',
+      header: t('Location'),
+      size: 120,
+      enableColumnFilter: false,
+      enableSorting: false,
+      Cell: ({ row }) => {
+        const location = row.original.shippingAddress?.location;
+        if (!location) return 'N/A';
+        
+        return (
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => {
+              // Open Google Maps with the location
+              window.open(location, '_blank');
+            }}
+          >
+            {t('View on Map')}
+          </Button>
+        );
+      },
+    },
+    {
       accessorKey: 'email',
       header: t('Email'),
       size: 150,

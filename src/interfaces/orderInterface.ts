@@ -9,6 +9,7 @@ export interface OrderIn {
       phone: string;
       name: string;
       email: string;
+      location: string;
     };
     user?: {
         name: string;
