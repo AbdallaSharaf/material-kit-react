@@ -19,7 +19,7 @@ import { UserPopover } from './user-popover';
 import LanguagePopover from './language-popover';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store/store';
-import { restoreSession } from '@/redux/slices/authSlice';
+import { fetchUserData, restoreSession } from '@/redux/slices/authSlice';
 import { useRouter } from 'next/navigation';
 import MobileNavWrapper from './MobileNavWrapper';
 
@@ -36,8 +36,10 @@ export function MainNav(): React.JSX.Element {
     if (user) return;
     const restoreSessionData = async () => {
       try {
-        await dispatch(restoreSession());
-        setIsNavReady(true); // Ensure the nav is ready after async logic is complete
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No token found');
+          await dispatch(fetchUserData());
+          setIsNavReady(true); // Ensure the nav is ready after async logic is complete
       } catch (error) {
         console.error('Error restoring session:', error);
       }
