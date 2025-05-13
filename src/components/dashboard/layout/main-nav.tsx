@@ -33,6 +33,7 @@ export function MainNav(): React.JSX.Element {
   const languagePopover = usePopover<HTMLButtonElement>(); // Updated ref type
 
   React.useEffect(() => {
+    if (user) return;
     dispatch(restoreSession())
       .then(() => {
         setIsNavReady(true); // Ensure the nav is ready after async logic is complete
@@ -40,8 +41,8 @@ export function MainNav(): React.JSX.Element {
       .catch((error) => {
         console.error('Error restoring session:', error);
       });
-  }, []);
-
+  }, [user]);
+  // console.log(user)
   return (
     <React.Fragment>
       <Box
