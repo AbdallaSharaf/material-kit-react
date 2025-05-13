@@ -33,10 +33,11 @@ export function MainNav(): React.JSX.Element {
   const languagePopover = usePopover<HTMLButtonElement>(); // Updated ref type
 
   React.useEffect(() => {
-    if (user) return;
+    if (user !== null) return;
+    console.log('restoring session');
     const restoreSessionData = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('custom-auth-token');
         if (!token) throw new Error('No token found');
           await dispatch(fetchUserData());
           setIsNavReady(true); // Ensure the nav is ready after async logic is complete
