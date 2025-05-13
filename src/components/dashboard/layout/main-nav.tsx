@@ -40,7 +40,7 @@ export function MainNav(): React.JSX.Element {
       .catch((error) => {
         console.error('Error restoring session:', error);
       });
-  }, [dispatch]);
+  }, []);
 
   return (
     <React.Fragment>
