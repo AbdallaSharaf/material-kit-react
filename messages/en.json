@@ -21,6 +21,8 @@
         "Profile": "Profile",
         "Location": "Location",
         "Sign Out": "Sign Out",
+        "Paid": "Paid",
+        "View on Map":"View on Map",
             "profile": "Profile",
         "editableInfo": "The information can be edited",
         "email": "Email address",
