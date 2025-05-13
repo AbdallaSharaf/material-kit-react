@@ -27,6 +27,17 @@
         "Unit Price": "سعر الوحدة",
         "Order Total": "إجمالي الطلب",
         "Product": "المنتج",
+        "Profile": "الملف الشخصي",
+        "Sign Out": "تسجيل خروج",
+            "profile": "الملف الشخصي",
+    "editableInfo": "يمكن تعديل المعلومات",
+    "email": "عنوان البريد الإلكتروني",
+    "saveDetails": "حفظ التغييرات",
+    "errors": {
+      "required": "هذا الحقل مطلوب",
+      "invalidEmail": "بريد إلكتروني غير صالح",
+      "invalidPhone": "يجب أن يحتوي على أرقام فقط"
+    },
         "Verify Registration": "تأكيد التسجيل",
         "Enabled": "مفعل",
         "Disabled": "معطل",

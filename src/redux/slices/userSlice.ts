@@ -5,6 +5,7 @@ import axios from '../../utils/axiosInstance';
 
 import { MRT_ColumnFiltersState, MRT_PaginationState, MRT_SortingState } from 'material-react-table';
 import { User } from '@/types/user';
+import { uploadPhoto } from '@/cloudinary';
 
 // Define the slice state type
 interface usersState {
@@ -45,7 +46,7 @@ const initialState: usersState = {
 };
 
 // Define the base URL for your API endpoint (adjust as needed)
-const API_URL = `${process.env.VITE_BASE_URL}user`;
+const API_URL = `https://fruits-heaven-api.onrender.com/api/v1/user`;
 
 // Fetch allusers
 export const fetchUsers = createAsyncThunk<
@@ -149,10 +150,20 @@ export const updateAccount = createAsyncThunk<
   async (accountData, { rejectWithValue }) => {
     try {
       // Destructure properties you don't want to send (example)
-      const { image, ...rest } = accountData;
-
+      const { profilePic, phone, ...rest } = accountData;
+      let profilePicUrl: string | undefined;
+      
+      if (accountData.profilePic) {
+        if (typeof accountData.profilePic === "string" && accountData.profilePic.startsWith("https://res.cloudinary.com")) {
+          profilePicUrl = accountData.profilePic;
+        } else {
+          profilePicUrl = await uploadPhoto(accountData.profilePic);
+          if (!profilePicUrl) throw new Error("Image cover upload failed");
+        }
+      }      
+      const updatedData = { ...rest, profilePic: profilePicUrl };
       // Call your update API (adjust endpoint if needed)
-      const response = await axios.patch(`${API_URL}/updateMyData`, rest);
+      const response = await axios.patch(`${API_URL}/updateMyData`, updatedData);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(

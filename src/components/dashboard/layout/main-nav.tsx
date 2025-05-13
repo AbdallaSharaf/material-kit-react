@@ -17,8 +17,8 @@ import { usePopover } from '@/hooks/use-popover';
 import { MobileNav } from './mobile-nav';
 import { UserPopover } from './user-popover';
 import LanguagePopover from './language-popover';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/redux/store/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/redux/store/store';
 import { restoreSession } from '@/redux/slices/authSlice';
 import { useRouter } from 'next/navigation';
 import MobileNavWrapper from './MobileNavWrapper';
@@ -28,6 +28,7 @@ export function MainNav(): React.JSX.Element {
   const [isNavReady, setIsNavReady] = React.useState<boolean>(false); 
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+  const { user } = useSelector((state: RootState) => state.auth);
   const userPopover = usePopover<HTMLDivElement>();
   const languagePopover = usePopover<HTMLButtonElement>(); // Updated ref type
 
@@ -93,7 +94,7 @@ export function MainNav(): React.JSX.Element {
             <Avatar
               onClick={userPopover.handleOpen}
               ref={userPopover.anchorRef}
-              src="/assets/avatar.png"
+              src={user?.profilePic}
               sx={{ cursor: 'pointer' }}
             />
           </Stack>

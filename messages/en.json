@@ -18,6 +18,17 @@
     },
     "common":{
         "products": "Products",
+        "Profile": "Profile",
+        "Sign Out": "Sign Out",
+            "profile": "Profile",
+        "editableInfo": "The information can be edited",
+        "email": "Email address",
+        "saveDetails": "Save details",
+        "errors": {
+        "required": "This field is required",
+        "invalidEmail": "Invalid email address",
+        "invalidPhone": "Must contain only numbers"
+        },
         "lowestSellingProducts": "Lowest Selling Products",
         "quantitySold": "Quantity Sold",
         "Overview": "Overview",
