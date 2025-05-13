@@ -150,7 +150,7 @@ export const updateAccount = createAsyncThunk<
   async (accountData, { rejectWithValue }) => {
     try {
       // Destructure properties you don't want to send (example)
-      const { profilePic, phone, ...rest } = accountData;
+      const { profilePic, phone, email, ...rest } = accountData;
       let profilePicUrl: string | undefined;
       
       if (accountData.profilePic) {
