@@ -10,6 +10,7 @@ import { Box } from '@mui/material';
 import { AppDispatch } from '@/redux/store/store';
 import { updateAccount } from "@/redux/slices/userSlice";
 import Swal from 'sweetalert2';
+import { useEffect } from "react";
 
 const AccountWrapper = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -61,6 +62,15 @@ const AccountWrapper = () => {
     },
     enableReinitialize: true,
   });
+
+  useEffect(() => {
+    formik.setValues({
+      name: user?.name || '',
+      email: user?.email || '',
+      phone: user?.phone || '',
+      profilePic: user?.profilePic || undefined,
+    });
+  }, [user]);
 
   return (
     <form onSubmit={formik.handleSubmit}>
