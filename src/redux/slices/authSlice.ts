@@ -27,6 +27,7 @@ export const fetchUserData = createAsyncThunk<User, void, { rejectValue: string 
   'auth/fetchUserData',
   async (_, { rejectWithValue }) => {
     try {
+      console.log("called")
       const response = await axios.get('https://fruits-heaven-api.onrender.com/api/v1/user/myData');
       return response.data.user;
     } catch (error: any) {
