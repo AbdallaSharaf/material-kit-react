@@ -64,6 +64,7 @@ const AccountWrapper = () => {
   });
 
   useEffect(() => {
+    console.log(user);
     formik.setValues({
       name: user?.name || '',
       email: user?.email || '',
