@@ -240,7 +240,9 @@
         "Delete": "حذف",
         "Up to": "إلى",
         "N/A": "غير متاح",
-        "Invoice Id":"رقم الفاتورة"
+        "Invoice Id":"رقم الفاتورة",
+        "download invoice": "تحميل الفاتورة",
+        "user didn't set location": "المستخدم لم يقم بتحديد الموقع"
 
     }
     }

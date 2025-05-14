@@ -16,12 +16,12 @@ import {
 } from '@mui/material';
 import { Box } from '@mui/system';
 import { MaterialReactTable, MRT_ColumnDef, MRT_TableOptions } from 'material-react-table';
-
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CustomToolbar from './custom-toolbar';
 import Swal from 'sweetalert2';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import { useOrderHandlers } from '@/controllers/ordersController';
 import { OrderIn } from '@/interfaces/orderInterface';
 import { setColumnFilters, setPagination, setSearchQuery } from '@/redux/slices/orderSlice';
@@ -245,19 +245,38 @@ export function OrdersTable(): React.JSX.Element {
       enableSorting: false,
       Cell: ({ row }) => {
         const location = row.original.shippingAddress?.location;
-        if (!location) return 'N/A';
+        // if (!location) return 'N/A';
+        if (location =='https://www.google.com/maps?q=null,null' || !location) return (        <Tooltip title={t( "user didn't set location")}>
+
+        <Button
+          // variant="outlined"
+          size="small"
+          // onClick={() => {
+          //   // Open Google Maps with the location
+          //   window.open(location, '_blank');
+          // }}
+          disabled
+        >
+          {/* {t('View on Map')} */}
+          <LocationOnIcon/>
+        </Button>
+        </Tooltip>);
         
         return (
+          <Tooltip title={t('View on Map')}>
+
           <Button
-            variant="outlined"
+            // variant="outlined"
             size="small"
             onClick={() => {
               // Open Google Maps with the location
               window.open(location, '_blank');
             }}
           >
-            {t('View on Map')}
+            {/* {t('View on Map')} */}
+            <LocationOnIcon/>
           </Button>
+          </Tooltip>
         );
       },
     },
@@ -432,13 +451,19 @@ export function OrdersTable(): React.JSX.Element {
       enableColumnActions: false,
     },
     {
-      header: 'Actions',
+      header: t('download invoice'),
       enableColumnActions: false,
-      size: 80,
+      size: 110,
+      muiTableBodyCellProps: {
+        align: 'center',
+      },
       Cell: ({ row }) => (
+        <Tooltip title={t('download invoice')}>
+
         <IconButton onClick={() => handleDownload(row.original)} aria-label="download pdf" color="primary">
-        <PictureAsPdfIcon />
+        <ReceiptIcon />
       </IconButton>
+        </Tooltip>
         )
     }
   ];

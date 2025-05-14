@@ -241,6 +241,10 @@
         "Pending":"Pending",
         "cod":"cod",
         "credit_card":"credit_card",
-        "Invoice Id":"Invoice Id"
+        "Invoice Id":"Invoice Id",
+        "download invoice":"Download Invoice",
+        "Order Id":"Order Id",
+        "Order Status":"Order Status",
+        "user didn't set location":"User didn't set location"
     }
 }
