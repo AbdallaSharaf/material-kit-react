@@ -83,13 +83,13 @@ export function MainNav(): React.JSX.Element {
                   <EyeIcon />
                 </IconButton>
             </Tooltip>
-            <Tooltip title="Notifications">
+            {/* <Tooltip title="Notifications">
               <Badge badgeContent={4} color="success" variant="dot">
                 <IconButton>
                   <BellIcon />
                 </IconButton>
               </Badge>
-            </Tooltip>
+            </Tooltip> */}
             <Tooltip title="Switch Language">
               <IconButton
                 onClick={languagePopover.handleOpen}
