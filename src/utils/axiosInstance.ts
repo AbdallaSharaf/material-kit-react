@@ -29,6 +29,13 @@ axiosInstance.interceptors.response.use(
     if (error.response?.data.error|| error) {
       // Handle unauthorized errors (e.g., redirect to login)
       console.error(error.response);
+      if(error.response.error = "Invalid token"
+      ){
+        localStorage.removeItem('custom-auth-token'); // ⬅️ Remove from localStorage
+        localStorage.removeItem('auth-token-issued-at'); // ⬅️ Remove from localStorage
+        window.location.href = '/auth/sign-in'; // Redirect to login page
+      }
+      
       // Cookies.remove('token');
       // Cookies.remove('userData');
       // localStorage.removeItem('token'); // ⬅️ Remove from localStorage
