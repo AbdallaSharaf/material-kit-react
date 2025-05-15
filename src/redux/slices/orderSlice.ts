@@ -1,35 +1,32 @@
-// features/orders/ordersSlice.ts
-
-import { OrderIn, OrderOut } from '@/interfaces/orderInterface';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AxiosResponse } from 'axios';
 import { MRT_ColumnFiltersState, MRT_PaginationState, MRT_SortingState } from 'material-react-table';
-
 import axios from '../../utils/axiosInstance';
+import { OrderIn, OrderOut } from '@/interfaces/orderInterface';
 
-// Define the slice state type
+// ------------------------
+// Slice State Definition
+// ------------------------
+
 interface OrdersState {
   orders: OrderIn[];
   loading: boolean;
   error: string | null;
-  totalCount: number; // Total number of orders
-
-  // UI state variables to be shared across controller and view
+  totalCount: number;
   refreshData: number;
   searchQuery: string;
   sorting: MRT_SortingState;
   pagination: MRT_PaginationState;
   columnFilters: MRT_ColumnFiltersState;
   rowCount: number;
+  lastKnownCount: number | null;
 }
 
-// Define the initial state
 const initialState: OrdersState = {
   orders: [],
   loading: false,
   error: null,
-  totalCount: 0, // Total number of orders
-  // Initialize your UI state variables
+  totalCount: 0,
   refreshData: 0,
   searchQuery: '',
   sorting: [],
@@ -37,58 +34,71 @@ const initialState: OrdersState = {
     pageIndex: 0,
     pageSize: 10,
   },
-  rowCount: 0,
   columnFilters: [],
+  rowCount: 0,
+  lastKnownCount: null,
 };
 
-// Define the base URL for your API endpoint (adjust as needed)
 const API_URL = `https://fruits-heaven-api.onrender.com/api/v1/order`;
 
-// Fetch all orders
+// ------------------------
+// Thunks
+// ------------------------
+
+// Fetch orders
 export const fetchOrders = createAsyncThunk<
-  { orders: OrderIn[]; totalCount: number }, // Return type with orders and total count
-  { id?: string; columnFilters: any; page: any; pageSize: any; sorting: any; globalFilter: any }, // Arguments
+  { orders: OrderIn[]; totalCount: number },
+  {
+    id?: string;
+    columnFilters: any;
+    page: number;
+    pageSize: number;
+    sorting: any;
+    globalFilter: string;
+  },
   { rejectValue: string }
 >('orders/fetchOrders', async (params, { rejectWithValue }) => {
   try {
-    const { page } = params;
-
+    const { page, pageSize, columnFilters, sorting, globalFilter } = params;
     const url = new URL(API_URL);
-    {
-      params.globalFilter && url.searchParams.set('_id', params.globalFilter ?? '');
+
+    if (globalFilter) {
+      url.searchParams.set('_id', globalFilter);
     }
-    url.searchParams.set('PageCount', params.pageSize);
-    url.searchParams.set('page', page + 1);
-    if (params.columnFilters && params.columnFilters.length > 0) {
-      params.columnFilters.forEach((filter: any) => {
+    url.searchParams.set('PageCount', String(pageSize));
+    url.searchParams.set('page', String(page + 1));
+
+    if (columnFilters?.length > 0) {
+      columnFilters.forEach((filter: any) => {
         url.searchParams.append(filter.id, filter.value);
       });
     }
-    if (params.sorting && params.sorting.length > 0) {
-      params.sorting.forEach((sort: any) => {
+
+    if (sorting?.length > 0) {
+      sorting.forEach((sort: any) => {
         url.searchParams.append('sort', sort.desc ? `-${sort.id}` : sort.id);
       });
     } else {
-      // Default sorting by createdAt descending
       url.searchParams.append('sort', '-createdAt');
-      // url.searchParams.append('sort', 'status');
     }
+
     const response = await axios.get(url.href);
     const { data, TotalCount } = response.data;
+
     return { orders: data, totalCount: TotalCount };
   } catch (error: any) {
     return rejectWithValue(error.response?.data?.message || error.message || 'Failed to fetch orders');
   }
 });
 
-// Update an existing order
+// Update order
 export const updateOrder = createAsyncThunk<
-  OrderIn, // Return type on success
-  { id: string; updatedData: Partial<OrderOut> }, // Argument type
+  OrderIn,
+  { id: string; updatedData: Partial<OrderOut> },
   { rejectValue: string }
 >('orders/updateOrder', async ({ id, updatedData }, { rejectWithValue }) => {
   try {
-    const response = await axios.patch<OrderOut, AxiosResponse<{ message: string; Order: OrderIn }, any>>(
+    const response = await axios.patch<OrderOut, AxiosResponse<{ message: string; Order: OrderIn }>>(
       `${API_URL}/${id}`,
       updatedData
     );
@@ -98,11 +108,28 @@ export const updateOrder = createAsyncThunk<
   }
 });
 
+// Fetch order count
+export const fetchOrderCount = createAsyncThunk<
+  number,
+  void,
+  { rejectValue: string }
+>('orders/fetchOrderCount', async (_, { rejectWithValue }) => {
+  try {
+    const response = await axios.get(`${API_URL}/count`);
+    return response.data.count;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || error.message || 'Failed to fetch order count');
+  }
+});
+
+// ------------------------
+// Slice
+// ------------------------
+
 const ordersSlice = createSlice({
   name: 'orders',
   initialState,
   reducers: {
-    // Reducers to update UI state variables
     setRefreshData: (state, action: PayloadAction<number>) => {
       state.refreshData = action.payload;
     },
@@ -121,10 +148,11 @@ const ordersSlice = createSlice({
     setColumnFilters: (state, action: PayloadAction<MRT_ColumnFiltersState>) => {
       state.columnFilters = action.payload;
     },
+    setLastKnownCount: (state, action: PayloadAction<number>) => {
+      state.lastKnownCount = action.payload;
+    },
   },
-
   extraReducers: (builder) => {
-    // Fetch orders
     builder
       .addCase(fetchOrders.pending, (state) => {
         state.loading = true;
@@ -132,15 +160,14 @@ const ordersSlice = createSlice({
       })
       .addCase(fetchOrders.fulfilled, (state, action) => {
         state.loading = false;
-        state.orders = action.payload.orders; // Store the orders
-        state.totalCount = action.payload.totalCount; // Store the total count
+        state.orders = action.payload.orders;
+        state.totalCount = action.payload.totalCount;
       })
       .addCase(fetchOrders.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Failed to fetch orders';
       });
 
-    // Update order
     builder
       .addCase(updateOrder.pending, (state) => {
         state.loading = true;
@@ -148,21 +175,35 @@ const ordersSlice = createSlice({
       })
       .addCase(updateOrder.fulfilled, (state, action: PayloadAction<OrderIn>) => {
         state.loading = false;
-        // const index = state.orders.findIndex((order) => order._id === action.payload._id);
-        // if (index !== -1) {
-        //   state.orders[index] = action.payload;
-        // }
+        const index = state.orders.findIndex(order => order._id === action.payload._id);
+        if (index !== -1) {
+          state.orders[index] = action.payload;
+        }
       })
       .addCase(updateOrder.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Failed to update order';
       });
+
+    builder
+      .addCase(fetchOrderCount.fulfilled, (state, action: PayloadAction<number>) => {
+        state.lastKnownCount = action.payload;
+      });
   },
 });
 
-// Export the UI actions so that you can dispatch them from your components
-export const { setRefreshData, setSearchQuery, setSorting, setPagination, setRowCount, setColumnFilters } =
-  ordersSlice.actions;
+// ------------------------
+// Exports
+// ------------------------
 
-// Export the reducer to be used in the store
+export const {
+  setRefreshData,
+  setSearchQuery,
+  setSorting,
+  setPagination,
+  setRowCount,
+  setColumnFilters,
+  setLastKnownCount,
+} = ordersSlice.actions;
+
 export default ordersSlice.reducer;

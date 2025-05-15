@@ -242,7 +242,8 @@
         "N/A": "غير متاح",
         "Invoice Id":"رقم الفاتورة",
         "download invoice": "تحميل الفاتورة",
-        "user didn't set location": "المستخدم لم يقم بتحديد الموقع"
-
+        "user didn't set location": "المستخدم لم يقم بتحديد الموقع",
+        "notes":"ملاحظات",
+        "You have new orders!": "لديك طلبات جديدة!"
     }
     }

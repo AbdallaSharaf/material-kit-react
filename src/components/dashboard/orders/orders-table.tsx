@@ -36,6 +36,10 @@ import Image from 'next/image';
 import TablePaginationActions, { TablePaginationActionsProps } from '@mui/material/TablePagination/TablePaginationActions';
 import axiosInstance from '@/utils/axiosInstance';
 // Define columns outside the component to avoid defining them during render
+import { fetchOrderCount, fetchOrders, setLastKnownCount } from '@/redux/slices/orderSlice';
+
+
+const POLL_INTERVAL = 0.1 * 60 * 1000; 
 export function OrdersTable(): React.JSX.Element {
 
   // const handleDownload = async (rowData:any) => {
@@ -212,7 +216,7 @@ export function OrdersTable(): React.JSX.Element {
   const { refreshData, loading, orders, rowCount, pagination, columnFilters, searchQuery } = useSelector(
     (state: RootState) => state.orders
   );
-
+  const lastKnownCount = useSelector((state: RootState) => state.orders.lastKnownCount);
   const orderColumns: MRT_ColumnDef<OrderIn>[] = [
     {
       accessorKey: 'invoiceId',
@@ -405,7 +409,7 @@ export function OrdersTable(): React.JSX.Element {
         const label = value ? t('Paid') : t('Unpaid');
         const color: ChipProps['color'] = value ? 'success' : 'warning';
 
-        return <Chip label={label} color={color} size="small" variant="outlined" />;
+        return <Chip label={label} color={color} size="small"  />;
       },
     },
     {
@@ -432,6 +436,11 @@ export function OrdersTable(): React.JSX.Element {
       enableColumnFilter: false,
       enableSorting: false,
       enableColumnActions: false,
+      Cell: ({ row }) =>( 
+        <Tooltip title={row.original.shippingAddress.street}>
+        <span>{row.original.shippingAddress.street  ?? ''} </span>
+        </Tooltip>
+        ),
     },
     {
       accessorKey: 'shippingAddress.city',
@@ -446,6 +455,19 @@ export function OrdersTable(): React.JSX.Element {
       header: t('Country'),
       size: 100,
       Cell: ({ row }) => row.original.shippingAddress?.country ?? 'N/A',
+      enableColumnFilter: false,
+      enableSorting: false,
+      enableColumnActions: false,
+    },
+    {
+      accessorKey: 'notes',
+      header: t('notes'),
+      size: 100,
+      Cell: ({ row }) =>( 
+        <Tooltip title={row.original.notes}>
+        <span>{row.original.notes  ?? ''} </span>
+        </Tooltip>
+        ),
       enableColumnFilter: false,
       enableSorting: false,
       enableColumnActions: false,
@@ -467,7 +489,24 @@ export function OrdersTable(): React.JSX.Element {
         )
     }
   ];
+  React.useEffect(() => {
+    const interval = setInterval(async () => {
+      console.log("lastKnownCount",lastKnownCount)
+      try {
+        const result = await dispatch(fetchOrderCount()).unwrap();
+        if (lastKnownCount !== null && result !== lastKnownCount) {
+          Swal.fire(t('You have new orders!'));
+          // count changed, refetch orders
+          fetchData();
+        }
+        dispatch(setLastKnownCount(result));
+      } catch (error) {
+        console.error('Polling error:', error);
+      }
+    }, POLL_INTERVAL);
 
+    return () => clearInterval(interval);
+  }, [dispatch, lastKnownCount, columnFilters, searchQuery, refreshData, pagination]);
   React.useEffect(() => {
     fetchData();
   }, [refreshData, searchQuery, columnFilters, pagination]);

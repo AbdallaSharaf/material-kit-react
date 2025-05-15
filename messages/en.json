@@ -245,6 +245,8 @@
         "download invoice":"Download Invoice",
         "Order Id":"Order Id",
         "Order Status":"Order Status",
-        "user didn't set location":"User didn't set location"
+        "user didn't set location":"User didn't set location",
+        "notes":"Notes",
+        "You have new orders!":"You have new orders!"
     }
 }
