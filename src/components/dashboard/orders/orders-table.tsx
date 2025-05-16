@@ -306,7 +306,7 @@ export function OrdersTable(): React.JSX.Element {
     {
       accessorKey: 'status',
       header: t('Status'),
-      size: 100,
+      size: 150,
       Cell: ({ cell, row }) => {
         const status = cell.getValue<string>();
         const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -432,20 +432,25 @@ export function OrdersTable(): React.JSX.Element {
     {
       accessorKey: 'shippingAddress.street',
       header: t('Street'),
-      size: 100,
+      size: 200,
       enableColumnFilter: false,
       enableSorting: false,
       enableColumnActions: false,
       Cell: ({ row }) =>( 
-        <Tooltip title={row.original.shippingAddress.street}>
-        <span>{row.original.shippingAddress.street  ?? ''} </span>
+        <Tooltip title={row?.original?.shippingAddress?.street}>
+        <span>{row?.original?.shippingAddress?.street  ?? ''} </span>
         </Tooltip>
         ),
     },
     {
       accessorKey: 'shippingAddress.city',
       header: t('City'),
-      size: 100,
+      size: 150,
+      Cell: ({ row }) =>( 
+        <Tooltip title={row?.original?.shippingAddress?.city}>
+        <span>{row?.original?.shippingAddress?.city  ?? ''} </span>
+        </Tooltip>
+        ),
       enableColumnFilter: false,
       enableSorting: false,
       enableColumnActions: false,
@@ -462,12 +467,25 @@ export function OrdersTable(): React.JSX.Element {
     {
       accessorKey: 'notes',
       header: t('notes'),
-      size: 100,
-      Cell: ({ row }) =>( 
-        <Tooltip title={row.original.notes}>
-        <span>{row.original.notes  ?? ''} </span>
-        </Tooltip>
-        ),
+      size: 300,
+  Cell: ({ row }) => {
+    const { notes, adminNotes = [] } = row.original;
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        {notes && (
+          <Tooltip title={notes}>
+            <span>{notes}</span>
+          </Tooltip>
+        )}
+        {adminNotes.map((note, index) => (
+          <Tooltip key={index} title={note.note}>
+            <span>{note.note}</span>
+          </Tooltip>
+        ))}
+      </div>
+    );
+  },
       enableColumnFilter: false,
       enableSorting: false,
       enableColumnActions: false,
