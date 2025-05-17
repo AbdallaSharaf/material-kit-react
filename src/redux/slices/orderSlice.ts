@@ -175,10 +175,6 @@ const ordersSlice = createSlice({
       })
       .addCase(updateOrder.fulfilled, (state, action: PayloadAction<OrderIn>) => {
         state.loading = false;
-        const index = state.orders.findIndex(order => order._id === action.payload._id);
-        if (index !== -1) {
-          state.orders[index] = action.payload;
-        }
       })
       .addCase(updateOrder.rejected, (state, action) => {
         state.loading = false;
