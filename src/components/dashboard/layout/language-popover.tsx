@@ -39,7 +39,7 @@ export default function LanguageToggle(): React.JSX.Element {
 
   return (
     <div onClick={toggleLocale}>
-      <FlagIcon code={locale === 'en' ? 'US' : 'EG'} />
+      <FlagIcon code={locale === 'en' ? 'US' : 'SA'} />
     </div>
   );
 }
