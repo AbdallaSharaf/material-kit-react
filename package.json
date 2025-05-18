@@ -42,6 +42,7 @@
     "export-to-csv": "^1.4.0",
     "formik": "^2.4.6",
     "handlebars": "^4.7.8",
+    "lucide-react": "^0.511.0",
     "material-react-table": "^3.1.0",
     "next": "14.2.4",
     "next-intl": "^4.0.2",

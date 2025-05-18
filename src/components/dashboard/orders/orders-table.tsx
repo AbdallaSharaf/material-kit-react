@@ -41,7 +41,7 @@ import { fetchOrderCount, fetchOrders, setLastKnownCount } from '@/redux/slices/
 
 const POLL_INTERVAL = 0.1 * 60 * 1000; 
 export function OrdersTable(): React.JSX.Element {
-  const [notificationsEnabled, setNotificationsEnabled] = React.useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
   const audioRef = React.useRef<HTMLAudioElement>(null);
   // const handleDownload = async (rowData:any) => {
   //   const response = await axios.post('../../../app/api/generate-invoice', rowData, {
@@ -557,11 +557,11 @@ export function OrdersTable(): React.JSX.Element {
   return (
     <Paper>
           <div>
-      {!notificationsEnabled && (
+      {/* {!notificationsEnabled && (
         <button onClick={() => setNotificationsEnabled(true)}>
           Enable Order Notifications
         </button>
-      )}
+      )} */}
 
       {/* Hidden audio element */}
       <audio ref={audioRef} src="/sounds/ringtone.mp3" preload="auto" />
