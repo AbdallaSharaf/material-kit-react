@@ -41,7 +41,8 @@ import { fetchOrderCount, fetchOrders, setLastKnownCount } from '@/redux/slices/
 
 const POLL_INTERVAL = 0.1 * 60 * 1000; 
 export function OrdersTable(): React.JSX.Element {
-
+  const [notificationsEnabled, setNotificationsEnabled] = React.useState(false);
+  const audioRef = React.useRef(null);
   // const handleDownload = async (rowData:any) => {
   //   const response = await axios.post('../../../app/api/generate-invoice', rowData, {
   //     responseType: 'blob',
@@ -520,19 +521,31 @@ export function OrdersTable(): React.JSX.Element {
     }
   ];
   React.useEffect(() => {
-    const interval = setInterval(async () => {
+    let interval: string | number | NodeJS.Timeout | undefined;
+     interval = setInterval(async () => {
       console.log("lastKnownCount",lastKnownCount)
       try {
         const result = await dispatch(fetchOrderCount()).unwrap();
         if (lastKnownCount !== null && result !== lastKnownCount) {
-          Swal.fire(t('You have new orders!'));
           // count changed, refetch orders
+          if (audioRef.current) {
+            audioRef?.current?.play()?.catch(err =>
+              console.warn("Autoplay error:", err)
+              );
+            }
+            Swal.fire(t('You have new orders!'));
           fetchData();
         }
         dispatch(setLastKnownCount(result));
       } catch (error) {
         console.error('Polling error:', error);
       }
+      // return () => clearInterval(interval);
+      // if (audioRef.current) {
+      //   audioRef?.current?.pause()?.catch(err =>
+      //     console.log("Autoplay error:", err)
+      //   );
+      // }
     }, POLL_INTERVAL);
 
     return () => clearInterval(interval);
@@ -543,6 +556,16 @@ export function OrdersTable(): React.JSX.Element {
 
   return (
     <Paper>
+          <div>
+      {!notificationsEnabled && (
+        <button onClick={() => setNotificationsEnabled(true)}>
+          Enable Order Notifications
+        </button>
+      )}
+
+      {/* Hidden audio element */}
+      <audio ref={audioRef} src="/sounds/ringtone.mp3" preload="auto" />
+    </div>
       <MaterialReactTable
         columns={orderColumns}
         data={orders}
