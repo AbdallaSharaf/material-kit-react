@@ -42,7 +42,7 @@ import { fetchOrderCount, fetchOrders, setLastKnownCount } from '@/redux/slices/
 const POLL_INTERVAL = 0.1 * 60 * 1000; 
 export function OrdersTable(): React.JSX.Element {
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(false);
-  const audioRef = React.useRef(null);
+  const audioRef = React.useRef<HTMLAudioElement>(null);
   // const handleDownload = async (rowData:any) => {
   //   const response = await axios.post('../../../app/api/generate-invoice', rowData, {
   //     responseType: 'blob',
