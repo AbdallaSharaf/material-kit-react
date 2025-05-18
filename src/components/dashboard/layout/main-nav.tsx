@@ -22,6 +22,7 @@ import { AppDispatch, RootState } from '@/redux/store/store';
 import { fetchUserData, restoreSession } from '@/redux/slices/authSlice';
 import { useRouter } from 'next/navigation';
 import MobileNavWrapper from './MobileNavWrapper';
+import GlobalOrderNotification from '@/components/core/GlobalOrderNotification';
 
 export function MainNav(): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);
@@ -90,6 +91,8 @@ export function MainNav(): React.JSX.Element {
                 </IconButton>
               </Badge>
             </Tooltip> */}
+          <GlobalOrderNotification />
+
             <Tooltip title="Switch Language">
               <IconButton
                 onClick={languagePopover.handleOpen}
