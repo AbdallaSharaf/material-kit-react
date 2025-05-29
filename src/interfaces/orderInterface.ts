@@ -53,4 +53,5 @@ export interface OrderIn {
 export interface OrderOut {
     _id: string;
     status: string;
+    isPaid: boolean;
   }

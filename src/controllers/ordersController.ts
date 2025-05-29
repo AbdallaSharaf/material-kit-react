@@ -16,7 +16,7 @@ const dispatch = useDispatch<AppDispatch>()
     sorting,
 } = useSelector((state: RootState) => state.orders);
 
-const handleChangeStatus = async (order: OrderOut) => {
+const handleChangeStatus = async (order: { _id: string, status: string }) => {
   try {
       const resultAction = await dispatch(updateOrder({id: order._id, updatedData: {status: order.status}}));
       if (updateOrder.fulfilled.match(resultAction)) {
@@ -42,6 +42,37 @@ const handleChangeStatus = async (order: OrderOut) => {
       });
     }
   };
+
+const handleChangePaymentStatus = async (order: { _id: string, isPaid: boolean }) => {
+  try {
+    const resultAction = await dispatch(
+      updateOrder({
+        id: order._id, 
+        updatedData: { isPaid: order.isPaid }
+      })
+    );
+
+    if (updateOrder.fulfilled.match(resultAction)) {
+      // Update the existing Swal instead of reopening it
+      dispatch(setRefreshData(refreshData + 1));
+    } else {
+      // Update the Swal alert with an error
+      Swal.fire({
+        title: 'Error Updating Payment Status',
+        text: resultAction.payload ? String(resultAction.payload) : 'Unknown error',
+        icon: 'error',
+        showConfirmButton: true,
+      });
+    }
+  } catch (error: any) {
+    Swal.fire({
+      title: 'Unexpected Error',
+      text: error.message,
+      icon: 'error',
+      showConfirmButton: true,
+    });
+  }
+};
 
 
   const fetchData = async () => {
@@ -82,5 +113,6 @@ const handleChangeStatus = async (order: OrderOut) => {
         fetchData,
         fetchOptions,
         handleChangeStatus,
+        handleChangePaymentStatus
       };
 }

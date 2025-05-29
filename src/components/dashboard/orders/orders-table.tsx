@@ -211,7 +211,7 @@ export function OrdersTable(): React.JSX.Element {
     }
   };
   const t = useTranslations("common")
-  const { fetchData, handleChangeStatus } = useOrderHandlers();
+  const { fetchData, handleChangeStatus, handleChangePaymentStatus } = useOrderHandlers();
   const dispatch = useDispatch<AppDispatch>();
   const locale = useLocale() as "en" | "ar"
   const { refreshData, loading, orders, rowCount, pagination, columnFilters, searchQuery } = useSelector(
@@ -405,12 +405,76 @@ export function OrdersTable(): React.JSX.Element {
       header: t('Payment Status'),
       size: 155,
       filterVariant: 'checkbox',
-      Cell: ({ cell }) => {
-        const value = cell.getValue<boolean>();
-        const label = value ? t('Paid') : t('Unpaid');
-        const color: ChipProps['color'] = value ? 'success' : 'warning';
+      Cell: ({ cell, row }) => {
+        const isPaid = cell.getValue<boolean>();
+        const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+        const open = Boolean(anchorEl);
 
-        return <Chip label={label} color={color} size="small"  />;
+        const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
+          setAnchorEl(event.currentTarget);
+        };
+
+        const handleCloseMenu = () => {
+          setAnchorEl(null);
+        };
+
+        const handlePaymentStatusChange = async (newStatus: boolean) => {
+          handleCloseMenu();
+          try {
+            // Assuming you have a function to handle payment status updates
+            await handleChangePaymentStatus({ 
+              _id: row.original._id, 
+              isPaid: newStatus 
+            });
+          } catch (error) {
+            console.error('Failed to update payment status:', error);
+          }
+        };
+
+        const label = isPaid ? t('Paid') : t('Unpaid');
+        const color: ChipProps['color'] = isPaid ? 'success' : 'warning';
+
+        return (
+          <>
+            <Chip
+              label={label}
+              color={color}
+              size="small"
+              onDoubleClick={handleOpenMenu}
+              sx={{ cursor: 'pointer' }}
+            />
+            <Menu 
+              anchorEl={anchorEl} 
+              open={open} 
+              onClose={handleCloseMenu}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+            >
+              <MenuItem onClick={() => handlePaymentStatusChange(true)}>
+                <Chip 
+                  label={t('Paid')} 
+                  color="success" 
+                  size="small" 
+                  sx={{ mr: 1 }} 
+                />
+              </MenuItem>
+              <MenuItem onClick={() => handlePaymentStatusChange(false)}>
+                <Chip 
+                  label={t('Unpaid')} 
+                  color="warning" 
+                  size="small" 
+                  sx={{ mr: 1 }} 
+                />
+              </MenuItem>
+            </Menu>
+          </>
+        );
       },
     },
     {
